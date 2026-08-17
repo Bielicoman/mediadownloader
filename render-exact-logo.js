@@ -2,40 +2,24 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
-// 1. Create pixel-perfect SVG matching user image
+// 1. Official Premiere + Download Arrow SVG Logo
 const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <defs>
-    <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#38bdf8" />
-      <stop offset="50%" stop-color="#0284c7" />
-      <stop offset="100%" stop-color="#0369a1" />
-    </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#0284c7" flood-opacity="0.4" />
-    </filter>
-  </defs>
-
-  <!-- Squircle Rounded Rect -->
-  <rect x="32" y="32" width="448" height="448" rx="112" ry="112" fill="url(#cloudGrad)" filter="url(#glow)" />
-  <rect x="32" y="32" width="448" height="448" rx="112" ry="112" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="6" />
-
-  <!-- White Cloud with Arrow -->
-  <g fill="#ffffff">
-    <!-- Cloud Silhouette -->
-    <path d="M380 270c0-11-4-21-10-30-2-3-4-5-7-7-1-1-2-2-4-3 1-5 2-11 2-16 0-44-36-80-80-80-36 0-66 24-76 57-9-6-19-9-31-9-30 0-54 24-54 54 0 4 1 8 2 12-25 8-42 31-42 58 0 33 27 60 60 60h200c44 0 80-36 80-80 0-6-1-11-2-16h2z" />
-  </g>
-
-  <!-- Cutout Arrow (Cyan/Blue Arrow inside Cloud) -->
-  <g fill="url(#cloudGrad)">
-    <!-- Stem -->
-    <rect x="234" y="220" width="44" height="60" rx="4" />
-    <!-- Pointer -->
-    <polygon points="210,270 302,270 256,325" />
+  <!-- Adobe Premiere Pro Deep Navy Background with Blue Border -->
+  <rect x="24" y="24" width="464" height="464" rx="104" ry="104" fill="#00005b" stroke="#0066ff" stroke-width="20" />
+  
+  <!-- Classic Premiere Typography 'Pr' -->
+  <text x="75" y="325" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="220" font-weight="900" fill="#99c2ff" letter-spacing="-6">Pr</text>
+  
+  <!-- Sleek Cyan Download Arrow & Dock Platform -->
+  <g fill="#00d2ff" transform="translate(365, 235)">
+    <path d="M-18 -65 h36 v70 h32 L0 68 L-50 5 h32 Z" />
+    <rect x="-46" y="86" width="92" height="16" rx="5" />
   </g>
 </svg>`;
 
-// Write SVG icons
 const rootDir = 'd:\\IA\\02_Plugins\\ADOBE PREMIERE\\MediaDownloader';
+
+// Write SVG icons
 fs.writeFileSync(path.join(rootDir, 'favicon.svg'), svgContent);
 fs.writeFileSync(path.join(rootDir, 'website', 'favicon.svg'), svgContent);
 fs.writeFileSync(path.join(rootDir, 'com.alexascencio.mediadownloader', 'icons', 'icon.svg'), svgContent);
@@ -99,11 +83,11 @@ function crc32(buf) {
     return (crc ^ (-1)) >>> 0;
 }
 
-function renderExactIcon(size) {
+function renderOfficialPrIcon(size) {
     const buf = Buffer.alloc(size * size * 4);
     const cx = size / 2;
     const cy = size / 2;
-    const cornerR = size * 0.28; // Squircle roundness
+    const cornerR = size * 0.22; // Squircle roundness
 
     for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
@@ -116,43 +100,56 @@ function renderExactIcon(size) {
             const distBox = Math.sqrt(hx * hx + hy * hy);
 
             if (distBox <= cornerR) {
-                // Vibrant Blue to Cyan Gradient
-                const t = y / size;
-                const bgR = Math.round(56 * (1 - t) + 2 * t);
-                const bgG = Math.round(189 * (1 - t) + 132 * t);
-                const bgB = Math.round(248 * (1 - t) + 199 * t);
+                // Outer Border or Dark Blue Background
+                const isBorder = (distBox > cornerR - Math.max(1.5, size * 0.04));
+                let bgR = 0;
+                let bgG = 0;
+                let bgB = 91; // #00005b
+
+                if (isBorder) {
+                    bgR = 0; bgG = 102; bgB = 255; // #0066ff
+                }
 
                 buf[idx] = bgR;
                 buf[idx + 1] = bgG;
                 buf[idx + 2] = bgB;
                 buf[idx + 3] = 255;
 
-                // Normalized coordinate for cloud drawing
+                // Normalized coordinate for 'P' and 'r' and Download Arrow
                 const nx = (x - cx) / (size * 0.5);
                 const ny = (y - cy) / (size * 0.5);
 
-                // Cloud body geometry
-                const inMain = (Math.pow(nx, 2) + Math.pow(ny + 0.12, 2)) < 0.15;
-                const inLeft = (Math.pow(nx + 0.28, 2) + Math.pow(ny - 0.02, 2)) < 0.10;
-                const inRight = (Math.pow(nx - 0.28, 2) + Math.pow(ny - 0.02, 2)) < 0.09;
-                const inBase = (Math.abs(nx) <= 0.38 && ny >= -0.05 && ny <= 0.22);
+                // Draw 'P'
+                // Stem of P
+                const inPStem = (nx >= -0.75 && nx <= -0.55 && ny >= -0.45 && ny <= 0.45);
+                // Top loop of P
+                const inPLoopTop = (nx >= -0.75 && nx <= -0.22 && ny >= -0.45 && ny <= -0.28);
+                const inPLoopBottom = (nx >= -0.75 && nx <= -0.22 && ny >= -0.12 && ny <= 0.05);
+                const inPLoopRight = (nx >= -0.36 && nx <= -0.20 && ny >= -0.45 && ny <= 0.05);
+                const inP = inPStem || inPLoopTop || inPLoopBottom || inPLoopRight;
 
-                if (inMain || inLeft || inRight || inBase) {
-                    // Arrow cutout
-                    const inArrowStem = (Math.abs(nx) <= 0.08 && ny >= -0.08 && ny <= 0.10);
-                    const inArrowHead = (ny >= 0.05 && ny <= 0.25 && Math.abs(nx) <= (0.25 - ny) * 0.9);
+                // Draw 'r'
+                // Stem of r
+                const inRStem = (nx >= -0.15 && nx <= 0.02 && ny >= -0.15 && ny <= 0.45);
+                // Hook of r
+                const inRHook = (nx >= -0.15 && nx <= 0.20 && ny >= -0.15 && ny <= -0.01);
+                const inR = inRStem || inRHook;
 
-                    if (inArrowStem || inArrowHead) {
-                        // Blue cutout inside cloud
-                        buf[idx] = bgR;
-                        buf[idx + 1] = bgG;
-                        buf[idx + 2] = bgB;
-                    } else {
-                        // Crisp White Cloud
-                        buf[idx] = 255;
-                        buf[idx + 1] = 255;
-                        buf[idx + 2] = 255;
-                    }
+                if (inP || inR) {
+                    buf[idx] = 153;     // #99c2ff
+                    buf[idx + 1] = 194;
+                    buf[idx + 2] = 255;
+                }
+
+                // Draw Download Arrow on the right
+                const inArrowStem = (nx >= 0.35 && nx <= 0.49 && ny >= -0.38 && ny <= 0.10);
+                const inArrowHead = (ny >= 0.05 && ny <= 0.35 && Math.abs(nx - 0.42) <= (0.35 - ny) * 0.9);
+                const inArrowBase = (nx >= 0.25 && nx <= 0.59 && ny >= 0.42 && ny <= 0.52);
+
+                if (inArrowStem || inArrowHead || inArrowBase) {
+                    buf[idx] = 0;       // #00d2ff
+                    buf[idx + 1] = 210;
+                    buf[idx + 2] = 255;
                 }
             } else {
                 buf[idx] = 0; buf[idx + 1] = 0; buf[idx + 2] = 0; buf[idx + 3] = 0;
@@ -162,9 +159,9 @@ function renderExactIcon(size) {
     return buf;
 }
 
-const fav32 = createPNG(32, 32, renderExactIcon(32));
-const fav128 = createPNG(128, 128, renderExactIcon(128));
-const fav512 = createPNG(512, 512, renderExactIcon(512));
+const fav32 = createPNG(32, 32, renderOfficialPrIcon(32));
+const fav128 = createPNG(128, 128, renderOfficialPrIcon(128));
+const fav512 = createPNG(512, 512, renderOfficialPrIcon(512));
 
 // Save in all locations
 [
@@ -187,4 +184,4 @@ const fav512 = createPNG(512, 512, renderExactIcon(512));
     }
 });
 
-console.log('🎉 Exact logo generated as SVG, ICO, PNG and deployed to website favicon and ZXP plugin!');
+console.log('🎉 Official Adobe Premiere + Download Arrow icon generated as SVG, ICO, PNG and deployed to website favicon and ZXP plugin!');
