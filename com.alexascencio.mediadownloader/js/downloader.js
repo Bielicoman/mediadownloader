@@ -385,14 +385,11 @@
                         args.push("--cookies", cookiesPath);
                     }
 
-                    var isYouTube = (candidateId && (candidateId.length === 11 || url.indexOf("youtu") !== -1));
-                    if (isYouTube) {
-                        // YouTube: Aceleração Android CDN sem throttling de velocidade
-                        args.push(
-                            "--extractor-args", "youtube:player_client=android,web",
-                            "--concurrent-fragments", "16"
-                        );
-                    } else if (aria2 && aria2.found && aria2.path) {
+                    // Adiciona runtime Node.js nativo para decodificar assinaturas e desbloquear todas as resoluções (4K, 1080p60)
+                    var nodeExecutable = (typeof process !== "undefined" && process.execPath) ? process.execPath : "node";
+                    args.push("--js-runtimes", "node:" + nodeExecutable);
+
+                    if (aria2 && aria2.found && aria2.path) {
                         // Outras plataformas: Acelerador multi-conexão
                         args.push(
                             "--downloader", aria2.path,
