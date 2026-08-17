@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaDownloader Pro — Plugin de Download Direto para Adobe Premiere Pro</title>
+    <meta name="description" content="O plugin definitivo para editores de vídeo no Adobe Premiere Pro. Baixe vídeos em 4K, 1440p, Reels e TikTok direto na Timeline em segundos com compatibilidade 100% garantida.">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="MediaDownloader Pro — Plugin para Adobe Premiere Pro">
+    <meta property="og:description" content="Baixe e importe vídeos em 4K do YouTube, Instagram Reels e TikTok direto para sua Timeline no Premiere Pro sem sair da edição.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=1200&q=80">
+    <meta name="theme-color" content="#060709">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <!-- Sticky Header -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="#" class="brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                </div>
+                <span>MediaDownloader<span style="color:var(--accent-cyan)">Pro</span></span>
+                <span class="brand-version">v1.0.0</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="#features">Recursos</a>
+                <a href="#simulator">Simulador</a>
+                <a href="#comparison">Comparativo</a>
+                <a href="#install">Instalação</a>
+                <a href="#faq">FAQ</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="downloads/MediaDownloader.zxp" class="btn btn-primary" download>
+                    <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Download Grátis
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-pill">
+                <span class="dot"></span>
+                <span>Compatível com Premiere Pro 2020 até 2026+</span>
+            </div>
+
+            <h1 class="hero-title">
+                Baixe e importe vídeos de qualquer plataforma <span class="gradient-text">direto na sua Timeline</span>
+            </h1>
+
+            <p class="hero-subtitle">
+                O plugin CEP nativo que elimina sites cheios de anúncios e downloads lentos. Baixe em 4K UHD, Reels e TikTok com vídeo e áudio 100% sincronizados na velocidade da luz.
+            </p>
+
+            <div class="hero-ctas">
+                <a href="downloads/MediaDownloader.zxp" class="btn btn-primary btn-lg" download>
+                    <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Baixar Pacote Oficial (.ZXP)
+                </a>
+                <a href="downloads/Instalar-Windows.bat" class="btn btn-secondary btn-lg" download>
+                    <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+                    Instalador Rápido Windows (.bat)
+                </a>
+            </div>
+
+            <div class="hero-badges">
+                <div class="hero-badge-item">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <span>100% Gratuito & Open Source</span>
+                </div>
+                <div class="hero-badge-item">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <span>YouTube 4K, 1440p & Shorts</span>
+                </div>
+                <div class="hero-badge-item">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <span>Instagram Reels & TikTok</span>
+                </div>
+                <div class="hero-badge-item">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <span>Zero Erro [WinError 32]</span>
+                </div>
+            </div>
+
+            <!-- Interactive Mockup Simulator -->
+            <div id="simulator" class="mockup-wrapper">
+                <div class="mockup-glow"></div>
+                <div class="mockup-window">
+                    <div class="window-header">
+                        <div class="window-dots">
+                            <div class="window-dot red"></div>
+                            <div class="window-dot yellow"></div>
+                            <div class="window-dot green"></div>
+                        </div>
+                        <div class="window-title">
+                            <span class="premiere-tag">Pr</span>
+                            <span>Adobe Premiere Pro — Media Downloader Panel</span>
+                        </div>
+                        <div style="font-size:10px; color:var(--accent-emerald); font-weight:700;">● Conectado</div>
+                    </div>
+
+                    <div class="simulator-body">
+                        <!-- Simulated Extension Left Column -->
+                        <div class="sim-panel">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:11px; font-weight:800; color:var(--text-pure); letter-spacing:0.05em;">MEDIA DOWNLOADER</span>
+                                <div style="display:flex; gap:4px;">
+                                    <button onclick="loadSimDemo(0)" class="sim-paste-btn" title="YouTube 4K">YouTube</button>
+                                    <button onclick="loadSimDemo(1)" class="sim-paste-btn" title="Instagram Reels">Reels</button>
+                                    <button onclick="loadSimDemo(2)" class="sim-paste-btn" title="TikTok">TikTok</button>
+                                </div>
+                            </div>
+
+                            <div class="sim-input-box">
+                                <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                                <input id="simInput" class="sim-input" value="https://www.youtube.com/watch?v=z7AofehqASc" readonly />
+                            </div>
+
+                            <div class="sim-preview-card">
+                                <img id="simThumb" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300&q=80" class="sim-thumb" alt="thumb" />
+                                <div class="sim-meta">
+                                    <div id="simTitle" class="sim-meta-title">Cena de Ação 4K UHD Master (2160p60)</div>
+                                    <div id="simChannel" class="sim-meta-sub">YouTube • 4K UHD</div>
+                                </div>
+                            </div>
+
+                            <div class="sim-action-row">
+                                <select class="sim-select">
+                                    <option>🎬 Máxima Qualidade (4K/HD)</option>
+                                    <option>Quad HD 1440p (2K)</option>
+                                    <option>Full HD 1080p</option>
+                                    <option>Apple ProRes 422</option>
+                                    <option>Áudio WAV 24-bit</option>
+                                </select>
+                                <button id="simBtnDownload" class="sim-download-btn">
+                                    <svg style="width:12px;height:12px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                    Baixar Mídia
+                                </button>
+                            </div>
+
+                            <div class="sim-toggles">
+                                <div>📁 Bin (_Downloads): <span>ATIVO</span></div>
+                                <div>🎬 Timeline: <span>PLAYHEAD</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Simulated Output Right Column -->
+                        <div class="sim-screen">
+                            <div>
+                                <div class="sim-log-header">
+                                    <span>CONEXÃO COM PREMIERE PRO</span>
+                                    <span style="color:var(--accent-cyan)">ExtendScript API</span>
+                                </div>
+                                <div id="simLogLines" class="sim-log-lines">
+                                    <div class="sim-log-line">Clique em <strong>Baixar Mídia</strong> para testar a simulação interativa...</div>
+                                </div>
+                            </div>
+
+                            <div id="simTimelineBanner" class="sim-timeline-banner" style="display:none;">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                                <div>Vídeo inserido na Timeline do Premiere no Playhead em camada vazia!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Diferenciais de Engenharia</span>
+                <h2 class="section-title">Construído especificamente para o workflow de edição profissional</h2>
+                <p>Chega de baixar vídeos corrompidos ou que só importam áudio. O MediaDownloader Pro resolve todos os gargalos conhecidos.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM8 15c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1v-2c0-.55.45-1 1-1h2c.55 0 1 .45 1 1v2zm0-4c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1h2c.55 0 1 .45 1 1v2zm12 4c0 .55-.45 1-1 1h-6c-.55 0-1-.45-1-1v-2c0-.55.45-1 1-1h6c.55 0 1 .45 1 1v2zm0-4c0 .55-.45 1-1 1h-6c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1h6c.55 0 1 .45 1 1v2z"/></svg>
+                    </div>
+                    <h3>Resolução 4K UHD & 1440p Real</h3>
+                    <p>Baixe a máxima resolução absoluta disponível no YouTube (2160p 4K, 1440p 2K e 1080p60) sem ficar limitado a 1080p por causa de formatos antigos.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                    </div>
+                    <h3>Compatibilidade 100% de Codecs</h3>
+                    <p>Instagram Reels e TikTok utilizam VP9 em containers MP4 que o Premiere não decodifica. Nosso motor transcodifica automaticamente para H.264 + AAC 48kHz.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    </div>
+                    <h3>Proteção Anti-Colisão [WinError 32]</h3>
+                    <p>Se o arquivo estiver aberto ou bloqueado pelo Premiere Pro, o plugin detecta o travamento e gera automaticamente um sufixo numerado, evitando erros de gravação.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                    </div>
+                    <h3>Download na Pasta do Projeto</h3>
+                    <p>Salva automaticamente todos os downloads na subpasta <code>_Downloads</code> do projeto <code>.prproj</code> que você estiver editando no momento.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M13 2.05v3.03c3.39.49 6 3.39 6 6.92 0 .9-.18 1.75-.48 2.54l2.6 1.53c.56-1.24.88-2.62.88-4.07 0-5.18-3.95-9.45-9-9.95zM12 19c-3.87 0-7-3.13-7-7 0-3.53 2.61-6.43 6-6.92V2.05c-5.05.5-9 4.77-9 9.95 0 5.52 4.47 10 9.99 10 3.31 0 6.24-1.61 8.01-4.09l-2.45-1.45C16.32 17.81 14.31 19 12 19z"/></svg>
+                    </div>
+                    <h3>Motor Turbo 16-Sockets</h3>
+                    <p>Conexões TCP paralelas com fragmentação concorrente de 16 vias e suporte embutido ao acelerador Aria2c para downloads ultra-rápidos.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>
+                    </div>
+                    <h3>Inserção em Camada Vazia</h3>
+                    <p>Insere a mídia no Playhead da Timeline localizando automaticamente a primeira trilha de vídeo e áudio livre, sem nunca sobrescrever seu material.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Matrix -->
+    <section id="comparison" class="section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Tabela Comparativa</span>
+                <h2 class="section-title">Por que o MediaDownloader Pro é incomparável?</h2>
+                <p>Veja a diferença entre utilizar sites de download na web e ter um plugin nativo integrado ao Adobe Premiere Pro.</p>
+            </div>
+
+            <div class="comparison-card">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Recurso / Capacidade</th>
+                            <th>Sites de Download Web</th>
+                            <th>Extensões Genéricas</th>
+                            <th class="highlight">MediaDownloader Pro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Resolução 4K & 1440p Real</strong></td>
+                            <td><span class="badge-cross">✕ Limitado a 720p/1080p</span></td>
+                            <td><span class="badge-cross">✕ Não suporta 1440p/4K</span></td>
+                            <td class="highlight"><span class="badge-check">✓ 4K UHD & 1440p Nativo</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Instagram Reels & TikTok com Vídeo</strong></td>
+                            <td><span class="badge-cross">✕ Importa só o áudio</span></td>
+                            <td><span class="badge-cross">✕ Codec VP9 corrompido</span></td>
+                            <td class="highlight"><span class="badge-check">✓ Auto-Conversão H.264</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Inserção Direta no Playhead</strong></td>
+                            <td><span class="badge-cross">✕ Manual via Explorer</span></td>
+                            <td><span class="badge-cross">✕ Apenas baixa em Downloads</span></td>
+                            <td class="highlight"><span class="badge-check">✓ 1-Click na Timeline</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Salvar na Pasta do Projeto (.prproj)</strong></td>
+                            <td><span class="badge-cross">✕ Não</span></td>
+                            <td><span class="badge-cross">✕ Não</span></td>
+                            <td class="highlight"><span class="badge-check">✓ Automático no Projeto</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Prevenção de Erro [WinError 32]</strong></td>
+                            <td><span class="badge-cross">✕ Trava o arquivo</span></td>
+                            <td><span class="badge-cross">✕ Erro de processo</span></td>
+                            <td class="highlight"><span class="badge-check">✓ Smart Versioning Shield</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Anúncios / Popups / Malware</strong></td>
+                            <td><span class="badge-cross">✕ Cheio de popups</span></td>
+                            <td><span class="badge-cross">✕ Limite de uso diário</span></td>
+                            <td class="highlight"><span class="badge-check">✓ 100% Limpo & Grátis</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Guide -->
+    <section id="install" class="section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Instalação em 1 Minuto</span>
+                <h2 class="section-title">Como instalar e começar a usar hoje mesmo</h2>
+                <p>Compatível com Windows 10/11 e macOS no Adobe Premiere Pro 2020 a 2026+.</p>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Baixe o Pacote Oficial</h3>
+                    <p>Baixe o arquivo <code>MediaDownloader.zxp</code> ou o instalador automático para Windows <code>Instalar-Windows.bat</code>.</p>
+                    <div style="margin-top:16px;">
+                        <a href="downloads/MediaDownloader.zxp" class="btn btn-cyan" style="width:100%" download>Download .ZXP</a>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Instalação Automática ou Manual</h3>
+                    <p>No Windows, dê dois cliques em <code>Instalar-Windows.bat</code>. No macOS/Windows via ZXP, use o <strong>ZXP Installer</strong> ou <strong>Anastasiy's Extension Manager</strong>.</p>
+                    <div class="code-snippet">
+                        <span>node install.js</span>
+                        <button class="btn-copy-code" onclick="copySnippet('node install.js', this)">Copiar</button>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Abra no Premiere Pro</h3>
+                    <p>Abra o Premiere Pro e acesse o menu superior em:</p>
+                    <div class="code-snippet" style="color:var(--text-pure)">
+                        <span>Janela > Extensões > Media Downloader</span>
+                    </div>
+                    <p style="font-size:12px; margin-top:10px; color:var(--accent-emerald);">🎉 Pronto para colar links e editar!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Dúvidas Frequentes</span>
+                <h2 class="section-title">Perguntas e Respostas</h2>
+            </div>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Como baixar vídeos com Restrição de Idade (18+) no YouTube?</span>
+                        <svg class="faq-icon" style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </div>
+                    <div class="faq-answer">
+                        O YouTube exige autenticação para vídeos 18+. Exporte seus cookies do YouTube usando a extensão gratuita <em>Get cookies.txt LOCALLY</em> no Chrome/Edge. Em seguida, no plugin, abra as Configurações (⚙️), clique em Selecionar no campo de Cookies e aponte para o arquivo <code>cookies.txt</code>.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Por que o plugin não sobrepõe clipes na minha Timeline?</span>
+                        <svg class="faq-icon" style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </div>
+                    <div class="faq-answer">
+                        Implementamos uma lógica de proteção de timeline no ExtendScript. O plugin escaneia as trilhas de vídeo e áudio no ponto exato da agulha (Playhead) e insere o clipe exclusivamente na primeira trilha desocupada, protegendo seus cortes anteriores.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Onde os arquivos de vídeo baixados ficam salvos?</span>
+                        <svg class="faq-icon" style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </div>
+                    <div class="faq-answer">
+                        Por padrão, o plugin detecta a pasta do projeto do Premiere que você está editando e salva tudo dentro de <code>[Pasta_Do_Projeto]\_Downloads\</code>. Se o projeto ainda não foi salvo em disco, o fallback padrão é <code>Vídeos\PremiereDownloads</code>.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Qual a diferença entre o formato MP4 H.264 e Apple ProRes?</span>
+                        <svg class="faq-icon" style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </div>
+                    <div class="faq-answer">
+                        O MP4 (H.264 + AAC) é ideal para agilidade e menor tamanho de arquivo. O Apple ProRes 422 HQ (MOV com áudio PCM 24-bit) é uma master de edição sem compressão pesada de CPU, ideal para computadores que buscam fluidez máxima na timeline.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="section">
+        <div class="container">
+            <div class="cta-box">
+                <h2>Acelere sua edição no Premiere Pro agora</h2>
+                <p>Baixe gratuitamente o plugin e nunca mais perca tempo abrindo o navegador para baixar referências e clipes.</p>
+                <div class="hero-ctas">
+                    <a href="downloads/MediaDownloader.zxp" class="btn btn-primary btn-lg" download>
+                        <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                        Download MediaDownloader Pro (.ZXP)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div>
+                <strong>MediaDownloader Pro</strong> — Plugin Oficial para Adobe Premiere Pro.
+                <div style="font-size:11px; margin-top:4px;">Desenvolvido com tecnologia Adobe CEP, Node.js, yt-dlp e FFmpeg.</div>
+            </div>
+            <div>
+                <span>© 2026 Alex Ascencio. Todos os direitos reservados.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

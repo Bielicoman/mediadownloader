@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionManifest
+	Version="7.0"
+	ExtensionBundleId="com.alexascencio.mediadownloader"
+	ExtensionBundleVersion="1.0.0"
+	ExtensionBundleName="Media Downloader Pro"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<ExtensionList>
+		<Extension Id="com.alexascencio.mediadownloader.panel" Version="1.0.0" />
+	</ExtensionList>
+
+	<ExecutionEnvironment>
+		<HostList>
+			<!-- Adobe Premiere Pro 2020 (v14.0) a 2026+ (v99.9) -->
+			<Host Name="PPRO" Version="[14.0,99.9]" />
+		</HostList>
+		<LocaleList>
+			<Locale Code="All" />
+		</LocaleList>
+		<RequiredRuntimeList>
+			<RequiredRuntime Name="CSXS" Version="9.0" />
+		</RequiredRuntimeList>
+	</ExecutionEnvironment>
+
+	<DispatchInfoList>
+		<!-- Painel Principal Acoplável (Dockable Sidebar Panel) -->
+		<Extension Id="com.alexascencio.mediadownloader.panel">
+			<DispatchInfo>
+				<Resources>
+					<MainPath>./index.html</MainPath>
+					<ScriptPath>./jsx/host.jsx</ScriptPath>
+					<CEFCommandLine>
+						<Parameter>--enable-nodejs</Parameter>
+						<Parameter>--mixed-context</Parameter>
+						<Parameter>--allow-file-access</Parameter>
+						<Parameter>--allow-file-access-from-files</Parameter>
+					</CEFCommandLine>
+				</Resources>
+				<Lifecycle>
+					<AutoVisible>true</AutoVisible>
+				</Lifecycle>
+				<UI>
+					<Type>Panel</Type>
+					<Menu>Media Downloader</Menu>
+					<Geometry>
+						<Size><Height>620</Height><Width>340</Width></Size>
+						<MinSize><Height>200</Height><Width>260</Width></MinSize>
+						<MaxSize><Height>1600</Height><Width>1400</Width></MaxSize>
+					</Geometry>
+				</UI>
+			</DispatchInfo>
+		</Extension>
+	</DispatchInfoList>
+</ExtensionManifest>

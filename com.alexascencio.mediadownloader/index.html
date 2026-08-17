@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Downloader Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Minimal Obsidian Header -->
+        <header class="app-header">
+            <div class="brand-badge">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                </div>
+                <span>MEDIA DOWNLOADER</span>
+                <span class="brand-status-dot" id="systemStatusDot" title="Pronto para o Premiere Pro"></span>
+            </div>
+            <div class="header-actions">
+                <button id="btnRefresh" class="icon-btn" title="Atualizar Verificação">
+                    <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                </button>
+                <button id="btnSettings" class="icon-btn" title="Configurações">
+                    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Downloader Card -->
+        <div class="main-card">
+            <!-- Unified URL Input Capsule -->
+            <div class="input-capsule">
+                <div class="input-platform-icon" id="inputPlatformIcon">
+                    <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                </div>
+                <input type="text" id="urlInput" class="url-input" placeholder="Cole o link do YouTube, Instagram, TikTok ou Web..." />
+                <button id="btnPaste" class="btn-paste" title="Colar da Área de Transferência">
+                    <svg viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/></svg>
+                    Colar
+                </button>
+            </div>
+
+            <!-- Instant Live Preview Box -->
+            <div id="previewBox" class="preview-box">
+                <div class="preview-thumb-container">
+                    <img id="previewThumb" class="preview-thumb" src="" alt="Thumbnail" />
+                    <span id="previewDuration" class="preview-duration">00:00</span>
+                </div>
+                <div class="preview-details">
+                    <div id="previewTitle" class="preview-title">Carregando informações...</div>
+                    <div class="preview-meta">
+                        <span id="previewMeta">Autor</span>
+                        <span id="previewPlatform" class="preview-platform-tag">Vídeo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Row: Quality Selector + Download Button -->
+            <div class="controls-row">
+                <!-- Custom Obsidian Select Dropdown -->
+                <div class="custom-select-wrapper" id="customSelectWrapper">
+                    <input type="hidden" id="selectPreset" value="best" />
+                    <button type="button" class="custom-select-trigger" id="customSelectTrigger">
+                        <div class="select-current-option">
+                            <svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+                            <span class="opt-label" id="currentOptionLabel">Máxima Qualidade (4K/HD)</span>
+                        </div>
+                        <svg class="chevron-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    
+                    <div class="custom-select-dropdown" id="customSelectDropdown">
+                        <div class="select-option active" data-value="best" data-label="Máxima Qualidade (4K/HD)">
+                            <svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+                            <div class="opt-text">
+                                <span class="opt-title">Máxima Qualidade Original</span>
+                                <span class="opt-desc">4K 2160p, 1440p ou Maior</span>
+                            </div>
+                            <span class="opt-badge">4K / MAX</span>
+                        </div>
+
+                        <div class="select-option" data-value="1440p" data-label="Quad HD 1440p (2K)">
+                            <svg class="opt-icon" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
+                            <div class="opt-text">
+                                <span class="opt-title">Quad HD 1440p MP4</span>
+                                <span class="opt-desc">2K / 2560x1440 H.264</span>
+                            </div>
+                            <span class="opt-badge">1440p</span>
+                        </div>
+                        
+                        <div class="select-option" data-value="1080p" data-label="Full HD 1080p MP4">
+                            <svg class="opt-icon" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
+                            <div class="opt-text">
+                                <span class="opt-title">Full HD 1080p MP4</span>
+                                <span class="opt-desc">H.264 / 1920x1080</span>
+                            </div>
+                            <span class="opt-badge">1080p</span>
+                        </div>
+
+                        <div class="select-option" data-value="720p" data-label="Rascunho 720p MP4">
+                            <svg class="opt-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 14H9v-6h2v6zm6 0h-2v-6h2v6z"/></svg>
+                            <div class="opt-text">
+                                <span class="opt-title">Rascunho 720p MP4</span>
+                                <span class="opt-desc">Otimizado para Edição Leve</span>
+                            </div>
+                            <span class="opt-badge">720p</span>
+                        </div>
+
+                        <div class="select-option" data-value="prores" data-label="Apple ProRes 422 HQ">
+                            <svg class="opt-icon" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+                            <div class="opt-text">
+                                <span class="opt-title">Apple ProRes 422 HQ</span>
+                                <span class="opt-desc">MOV Master de Edição</span>
+                            </div>
+                            <span class="opt-badge prores">PRORES</span>
+                        </div>
+
+                        <div class="select-divider"></div>
+
+                        <div class="select-option" data-value="audio_wav" data-label="Áudio Master WAV 24-bit">
+                            <svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>
+                            <div class="opt-text">
+                                <span class="opt-title">Áudio Master WAV</span>
+                                <span class="opt-desc">PCM 24-bit / 48.000 Hz</span>
+                            </div>
+                            <span class="opt-badge audio">WAV</span>
+                        </div>
+
+                        <div class="select-option" data-value="audio_mp3" data-label="Áudio MP3 320kbps">
+                            <svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                            <div class="opt-text">
+                                <span class="opt-title">Áudio MP3</span>
+                                <span class="opt-desc">320 kbps / 48.000 Hz Estéreo</span>
+                            </div>
+                            <span class="opt-badge audio">MP3</span>
+                        </div>
+
+                        <div class="select-option" data-value="thumbnail" data-label="Capa Thumbnail PNG">
+                            <svg class="opt-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1 2 .9 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                            <div class="opt-text">
+                                <span class="opt-title">Capa Thumbnail PNG</span>
+                                <span class="opt-desc">Imagem em Alta Definição</span>
+                            </div>
+                            <span class="opt-badge">PNG</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btnDownload" class="btn-download-primary">
+                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Baixar Mídia
+                </button>
+            </div>
+
+            <!-- Compact Inline Premiere Pro Toggles -->
+            <div class="toggles-inline-bar">
+                <label class="toggle-chip" title="Importar arquivo diretamente para pasta de projeto">
+                    <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                    <span>Importar Bin (_Downloads)</span>
+                    <span class="switch">
+                        <input type="checkbox" id="toggleImportBin" checked>
+                        <span class="slider"></span>
+                    </span>
+                </label>
+
+                <label class="toggle-chip" title="Inserir clipe na timeline na posição da agulha (Playhead)">
+                    <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></svg>
+                    <span>Inserir na Timeline</span>
+                    <span class="switch">
+                        <input type="checkbox" id="toggleInsertTimeline" checked>
+                        <span class="slider"></span>
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Progress Card -->
+        <div id="progressCard" class="progress-card">
+            <div class="progress-header">
+                <span id="progressTitle" class="progress-title">Baixando...</span>
+                <span id="progressPercent" class="progress-percent">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="progressBarFill" class="progress-bar-fill"></div>
+            </div>
+            <div class="progress-stats">
+                <span id="progressStatus">Conectando...</span>
+                <span id="progressSpeed">-- MB/s</span>
+                <span id="progressEta">ETA --:--</span>
+                <button id="btnCancelDownload" class="btn-cancel-download">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="history-section">
+            <div class="history-header">
+                <span>HISTÓRICO</span>
+                <div class="history-header-actions">
+                    <span id="historyCount" class="history-count">0</span>
+                    <button id="btnClearHistory" class="btn-clear-history" title="Limpar Histórico">Limpar</button>
+                </div>
+            </div>
+            <div id="historyList" class="history-list">
+                <!-- Dynamically populated by app.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Minimal Settings Modal -->
+    <div id="modalSettings" class="modal-backdrop">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <span class="modal-title">Configurações & Diagnóstico</span>
+                <button id="btnCloseSettings" class="icon-btn">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-row">
+                    <label>Pasta de Destino (Disco):</label>
+                    <input type="text" id="inputDownloadDir" class="url-input" style="background:var(--bg-input); border:1px solid var(--border-default); padding:6px 8px; border-radius:var(--radius-sm);" />
+                </div>
+
+                <div class="modal-row">
+                    <label>Nome do Bin no Premiere Pro:</label>
+                    <input type="text" id="inputBinName" class="url-input" placeholder="_Downloads" value="_Downloads" style="background:var(--bg-input); border:1px solid var(--border-default); padding:6px 8px; border-radius:var(--radius-sm);" />
+                </div>
+
+                <div class="modal-row">
+                    <label>Arquivo de Cookies (Vídeos 18+ / Restrição de Idade):</label>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <input type="text" id="inputCookiesPath" class="url-input" placeholder="Caminho do cookies.txt (opcional)" style="flex:1; background:var(--bg-input); border:1px solid var(--border-default); padding:6px 8px; border-radius:var(--radius-sm); font-size:11px;" />
+                        <label class="btn-secondary" style="cursor:pointer; height:30px; display:inline-flex; align-items:center; justify-content:center; padding:0 10px; font-size:11px; white-space:nowrap; border-radius:var(--radius-sm);">
+                            Selecionar
+                            <input type="file" id="fileCookiesPicker" accept=".txt" style="display:none;" />
+                        </label>
+                    </div>
+                    <small style="color:var(--text-muted); font-size:10px; margin-top:3px; display:block;">Para vídeos com restrição de idade (18+), exporte seus cookies do YouTube (extensão <em>Get cookies.txt</em>) e selecione o arquivo acima.</small>
+                </div>
+
+                <div class="modal-row" style="background:var(--bg-input); padding:10px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                    <div style="font-weight:700; margin-bottom:6px; color:var(--text-main);">Motores de Download:</div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="color:var(--text-muted);">yt-dlp:</span>
+                        <span id="ytDlpStatus" style="font-weight:700;">Verificando...</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="color:var(--text-muted);">FFmpeg:</span>
+                        <span id="ffmpegStatus" style="font-weight:700;">Verificando...</span>
+                    </div>
+                    <button id="btnUpdateYtDlp" class="btn-secondary" style="width:100%;">
+                        Atualizar yt-dlp Oficial
+                    </button>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:6px; border-top:1px solid var(--border-subtle); padding-top:8px;">
+                <button id="btnSaveSettings" class="btn-download-primary" style="height:28px; padding:0 12px;">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="lib/CSInterface.js"></script>
+    <script src="js/bridge.js"></script>
+    <script src="js/binManager.js"></script>
+    <script src="js/downloader.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
