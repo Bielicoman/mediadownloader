@@ -654,7 +654,10 @@
         if (elBtnClearHistory) elBtnClearHistory.addEventListener("click", clearHistory);
         if (elBtnRefresh) elBtnRefresh.addEventListener("click", function () {
             checkEnvironment();
-            showToast("Verificação atualizada.", "info");
+            showToast("Verificando ambiente e atualizações...", "info");
+            if (window.MediaDownloaderUpdater) {
+                window.MediaDownloaderUpdater.check(false);
+            }
         });
 
         if (elFileCookiesPicker) {
