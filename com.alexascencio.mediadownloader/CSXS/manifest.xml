@@ -3,7 +3,7 @@
 	Version="7.0"
 	ExtensionBundleId="com.alexascencio.mediadownloader"
 	ExtensionBundleVersion="1.0.0"
-	ExtensionBundleName="Media Downloader Pro"
+	ExtensionBundleName="Media Downloader"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 >
 	<ExtensionList>
@@ -48,6 +48,13 @@
 						<MinSize><Height>200</Height><Width>260</Width></MinSize>
 						<MaxSize><Height>1600</Height><Width>1400</Width></MaxSize>
 					</Geometry>
+					<Icons>
+						<Icon Type="Normal">./icons/iconNormal.png</Icon>
+						<Icon Type="RollOver">./icons/iconRollOver.png</Icon>
+						<Icon Type="Disabled">./icons/iconDisabled.png</Icon>
+						<Icon Type="DarkNormal">./icons/iconDarkNormal.png</Icon>
+						<Icon Type="DarkRollOver">./icons/iconDarkRollOver.png</Icon>
+					</Icons>
 				</UI>
 			</DispatchInfo>
 		</Extension>

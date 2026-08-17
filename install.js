@@ -1,5 +1,5 @@
 /**
- * install.js - Instala a extensão CEP no Adobe Premiere Pro e ativa o PlayerDebugMode
+ * install.js - Desinstalação Limpa e Instalação a partir do pacote ZXP/ZIP no Premiere Pro
  */
 
 const fs = require('fs');
@@ -11,7 +11,19 @@ const cepDir = path.join(appData, 'Adobe', 'CEP', 'extensions');
 const targetDir = path.join(cepDir, 'com.alexascencio.mediadownloader');
 const sourceDir = path.join(__dirname, 'com.alexascencio.mediadownloader');
 
-console.log('🚀 Instalando Media Downloader Pro no Premiere Pro...');
+console.log('🔄 Desinstalando versão anterior do Media Downloader...');
+
+// 1. Limpeza / Desinstalação completa
+try {
+  if (fs.existsSync(targetDir)) {
+    fs.rmSync(targetDir, { recursive: true, force: true });
+    console.log('🗑️ Versão anterior desinstalada com sucesso!');
+  }
+} catch (e) {
+  console.log('⚠️ Aviso ao limpar diretório:', e.message);
+}
+
+console.log('🚀 Instalando Media Downloader a partir do pacote no Premiere Pro...');
 
 if (!fs.existsSync(cepDir)) {
   fs.mkdirSync(cepDir, { recursive: true });
@@ -32,14 +44,14 @@ function copyDir(src, dest) {
       try {
         fs.copyFileSync(srcPath, destPath);
       } catch (e) {
-        // Skip locked file if identical
+        console.error('Erro ao copiar', srcPath, e.message);
       }
     }
   }
 }
 
 copyDir(sourceDir, targetDir);
-console.log('✅ Arquivos copiados para:', targetDir);
+console.log('✅ Arquivos instalados em:', targetDir);
 
 // Ativa PlayerDebugMode via reg.exe nativo do Windows
 for (let i = 9; i <= 16; i++) {
@@ -47,6 +59,6 @@ for (let i = 9; i <= 16; i++) {
     execSync(`reg.exe add "HKEY_CURRENT_USER\\Software\\Adobe\\CSXS.${i}" /v PlayerDebugMode /t REG_SZ /d "1" /f`, { stdio: 'ignore' });
   } catch (e) {}
 }
-console.log('✅ PlayerDebugMode habilitado no Windows Registry para CSXS.9 até CSXS.16.');
+console.log('✅ PlayerDebugMode habilitado no Windows Registry (CSXS.9 a CSXS.16).');
 console.log('🎉 Instalação concluída com sucesso!');
 console.log('👉 Abra o Premiere Pro e acesse: Janela > Extensões > Media Downloader');

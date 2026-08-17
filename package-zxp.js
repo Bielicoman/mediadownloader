@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
-console.log('📦 Empacotando Media Downloader Pro para ZXP e ZIP (Pure Node.js)...');
+console.log('📦 Empacotando Media Downloader para ZXP e ZIP (Pure Node.js)...');
 
 const extDir = path.join(__dirname, 'com.alexascencio.mediadownloader');
 const zxpOutput = path.join(__dirname, 'MediaDownloader.zxp');

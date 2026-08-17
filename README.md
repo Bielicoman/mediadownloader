@@ -1,4 +1,4 @@
-# MediaDownloader Pro 🎬⚡
+# Media Downloader 🎬⚡
 
 > **Plugin CEP nativo para Adobe Premiere Pro** que permite baixar vídeos em 4K UHD, 1440p, Reels do Instagram e TikTok direto para sua Timeline com 1 clique.
 
