@@ -3,7 +3,7 @@
   "name": "Media Downloader",
   "version": "1.0.0",
   "minPremiereVersion": "2020",
-  "releaseDate": "2026-08-17",
+  "releaseDate": "2026-08-18",
   "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/latest/download/MediaDownloader.zxp",
   "zipUrl": "https://github.com/Bielicoman/mediadownloader/archive/refs/heads/main.zip",
   "mandatory": false,
@@ -13,5 +13,6 @@
     "Transcodificação automática Apple ProRes 422 HQ e áudio master WAV 24-bit",
     "Organização automática de mídias no Bin _Downloads do Premiere Pro",
     "Novo logotipo oficial com seta tática de download e design Obsidian Cinema"
-  ]
+  ],
+  "fullName": "Media Downloader 1.0.0"
 }

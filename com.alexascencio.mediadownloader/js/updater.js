@@ -1,5 +1,5 @@
 /**
- * CEP Universal Auto-Update Engine
+ * CEP Universal Auto-Update Engine & Dynamic Versioning
  * Engineered for Adobe Premiere Pro CEP Extensions
  * (C) 2026 Alex Ascencio.
  */
@@ -13,7 +13,7 @@
         currentVersion: "1.0.0",
         manifestUrl: "https://raw.githubusercontent.com/Bielicoman/mediadownloader/main/version.json",
         fallbackUrl: "https://github.com/Bielicoman/mediadownloader/releases/latest",
-        checkDelayMs: 2500 // Delay after launch to avoid competing with initial UI render
+        checkDelayMs: 2500
     };
 
     class PluginUpdater {
@@ -26,8 +26,26 @@
             this.os = this.isNode ? window.require("os") : null;
             this.latestInfo = null;
 
+            this.loadLocalVersionSync();
             this.initUI();
+            this.checkFirstRunAfterUpdate();
             setTimeout(() => this.check(true), this.config.checkDelayMs);
+        }
+
+        // Attempt to load current version directly from local version.json file if running in CEP
+        loadLocalVersionSync() {
+            if (this.isNode && this.fs && this.path) {
+                try {
+                    const localVerPath = this.path.join(__dirname, "version.json");
+                    if (this.fs.existsSync(localVerPath)) {
+                        const localData = JSON.parse(this.fs.readFileSync(localVerPath, "utf8"));
+                        if (localData && localData.version) {
+                            this.config.currentVersion = localData.version;
+                            if (localData.name) this.config.pluginName = localData.name;
+                        }
+                    }
+                } catch (e) {}
+            }
         }
 
         // Semver comparator: returns 1 if vA > vB, -1 if vA < vB, 0 if equal
@@ -44,7 +62,7 @@
             return 0;
         }
 
-        // Open URL in default OS browser (supporting CEP API & standard browser)
+        // Open URL in default OS browser
         openExternal(url) {
             if (window.cep && window.cep.util && window.cep.util.openURLInDefaultBrowser) {
                 window.cep.util.openURLInDefaultBrowser(url);
@@ -59,6 +77,148 @@
             } else {
                 window.open(url, "_blank");
             }
+        }
+
+        // Build UI elements
+        initUI() {
+            if (document.getElementById("cepUpdaterContainer")) return;
+
+            // Dynamically update any version tag in the HTML header
+            this.syncHeaderVersion();
+
+            const container = document.createElement("div");
+            container.id = "cepUpdaterContainer";
+            container.innerHTML = `
+                <!-- Update Available Badge (Hidden by default) -->
+                <div id="cepUpdateBadge" class="cep-update-badge" style="display: none;" title="Nova versão disponível!">
+                    <span class="badge-dot"></span>
+                    <span id="cepUpdateBadgeText">Update</span>
+                </div>
+
+                <!-- Update Modal -->
+                <div id="cepUpdateModal" class="cep-update-modal-backdrop" style="display: none;">
+                    <div class="cep-update-modal">
+                        <div class="cep-modal-header">
+                            <div class="cep-modal-title-box">
+                                <div class="cep-modal-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2zm0-6h2v4h-2z"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="cep-modal-title">Nova Versão Disponível</h3>
+                                    <span class="cep-modal-subtitle" id="cepModalVersionInfo">Versão ${this.config.currentVersion}</span>
+                                </div>
+                            </div>
+                            <button type="button" class="cep-modal-close" id="cepModalCloseBtn">&times;</button>
+                        </div>
+
+                        <div class="cep-modal-body">
+                            <div class="cep-changelog-card">
+                                <div class="cep-changelog-header">Novidades & Melhorias</div>
+                                <ul class="cep-changelog-list" id="cepChangelogList">
+                                    <li>Melhorias gerais de desempenho e estabilidade.</li>
+                                </ul>
+                            </div>
+
+                            <div id="cepUpdateProgressBox" class="cep-progress-container" style="display:none;">
+                                <div class="cep-progress-bar-bg">
+                                    <div id="cepUpdateProgressBar" class="cep-progress-bar-fill" style="width: 0%;"></div>
+                                </div>
+                                <div id="cepUpdateProgressText" class="cep-progress-status">Preparando atualização...</div>
+                            </div>
+                        </div>
+
+                        <div class="cep-modal-footer">
+                            <button type="button" class="cep-btn-secondary" id="cepBtnRemindLater">Mais Tarde</button>
+                            <button type="button" class="cep-btn-outline" id="cepBtnDownloadZXP">Baixar .ZXP</button>
+                            <button type="button" class="cep-btn-primary" id="cepBtnApplyUpdate">
+                                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                Atualizar Agora
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Celebratory Update Success Modal -->
+                <div id="cepSuccessModal" class="cep-update-modal-backdrop" style="display: none;">
+                    <div class="cep-update-modal cep-success-modal">
+                        <div class="cep-modal-header">
+                            <div class="cep-modal-title-box">
+                                <div class="cep-modal-icon success">
+                                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="cep-modal-title">Plugin Atualizado com Sucesso!</h3>
+                                    <span class="cep-modal-subtitle">${this.config.pluginName} ${this.config.currentVersion}</span>
+                                </div>
+                            </div>
+                            <button type="button" class="cep-modal-close" id="cepSuccessModalCloseBtn">&times;</button>
+                        </div>
+                        <div class="cep-modal-body">
+                            <p style="font-size: 13px; line-height: 1.6; color: #a0aec0; margin: 0 0 12px 0;">
+                                O <strong>${this.config.pluginName}</strong> foi atualizado para a versão <strong>v${this.config.currentVersion}</strong>. Todas as novas ferramentas e correções já estão ativas na sua timeline do Premiere Pro!
+                            </p>
+                        </div>
+                        <div class="cep-modal-footer">
+                            <button type="button" class="cep-btn-primary" id="cepSuccessBtnOk">
+                                Continuar Editando
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toast Notification -->
+                <div id="cepUpdateToast" class="cep-update-toast" style="display:none;"></div>
+            `;
+
+            document.body.appendChild(container);
+
+            // Hook Event Listeners
+            document.getElementById("cepUpdateBadge").addEventListener("click", () => this.openModal());
+            document.getElementById("cepModalCloseBtn").addEventListener("click", () => this.closeModal());
+            document.getElementById("cepBtnRemindLater").addEventListener("click", () => this.closeModal());
+            document.getElementById("cepBtnDownloadZXP").addEventListener("click", () => {
+                const url = (this.latestInfo && this.latestInfo.downloadUrl) || this.config.fallbackUrl;
+                this.openExternal(url);
+            });
+            document.getElementById("cepBtnApplyUpdate").addEventListener("click", () => this.runInAppUpdate());
+
+            // Success modal handlers
+            const closeSuccess = () => {
+                const sModal = document.getElementById("cepSuccessModal");
+                if (sModal) sModal.style.display = "none";
+            };
+            document.getElementById("cepSuccessModalCloseBtn").addEventListener("click", closeSuccess);
+            document.getElementById("cepSuccessBtnOk").addEventListener("click", closeSuccess);
+        }
+
+        // Dynamically update version tags in header & title
+        syncHeaderVersion() {
+            const versionTags = document.querySelectorAll("#pluginVersionTag, .brand-version-badge, .version-tag");
+            versionTags.forEach(el => {
+                el.textContent = `v${this.config.currentVersion}`;
+            });
+
+            const brandTitles = document.querySelectorAll("#pluginBrandTitle");
+            brandTitles.forEach(el => {
+                el.innerHTML = `${this.config.pluginName} <span class="brand-version-badge" id="pluginVersionTag">v${this.config.currentVersion}</span>`;
+            });
+        }
+
+        // Check if plugin was just updated
+        checkFirstRunAfterUpdate() {
+            try {
+                const storageKey = `cep_installed_version_${this.config.pluginId}`;
+                const prevVersion = localStorage.getItem(storageKey);
+
+                if (prevVersion && this.compareVersions(this.config.currentVersion, prevVersion) > 0) {
+                    // Show celebration modal
+                    setTimeout(() => {
+                        const sModal = document.getElementById("cepSuccessModal");
+                        if (sModal) sModal.style.display = "flex";
+                    }, 500);
+                }
+                localStorage.setItem(storageKey, this.config.currentVersion);
+            } catch (e) {}
         }
 
         // Fetch remote manifest
@@ -100,83 +260,17 @@
 
                 if (hasUpdate) {
                     this.showUpdateAvailable(manifest);
+                    if (!silent) {
+                        this.openModal();
+                    }
                 } else if (!silent) {
-                    this.showToast(`Você está utilizando a versão mais recente (v${this.config.currentVersion})!`);
+                    this.showToast(`O ${this.config.pluginName} já está na versão mais recente (v${this.config.currentVersion})!`, "success");
                 }
             } catch (err) {
                 if (!silent) {
                     this.showToast(`Não foi possível verificar atualizações: ${err.message}`, "error");
                 }
             }
-        }
-
-        // Inject UI Container into DOM
-        initUI() {
-            if (document.getElementById("cepUpdaterContainer")) return;
-
-            const container = document.createElement("div");
-            container.id = "cepUpdaterContainer";
-            container.innerHTML = `
-                <!-- Top Header Update Badge -->
-                <div id="cepUpdateBadge" class="cep-update-badge" style="display:none;" title="Clique para ver novidades e atualizar">
-                    <span class="badge-dot"></span>
-                    <span class="badge-text" id="cepUpdateBadgeText">Update v1.0.1</span>
-                </div>
-
-                <!-- Update Modal Dialog -->
-                <div id="cepUpdateModal" class="cep-update-modal-backdrop" style="display:none;">
-                    <div class="cep-update-modal-card">
-                        <div class="cep-modal-header">
-                            <div class="cep-modal-brand">
-                                <div class="cep-modal-icon">
-                                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                                </div>
-                                <div>
-                                    <div class="cep-modal-title">Nova Versão Disponível!</div>
-                                    <div class="cep-modal-sub" id="cepModalVersionInfo">v1.0.0 → v1.0.1</div>
-                                </div>
-                            </div>
-                            <button type="button" class="cep-modal-close" id="cepModalCloseBtn">&times;</button>
-                        </div>
-
-                        <div class="cep-modal-body">
-                            <div class="cep-changelog-header">O que há de novo:</div>
-                            <ul class="cep-changelog-list" id="cepChangelogList"></ul>
-                            
-                            <div id="cepUpdateProgressBox" class="cep-update-progress-box" style="display:none;">
-                                <div class="cep-progress-text" id="cepUpdateProgressText">Baixando arquivos...</div>
-                                <div class="cep-progress-bar-bg">
-                                    <div class="cep-progress-bar-fill" id="cepUpdateProgressBar"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="cep-modal-footer">
-                            <button type="button" class="cep-btn-secondary" id="cepBtnRemindLater">Mais Tarde</button>
-                            <button type="button" class="cep-btn-outline" id="cepBtnDownloadZXP">Baixar .ZXP</button>
-                            <button type="button" class="cep-btn-primary" id="cepBtnApplyUpdate">
-                                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                                Atualizar Agora
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Toast Notification -->
-                <div id="cepUpdateToast" class="cep-update-toast" style="display:none;"></div>
-            `;
-
-            document.body.appendChild(container);
-
-            // Hook Event Listeners
-            document.getElementById("cepUpdateBadge").addEventListener("click", () => this.openModal());
-            document.getElementById("cepModalCloseBtn").addEventListener("click", () => this.closeModal());
-            document.getElementById("cepBtnRemindLater").addEventListener("click", () => this.closeModal());
-            document.getElementById("cepBtnDownloadZXP").addEventListener("click", () => {
-                const url = (this.latestInfo && this.latestInfo.downloadUrl) || this.config.fallbackUrl;
-                this.openExternal(url);
-            });
-            document.getElementById("cepBtnApplyUpdate").addEventListener("click", () => this.runInAppUpdate());
         }
 
         // Show update badge
@@ -187,7 +281,6 @@
                 badgeText.textContent = `Update v${manifest.version}`;
                 badge.style.display = "inline-flex";
 
-                // Check if user dismissed this specific version in this session
                 const dismissed = sessionStorage.getItem(`dismissed_update_${manifest.version}`);
                 if (!dismissed && manifest.mandatory) {
                     this.openModal();
@@ -236,7 +329,7 @@
             }, 3500);
         }
 
-        // 1-Click In-App Update Implementation
+        // 1-Click In-App Update
         async runInAppUpdate() {
             const btn = document.getElementById("cepBtnApplyUpdate");
             const progressBox = document.getElementById("cepUpdateProgressBox");
@@ -250,10 +343,8 @@
 
             const downloadUrl = (this.latestInfo && this.latestInfo.downloadUrl) || this.config.fallbackUrl;
 
-            // In CEP environment with Node.js
             if (this.isNode && this.fs && this.os && this.path) {
                 try {
-                    // Simulate progress / extraction
                     let p = 20;
                     const interval = setInterval(() => {
                         p += 20;
@@ -279,7 +370,6 @@
                     this.openExternal(downloadUrl);
                 }
             } else {
-                // Browser environment fallback
                 progressBar.style.width = "100%";
                 progressText.textContent = "Abrindo página de download...";
                 setTimeout(() => {
