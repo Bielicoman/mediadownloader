@@ -1,15 +1,15 @@
 {
   "pluginId": "com.alexascencio.mediadownloader",
   "name": "Media Downloader",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "minPremiereVersion": "2020",
   "releaseDate": "2026-08-18",
   "downloadUrl": "https://raw.githubusercontent.com/Bielicoman/mediadownloader/main/MediaDownloader.zxp",
   "zipUrl": "https://github.com/Bielicoman/mediadownloader/archive/refs/heads/main.zip",
   "mandatory": false,
   "changelog": [
-    "Lançamento oficial ZXP Universal",
-    "Compatibilidade total Premiere Pro 2020 a 2026+"
+    "Cross-platform folder opening (Windows/macOS)",
+    "Fixed --js-runtimes invocation in downloader engine"
   ],
-  "fullName": "Media Downloader 1.0.0"
+  "fullName": "Media Downloader 1.2.0"
 }

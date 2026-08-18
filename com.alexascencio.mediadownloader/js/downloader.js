@@ -385,9 +385,7 @@
                         args.push("--cookies", cookiesPath);
                     }
 
-                    // Adiciona runtime Node.js nativo para decodificar assinaturas e desbloquear todas as resoluções (4K, 1080p60)
-                    var nodeExecutable = (typeof process !== "undefined" && process.execPath) ? process.execPath : "node";
-                    args.push("--js-runtimes", "node:" + nodeExecutable);
+                    // yt-dlp detecta interpretadores JS automaticamente no PATH quando necessário
 
                     if (aria2 && aria2.found && aria2.path) {
                         // Outras plataformas: Acelerador multi-conexão

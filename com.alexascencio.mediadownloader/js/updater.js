@@ -10,7 +10,7 @@
     const DEFAULT_CONFIG = {
         pluginId: "com.alexascencio.mediadownloader",
         pluginName: "Media Downloader",
-        currentVersion: "1.0.0",
+        currentVersion: "1.2.0",
         manifestUrl: "https://raw.githubusercontent.com/Bielicoman/mediadownloader/main/version.json",
         fallbackUrl: "https://github.com/Bielicoman/mediadownloader/releases/latest",
         checkDelayMs: 2500

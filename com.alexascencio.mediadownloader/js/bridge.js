@@ -110,11 +110,19 @@
                     var path = require("path");
                     var fs = require("fs");
                     var dir = filePath;
-                    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-                        dir = path.dirname(filePath);
-                        child_process.exec('explorer.exe /select,"' + filePath.replace(/\//g, "\\") + '"');
+                    var isFile = fs.existsSync(filePath) && fs.statSync(filePath).isFile();
+                    if (process.platform === "darwin") {
+                        if (isFile) {
+                            child_process.exec('open -R "' + filePath + '"');
+                        } else {
+                            child_process.exec('open "' + dir + '"');
+                        }
                     } else {
-                        child_process.exec('explorer.exe "' + dir.replace(/\//g, "\\") + '"');
+                        if (isFile) {
+                            child_process.exec('explorer.exe /select,"' + filePath.replace(/\//g, "\\") + '"');
+                        } else {
+                            child_process.exec('explorer.exe "' + dir.replace(/\//g, "\\") + '"');
+                        }
                     }
                 }
             } catch (err) {
