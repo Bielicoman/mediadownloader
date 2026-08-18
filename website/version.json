@@ -4,15 +4,12 @@
   "version": "1.0.0",
   "minPremiereVersion": "2020",
   "releaseDate": "2026-08-18",
-  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/latest/download/MediaDownloader.zxp",
+  "downloadUrl": "https://raw.githubusercontent.com/Bielicoman/mediadownloader/main/MediaDownloader.zxp",
   "zipUrl": "https://github.com/Bielicoman/mediadownloader/archive/refs/heads/main.zip",
   "mandatory": false,
   "changelog": [
-    "Motor Turbo 16-Sockets com injeção direta no Playhead da Timeline",
-    "Suporte nativo a vídeos 4K UHD 60fps do YouTube, Instagram Reels e TikTok",
-    "Transcodificação automática Apple ProRes 422 HQ e áudio master WAV 24-bit",
-    "Organização automática de mídias no Bin _Downloads do Premiere Pro",
-    "Novo logotipo oficial com seta tática de download e design Obsidian Cinema"
+    "Lançamento oficial ZXP Universal",
+    "Compatibilidade total Premiere Pro 2020 a 2026+"
   ],
   "fullName": "Media Downloader 1.0.0"
 }

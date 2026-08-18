@@ -1,17 +1,19 @@
 /**
- * MediaDownloader Pro — Pure Node.js Zero-Dependency ZXP/ZIP Packager
- * Packages the CEP extension into MediaDownloader.zxp and MediaDownloader.zip
+ * MediaDownloader Pro — Pure Node.js Zero-Dependency ZXP Packager
+ * Packages the CEP extension into MediaDownloader.zxp complying with Adobe ZXP specification.
  */
 
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
-console.log('📦 Empacotando Media Downloader para ZXP e ZIP (Pure Node.js)...');
+console.log('📦 Empacotando Media Downloader para ZXP (Pure Node.js)...');
 
 const extDir = path.join(__dirname, 'com.alexascencio.mediadownloader');
 const zxpOutput = path.join(__dirname, 'MediaDownloader.zxp');
-const zipOutput = path.join(__dirname, 'MediaDownloader.zip');
+const dlDir = path.join(__dirname, 'downloads');
+const webDir = path.join(__dirname, 'website');
+const webDlDir = path.join(webDir, 'downloads');
 
 function crc32(buf) {
   let table = crc32.table;
@@ -32,7 +34,7 @@ function crc32(buf) {
   return (c ^ -1) >>> 0;
 }
 
-function createZip(sourceDir, outputFile) {
+function createZxp(sourceDir, outputFile) {
   const files = [];
 
   function walk(dir, rel) {
@@ -49,7 +51,7 @@ function createZip(sourceDir, outputFile) {
     }
   }
 
-  // Ensure mimetype is first without compression (standard for CEP ZXP format)
+  // Ensure mimetype is first without compression (Adobe CEP ZXP standard)
   const mimetypeFile = path.join(sourceDir, 'mimetype');
   if (fs.existsSync(mimetypeFile)) {
     files.push({ fullPath: mimetypeFile, relPath: 'mimetype', noCompress: true });
@@ -152,11 +154,16 @@ function createZip(sourceDir, outputFile) {
 }
 
 try {
-  createZip(extDir, zxpOutput);
-  fs.copyFileSync(zxpOutput, zipOutput);
+  createZxp(extDir, zxpOutput);
+  if (!fs.existsSync(dlDir)) fs.mkdirSync(dlDir, { recursive: true });
+  if (!fs.existsSync(webDlDir)) fs.mkdirSync(webDlDir, { recursive: true });
+
+  fs.copyFileSync(zxpOutput, path.join(dlDir, 'MediaDownloader.zxp'));
+  fs.copyFileSync(zxpOutput, path.join(webDir, 'MediaDownloader.zxp'));
+  fs.copyFileSync(zxpOutput, path.join(webDlDir, 'MediaDownloader.zxp'));
+
   const sizeKb = (fs.statSync(zxpOutput).size / 1024).toFixed(1);
-  console.log(`✅ MediaDownloader.zxp criado com sucesso! (${sizeKb} KB)`);
-  console.log(`✅ MediaDownloader.zip criado com sucesso! (${sizeKb} KB)`);
+  console.log(`✅ MediaDownloader.zxp criado e sincronizado com sucesso! (${sizeKb} KB)`);
 } catch (err) {
   console.error('❌ Erro:', err);
 }
