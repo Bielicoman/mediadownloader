@@ -2,12 +2,12 @@
 <ExtensionManifest
 	Version="7.0"
 	ExtensionBundleId="com.alexascencio.mediadownloader"
-	ExtensionBundleVersion="1.2.0"
+	ExtensionBundleVersion="1.2.1"
 	ExtensionBundleName="Media Downloader"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 >
 	<ExtensionList>
-		<Extension Id="com.alexascencio.mediadownloader.panel" Version="1.2.0" />
+		<Extension Id="com.alexascencio.mediadownloader.panel" Version="1.2.1" />
 	</ExtensionList>
 
 	<ExecutionEnvironment>

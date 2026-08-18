@@ -155,15 +155,22 @@ function createZxp(sourceDir, outputFile) {
 
 try {
   createZxp(extDir, zxpOutput);
+  
+  const zipOutput = path.join(__dirname, 'MediaDownloader.zip');
+  fs.copyFileSync(zxpOutput, zipOutput);
+
   if (!fs.existsSync(dlDir)) fs.mkdirSync(dlDir, { recursive: true });
   if (!fs.existsSync(webDlDir)) fs.mkdirSync(webDlDir, { recursive: true });
 
   fs.copyFileSync(zxpOutput, path.join(dlDir, 'MediaDownloader.zxp'));
+  fs.copyFileSync(zxpOutput, path.join(dlDir, 'MediaDownloader.zip'));
   fs.copyFileSync(zxpOutput, path.join(webDir, 'MediaDownloader.zxp'));
+  fs.copyFileSync(zxpOutput, path.join(webDir, 'MediaDownloader.zip'));
   fs.copyFileSync(zxpOutput, path.join(webDlDir, 'MediaDownloader.zxp'));
+  fs.copyFileSync(zxpOutput, path.join(webDlDir, 'MediaDownloader.zip'));
 
   const sizeKb = (fs.statSync(zxpOutput).size / 1024).toFixed(1);
-  console.log(`✅ MediaDownloader.zxp criado e sincronizado com sucesso! (${sizeKb} KB)`);
+  console.log(`✅ MediaDownloader.zxp e MediaDownloader.zip criados e sincronizados com sucesso! (${sizeKb} KB)`);
 } catch (err) {
   console.error('❌ Erro:', err);
 }

@@ -1,15 +1,15 @@
 {
   "pluginId": "com.alexascencio.mediadownloader",
   "name": "Media Downloader",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "minPremiereVersion": "2020",
   "releaseDate": "2026-08-18",
   "downloadUrl": "https://raw.githubusercontent.com/Bielicoman/mediadownloader/main/MediaDownloader.zxp",
   "zipUrl": "https://github.com/Bielicoman/mediadownloader/archive/refs/heads/main.zip",
   "mandatory": false,
   "changelog": [
-    "Cross-platform folder opening (Windows/macOS)",
-    "Fixed --js-runtimes invocation in downloader engine"
+    "Atualização da logo oficial para o novo design moderno",
+    "Downloads ZXP e ZIP sincronizados no site"
   ],
-  "fullName": "Media Downloader 1.2.0"
+  "fullName": "Media Downloader 1.2.1"
 }
