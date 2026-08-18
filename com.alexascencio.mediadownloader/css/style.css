@@ -1,61 +1,58 @@
 /* ==========================================================================
    MediaDownloader Pro — Minimalist Obsidian Pro Design System
    Designed specifically for Adobe Premiere Pro CEP Extensions
-   Palette: Deep Obsidian (#0c0c0e, #141417, #1a1a1f), Electric Cyan (#00d2ff),
-            Sapphire Blue (#0078d4), Emerald (#10b981)
+   Palette: Deep Obsidian (#0c0c0e, #0d1016, #12161e), Electric Cyan (#ffb020),
+            Sapphire Blue (#b87a00), Emerald (#3ddc84)
    Rule: ZERO Purple / Clutter-free / Razor-sharp Typography
    ========================================================================== */
 
 :root {
-  /* Surfaces & Backgrounds */
-  --bg-app: #0f0f12;
-  --bg-panel: #141418;
-  --bg-card: #191920;
-  --bg-card-hover: #21212a;
-  --bg-card-active: #272732;
-  --bg-input: #0a0a0d;
-  --bg-elevated: #23232c;
+  /* Identidade "Sinal" — mesma do site mediadownloader */
+  --bg-app: #080a0e;
+  --bg-panel: #0d1016;
+  --bg-card: #12161e;
+  --bg-card-hover: #1a202b;
+  --bg-card-active: #232b38;
+  --bg-input: #05070a;
+  --bg-elevated: #1a202b;
 
-  /* Borders & Dividers */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.10);
-  --border-focus: #00d2ff;
-  --border-highlight: rgba(255, 255, 255, 0.16);
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-default: rgba(255, 255, 255, 0.12);
+  --border-focus: #ffb020;
+  --border-highlight: rgba(255, 255, 255, 0.18);
 
-  /* Accents & Status */
-  --accent-cyan: #00d2ff;
-  --accent-cyan-hover: #33dcff;
-  --accent-blue: #0078d4;
-  --accent-blue-hover: #198ae6;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
+  /* o ambar de sinal ocupa o lugar do antigo cyan */
+  --accent-cyan: #ffb020;
+  --accent-cyan-hover: #ffc85a;
+  --accent-blue: #b87a00;
+  --accent-blue-hover: #d99612;
+  --accent-emerald: #3ddc84;
+  --accent-amber: #ffb020;
+  --accent-rose: #ff5a3c;
 
-  /* Typography */
-  --text-main: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #8e8ea0;
-  --text-dim: #525262;
+  --text-main: #e8eaee;
+  --text-secondary: #c2c8d2;
+  --text-muted: #7e8798;
+  --text-dim: #525b6c;
 
-  /* Sizing & Radius */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 9px;
-  --radius-lg: 14px;
+  --radius-xs: 0px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
   --radius-pill: 999px;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Helvetica, Arial, sans-serif;
-  --font-mono: "SF Mono", "Consolas", "Courier New", monospace;
+  --font-sans: "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, Tahoma, sans-serif;
+  --font-mono: "Cascadia Mono", "Consolas", "Courier New", monospace;
 
-  /* Shadows & Depth */
-  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --shadow-glow-cyan: 0 0 16px rgba(0, 210, 255, 0.25);
-  --shadow-btn: 0 2px 8px rgba(0, 120, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-glow-cyan: 0 0 16px rgba(255, 176, 32, 0.26);
+  --shadow-btn: 0 2px 8px rgba(255, 176, 32, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16);
 
-  --transition-fast: 0.14s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-normal: 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 0.14s cubic-bezier(0.22, 0.85, 0.25, 1);
+  --transition-normal: 0.22s cubic-bezier(0.22, 0.85, 0.25, 1);
 }
+
 
 * {
   box-sizing: border-box;
@@ -209,8 +206,8 @@ body {
 
 .input-capsule:focus-within {
   border-color: var(--accent-cyan);
-  box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.15);
-  background: #0d0d12;
+  box-shadow: 0 0 0 2px rgba(255, 176, 32, 0.15);
+  background: #080a0e;
 }
 
 .input-platform-icon {
@@ -385,7 +382,7 @@ body {
 
 .custom-select-trigger:hover {
   border-color: var(--border-highlight);
-  background: #111116;
+  background: #0d1016;
 }
 
 .select-current-option {
@@ -426,7 +423,7 @@ body {
   top: calc(100% + 5px);
   left: 0;
   right: 0;
-  background: #17171d;
+  background: #12161e;
   border: 1px solid var(--border-highlight);
   border-radius: var(--radius-md);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
@@ -461,8 +458,8 @@ body {
 }
 
 .select-option.active {
-  background: rgba(0, 210, 255, 0.12);
-  border: 1px solid rgba(0, 210, 255, 0.25);
+  background: rgba(255, 176, 32, 0.12);
+  border: 1px solid rgba(255, 176, 32, 0.25);
 }
 
 .select-option .opt-icon {
@@ -526,9 +523,9 @@ body {
 
 /* Download Action Button */
 .btn-download-primary {
-  background: linear-gradient(180deg, #0084e6 0%, #0066b8 100%);
+  background: linear-gradient(180deg, #ffb020 0%, #d99612 100%);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #ffffff;
+  color: #0a0700;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.3px;
@@ -545,8 +542,8 @@ body {
 }
 
 .btn-download-primary:hover {
-  background: linear-gradient(180deg, #0094ff 0%, #0074d0 100%);
-  box-shadow: 0 3px 12px rgba(0, 148, 255, 0.45);
+  background: linear-gradient(180deg, #ffc85a 0%, #e5a41c 100%);
+  box-shadow: 0 3px 12px rgba(255, 176, 32, 0.42);
 }
 
 .btn-download-primary:active {
@@ -686,7 +683,7 @@ input:checked + .slider:before {
 .progress-bar-fill {
   width: 0%;
   height: 100%;
-  background: linear-gradient(90deg, #0078d4 0%, #00d2ff 100%);
+  background: linear-gradient(90deg, #b87a00 0%, #ffb020 100%);
   border-radius: var(--radius-pill);
   transition: width 0.15s ease;
 }
@@ -808,7 +805,7 @@ input:checked + .slider:before {
 
 .history-item:hover {
   border-color: var(--border-highlight);
-  background: #111116;
+  background: #0d1016;
 }
 
 .history-thumb {
@@ -918,7 +915,7 @@ input:checked + .slider:before {
 }
 
 .modal-dialog {
-  background: #16161b;
+  background: #0d1016;
   border: 1px solid var(--border-highlight);
   border-radius: var(--radius-lg);
   width: 100%;
@@ -993,7 +990,7 @@ input:checked + .slider:before {
 }
 
 .toast {
-  background: #1e1e26;
+  background: #232b38;
   border: 1px solid var(--border-highlight);
   color: var(--text-main);
   padding: 8px 12px;

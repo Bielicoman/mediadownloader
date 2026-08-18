@@ -2,14 +2,23 @@
   "pluginId": "com.alexascencio.mediadownloader",
   "name": "Media Downloader",
   "version": "1.2.1",
-  "minPremiereVersion": "2020",
+  "channel": "stable",
+  "author": "Alex Ascencio",
+  "type": "CEP",
+  "host": "PPRO",
+  "hostVersionMin": "14.0",
+  "hostVersionMax": "100.0",
+  "platform": [
+    "Windows",
+    "macOS"
+  ],
   "releaseDate": "2026-08-18",
-  "downloadUrl": "https://raw.githubusercontent.com/Bielicoman/mediadownloader/main/MediaDownloader.zxp",
+  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/raw/main/MediaDownloader.zxp",
   "zipUrl": "https://github.com/Bielicoman/mediadownloader/archive/refs/heads/main.zip",
   "mandatory": false,
-  "changelog": [
-    "Atualização da logo oficial para o novo design moderno",
-    "Downloads ZXP e ZIP sincronizados no site"
-  ],
-  "fullName": "Media Downloader 1.2.1"
+  "changelog": {
+    "1.2.1": "Novo site com simulador de download e timeline",
+    "1.2.0": "Downloads ZXP e ZIP sincronizados",
+    "1.1.0": "Atualização da logo oficial"
+  }
 }
