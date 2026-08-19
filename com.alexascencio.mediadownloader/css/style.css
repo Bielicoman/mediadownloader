@@ -41,8 +41,8 @@
   --radius-lg: 4px;
   --radius-pill: 999px;
 
-  --font-sans: "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, Tahoma, sans-serif;
-  --font-mono: "Cascadia Mono", "Consolas", "Courier New", monospace;
+  --font-sans: "Archivo", "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, Tahoma, sans-serif;
+  --font-mono: "DM Mono", "Cascadia Mono", "Consolas", monospace;
 
   --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.45);
   --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.04);
