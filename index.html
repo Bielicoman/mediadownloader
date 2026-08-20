@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Media Downloader — Cole o link</title>
-<meta name="description" content="Download para a timeline do Adobe Premiere Pro. Vídeo em 4K do YouTube, Reels ou TikTok direto na sua sequência.">
+<title>Media Downloader Desktop — Aplicativo Oficial & Extensão Premiere Pro</title>
+<meta name="description" content="Aplicativo Desktop Oficial e Extensão para Adobe Premiere Pro. Baixe vídeos em 4K/8K, playlists completas, canais e áudios com recodificação instantânea para Apple ProRes 422 HQ, H.264 e WAV 24-bit.">
 <meta name="author" content="Alex Ascencio">
 <meta name="theme-color" content="#0A0C10">
-<meta property="og:title" content="Media Downloader — Cole o link">
-<meta property="og:description" content="Vídeo em 4K direto na sua sequência do Premiere.">
+<meta property="og:title" content="Media Downloader Desktop — Aplicativo Oficial & Extensão Premiere Pro">
+<meta property="og:description" content="Aplicativo Desktop Standalone e Extensão para Adobe Premiere Pro. Baixe vídeos do YouTube, Playlists, Reels e TikTok com recodificação instantânea em ProRes e WAV.">
 <meta property="og:type" content="website">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════════
-   MEDIA DOWNLOADER — "Sinal"
-   Telemetria industrial. Tinta, ambar de sinal, verde de linha.
+   MEDIA DOWNLOADER DESKTOP — "Sinal"
+   Telemetria industrial. Tinta, âmbar de sinal, verde de linha.
    Alex Ascencio
    ═══════════════════════════════════════════════════════════ */
 
@@ -26,14 +26,17 @@
   --ink-2:#0D1016;
   --deck:#12161E;
   --deck-2:#1A202B;
-  --edge:rgba(255,255,255,.07);
-  --edge-2:rgba(255,255,255,.15);
+  --deck-3:#242D3D;
+  --edge:rgba(255,255,255,.08);
+  --edge-2:rgba(255,255,255,.16);
   --txt:#E8EAEE;
   --dim:#7E8798;
   --dim-2:#525B6C;
   --amber:#FFB020;
   --amber-d:#B87A00;
+  --amber-glow:rgba(255,176,32,.18);
   --line:#3DDC84;
+  --line-glow:rgba(61,220,132,.18);
   --alert:#FF5A3C;
   --sans:'Archivo',system-ui,sans-serif;
   --mono:'DM Mono',ui-monospace,monospace;
@@ -54,7 +57,7 @@ body::before{
     radial-gradient(70% 45% at 10% 4%,rgba(61,220,132,.055),transparent 60%);
 }
 body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:997;opacity:.5;
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:997;opacity:.4;
   background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);
 }
 main,nav,footer{position:relative;z-index:1}
@@ -65,37 +68,43 @@ main,nav,footer{position:relative;z-index:1}
 
 /* ═════ NAV ═════ */
 nav{
-  position:sticky;top:0;z-index:100;background:rgba(8,10,14,.8);
+  position:sticky;top:0;z-index:100;background:rgba(8,10,14,.85);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border-bottom:1px solid var(--edge);
 }
-.nav-in{max-width:1240px;margin:0 auto;padding:0 34px;height:62px;display:flex;align-items:center;gap:28px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt)}
-.brand-txt{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
-.brand-txt i{color:var(--dim-2);font-style:normal}
-.nav-links{display:flex;gap:26px;margin-left:auto}
+.nav-in{max-width:1240px;margin:0 auto;padding:0 34px;height:64px;display:flex;align-items:center;gap:24px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--txt)}
+.brand-txt{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:600}
+.brand-txt i{color:var(--amber);font-style:normal}
+.brand-tag{
+  font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:2px 6px;
+  background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.35);
+  color:var(--amber);text-transform:uppercase;
+}
+.nav-links{display:flex;gap:22px;margin-left:auto}
 .nav-links a{font-size:13.5px;color:var(--dim);text-decoration:none;transition:color .2s}
 .nav-links a:hover{color:var(--txt)}
+.nav-links a.nav-highlight{color:var(--amber)}
 .nav-dl{
   font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
-  background:var(--amber);color:#0A0700;text-decoration:none;padding:10px 16px;font-weight:500;
-  transition:filter .2s;
+  background:var(--amber);color:#0A0700;text-decoration:none;padding:10px 18px;font-weight:600;
+  transition:filter .2s, transform .2s;display:inline-flex;align-items:center;gap:7px;
 }
-.nav-dl:hover{filter:brightness(1.14)}
-@media(max-width:860px){.nav-links{display:none}.nav-in{padding:0 20px}.nav-dl{margin-left:auto}}
+.nav-dl:hover{filter:brightness(1.14);transform:translateY(-1px)}
+@media(max-width:920px){.nav-links{display:none}.nav-in{padding:0 20px}.nav-dl{margin-left:auto}}
 
 /* ═════ HERO ═════ */
-header{padding:88px 0 76px}
+header{padding:84px 0 76px}
 .kicker{
   font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);
-  display:inline-flex;align-items:center;gap:10px;margin-bottom:26px;
-  border:1px solid rgba(255,176,32,.3);padding:6px 12px;
+  display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;
+  border:1px solid rgba(255,176,32,.3);padding:6px 14px;background:rgba(255,176,32,.04);
 }
 .kicker i{width:6px;height:6px;background:var(--amber);border-radius:50%;animation:blip 1.6s ease-in-out infinite}
 @keyframes blip{0%,100%{opacity:1}50%{opacity:.22}}
 
 h1{
-  font-weight:900;font-size:clamp(58px,10.5vw,142px);line-height:.86;
+  font-weight:900;font-size:clamp(52px,9.5vw,132px);line-height:.88;
   letter-spacing:-.05em;text-transform:uppercase;margin-bottom:26px;
 }
 h1 span{
@@ -104,27 +113,31 @@ h1 span{
 }
 h1:hover span{color:var(--amber);-webkit-text-stroke-color:var(--amber)}
 
-.hero-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:56px;align-items:end}
-@media(max-width:940px){.hero-grid{grid-template-columns:1fr;gap:42px}}
+.hero-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:52px;align-items:end}
+@media(max-width:980px){.hero-grid{grid-template-columns:1fr;gap:40px}}
 
-.lede{font-size:19px;color:var(--dim);max-width:36ch;margin-bottom:34px}
+.lede{font-size:18.5px;color:var(--dim);max-width:44ch;margin-bottom:32px;line-height:1.58}
 .lede b{color:var(--txt);font-weight:600}
 
 .gauges{display:flex;gap:1px;background:var(--edge);border:1px solid var(--edge);margin-bottom:32px;flex-wrap:wrap}
-.gauge{flex:1;min-width:92px;background:var(--ink-2);padding:13px 15px}
+.gauge{flex:1;min-width:95px;background:var(--ink-2);padding:13px 15px}
 .gauge-k{font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim-2);display:block;margin-bottom:5px}
-.gauge-v{font-family:var(--mono);font-size:14px;color:var(--txt)}
+.gauge-v{font-family:var(--mono);font-size:13.5px;color:var(--txt);font-weight:500}
 
-.cta-row{display:flex;gap:11px;flex-wrap:wrap}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .btn{
   display:inline-flex;align-items:center;gap:9px;text-decoration:none;cursor:pointer;
   font-family:var(--mono);font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;
-  padding:15px 24px;border:1px solid var(--edge-2);color:var(--txt);background:transparent;
-  transition:background .22s var(--ease),color .22s var(--ease),border-color .22s var(--ease);
+  padding:15px 22px;border:1px solid var(--edge-2);color:var(--txt);background:transparent;
+  transition:background .22s var(--ease),color .22s var(--ease),border-color .22s var(--ease),transform .22s var(--ease);
 }
-.btn:hover{background:var(--txt);color:var(--ink);border-color:var(--txt)}
-.btn-hot{background:var(--amber);border-color:var(--amber);color:#0A0700;font-weight:600}
+.btn:hover{background:var(--txt);color:var(--ink);border-color:var(--txt);transform:translateY(-1px)}
+.btn-hot{background:var(--amber);border-color:var(--amber);color:#0A0700;font-weight:700}
 .btn-hot:hover{background:#FFC85A;border-color:#FFC85A;color:#0A0700}
+.btn-premiere{
+  background:rgba(255,176,32,.08);border-color:rgba(255,176,32,.4);color:var(--amber);font-weight:600;
+}
+.btn-premiere:hover{background:var(--amber);color:#0A0700;border-color:var(--amber)}
 .btn:disabled{opacity:.35;cursor:not-allowed}
 
 /* mostrador do hero */
@@ -138,18 +151,78 @@ h1:hover span{color:var(--amber);-webkit-text-stroke-color:var(--amber)}
 .scope-legend{
   display:flex;gap:18px;margin-top:12px;padding-top:12px;border-top:1px solid var(--edge);
   font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim-2);
+  flex-wrap:wrap;
 }
 .scope-legend b{color:var(--txt);font-weight:500}
 
 /* ═════ SEÇÕES ═════ */
-section{padding:100px 0;border-top:1px solid var(--edge)}
-.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:40px}
+section{padding:96px 0;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:36px}
 .sec-n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amber)}
 .sec-t{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
 .sec-rule{flex:1;height:1px;background:linear-gradient(90deg,var(--edge),transparent)}
-h2{font-weight:900;font-size:clamp(34px,5.2vw,58px);line-height:.95;letter-spacing:-.04em;text-transform:uppercase;margin-bottom:16px}
+h2{font-weight:900;font-size:clamp(32px,5vw,56px);line-height:.96;letter-spacing:-.04em;text-transform:uppercase;margin-bottom:16px}
 h2 em{font-style:normal;color:var(--amber)}
-.sec-lede{font-size:17px;color:var(--dim);max-width:50ch;margin-bottom:42px}
+.sec-lede{font-size:17px;color:var(--dim);max-width:54ch;margin-bottom:40px;line-height:1.55}
+
+/* ═════ ÁREA ESPECÍFICA DO ADOBE PREMIERE PRO ═════ */
+.premiere-showcase{
+  border:1px solid rgba(255,176,32,.35);background:linear-gradient(180deg,rgba(255,176,32,.03) 0%,var(--ink-2) 100%);
+  position:relative;overflow:hidden;
+}
+.premiere-showcase::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--amber),transparent);
+}
+.prem-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:0}
+@media(max-width:960px){.prem-grid{grid-template-columns:1fr}}
+.prem-left{padding:42px 40px;border-right:1px solid var(--edge)}
+@media(max-width:960px){.prem-left{border-right:0;border-bottom:1px solid var(--edge);padding:32px 24px}}
+.prem-right{padding:42px 36px;background:var(--ink);display:flex;flex-direction:column;justify-content:space-between}
+@media(max-width:960px){.prem-right{padding:32px 24px}}
+
+.prem-badge{
+  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:4px 10px;
+  background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.3);
+}
+.prem-title{
+  font-size:clamp(26px,3.6vw,40px);font-weight:900;letter-spacing:-.03em;text-transform:uppercase;line-height:1.05;margin-bottom:16px;
+}
+.prem-desc{
+  font-size:15.5px;color:var(--dim);line-height:1.6;margin-bottom:28px;
+}
+.prem-desc b{color:var(--txt)}
+
+.prem-features{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+@media(max-width:600px){.prem-features{grid-template-columns:1fr}}
+.pf-item{
+  background:var(--deck);border:1px solid var(--edge);padding:14px 16px;
+}
+.pf-item-k{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;display:block;
+}
+.pf-item-v{
+  font-size:13px;color:var(--txt);line-height:1.4;
+}
+
+.prem-steps-h{
+  font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim-2);margin-bottom:16px;
+}
+.prem-step{
+  display:grid;grid-template-columns:26px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);
+}
+.prem-step:last-of-type{border-bottom:0}
+.prem-step-n{font-family:var(--mono);font-size:11px;color:var(--amber);padding-top:2px}
+.prem-step-txt{font-size:13.5px;color:var(--txt);line-height:1.45}
+.prem-step-txt small{display:block;font-size:12px;color:var(--dim-2);margin-top:3px}
+.prem-step-txt a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(255,176,32,.3)}
+.prem-step-txt a:hover{border-bottom-color:var(--amber)}
+
+.prem-actions{
+  margin-top:26px;padding-top:22px;border-top:1px solid var(--edge);
+  display:flex;gap:12px;flex-wrap:wrap;align-items:center;
+}
 
 /* ═════ CONSOLE ═════ */
 .console{border:1px solid var(--edge);background:var(--ink-2);display:grid;grid-template-columns:392px 1fr}
@@ -248,74 +321,58 @@ h2 em{font-style:normal;color:var(--amber)}
 .sockets{display:grid;grid-template-columns:repeat(16,1fr);gap:2px;height:44px;align-items:end}
 .sock{background:var(--deck-2);height:8%;transition:height .18s linear,background .18s}
 .sock.hot{background:var(--amber)}
-.sock.idle{background:var(--deck-2)}
 .sock-k{
-  font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim-2);
-  display:flex;justify-content:space-between;margin-top:9px;
+  display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--dim-2);margin-top:9px;
 }
 .sock-k b{color:var(--line);font-weight:500}
 
-/* log */
-.log{
-  font-family:var(--mono);font-size:10.5px;line-height:1.85;color:var(--dim);
-  height:118px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;
-}
-.log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:slideIn .3s var(--ease)}
-@keyframes slideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* registro */
+.log{background:var(--ink);border:1px solid var(--edge);padding:10px 12px;height:98px;overflow-y:auto;font-family:var(--mono);font-size:10px;line-height:1.55}
+.log::-webkit-scrollbar{width:4px}
+.log::-webkit-scrollbar-thumb{background:var(--dim-2)}
+.log .t{color:var(--dim-2)}
 .log .ok{color:var(--line)}
 .log .wa{color:var(--amber)}
-.log .er{color:var(--alert)}
-.log .t{color:var(--dim-2)}
 
 /* timeline */
-.tl{background:var(--ink);border:1px solid var(--edge);overflow:hidden}
+.tl{background:var(--ink);border:1px solid var(--edge);padding:14px 16px;position:relative;overflow:hidden}
 .tl-head{
-  display:flex;justify-content:space-between;align-items:center;padding:9px 13px;
-  border-bottom:1px solid var(--edge);background:var(--deck);
-  font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim-2);
+  display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--dim-2);margin-bottom:10px;
 }
-.tl-ruler{height:17px;position:relative;border-bottom:1px solid var(--edge);background:var(--deck)}
-.tl-ruler span{
-  position:absolute;top:3px;font-family:var(--mono);font-size:8px;color:var(--dim-2);
-  padding-left:4px;border-left:1px solid var(--edge-2);height:11px;line-height:11px;
-}
-.trk{display:flex;align-items:stretch;height:31px;border-bottom:1px solid var(--edge);position:relative}
-.trk:last-child{border-bottom:0}
-.trk-h{
-  width:52px;flex-shrink:0;border-right:1px solid var(--edge);background:var(--deck);
-  display:flex;align-items:center;padding-left:9px;gap:5px;
-  font-family:var(--mono);font-size:9px;letter-spacing:.09em;color:var(--dim);
-}
-.trk-h i{width:5px;height:5px;background:var(--dim-2)}
-.trk-b{flex:1;position:relative;min-width:0;background:
-  repeating-linear-gradient(90deg,transparent 0 39px,rgba(255,255,255,.035) 39px 40px)}
+.tl-head span:last-child{color:var(--amber);font-variant-numeric:tabular-nums}
+.tl-ruler{height:16px;border-bottom:1px solid var(--edge);position:relative;margin-bottom:10px}
+.tl-ruler span{position:absolute;top:0;font-family:var(--mono);font-size:8px;color:var(--dim-2);border-left:1px solid var(--edge);padding-left:3px}
+.trk{display:flex;align-items:center;height:24px;margin-bottom:4px;position:relative}
+.trk-h{width:32px;font-family:var(--mono);font-size:9px;color:var(--dim-2);letter-spacing:.08em;flex-shrink:0;display:flex;align-items:center;gap:4px}
+.trk-h i{width:4px;height:4px;background:var(--dim-2);border-radius:50%}
+.trk-b{flex:1;height:100%;background:var(--deck);position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.03)}
 .clip{
-  position:absolute;top:3px;bottom:3px;border:1px solid rgba(0,0,0,.5);
-  font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;color:rgba(0,0,0,.72);
-  padding:0 6px;display:flex;align-items:center;overflow:hidden;white-space:nowrap;
+  position:absolute;top:2px;bottom:2px;background:var(--deck-2);border:1px solid var(--edge-2);
+  font-family:var(--mono);font-size:8.5px;color:var(--dim);padding:2px 6px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em;
 }
-.clip.v{background:#4E7FB8}
-.clip.a{background:#5FA37A}
 .clip.new{
   background:var(--amber);color:#0A0700;font-weight:600;
   animation:drop .6s var(--ease);box-shadow:0 0 0 1px var(--amber),0 0 22px rgba(255,176,32,.5);
 }
-@keyframes drop{from{transform:translateY(-34px);opacity:0}to{transform:none;opacity:1}}
-.playhead{position:absolute;top:0;bottom:0;width:1px;background:var(--alert);z-index:5;pointer-events:none}
+.playhead{
+  position:absolute;top:0;bottom:0;width:1px;background:var(--amber);z-index:10;pointer-events:none;
+}
 .playhead::before{
-  content:'';position:absolute;top:0;left:-4px;border-left:4.5px solid transparent;
-  border-right:4.5px solid transparent;border-top:7px solid var(--alert);
+  content:'';position:absolute;top:0;left:-4px;border-left:4px solid transparent;
+  border-right:4px solid transparent;border-top:6px solid var(--amber);
 }
-.tl-note{
-  padding:10px 13px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--dim-2);border-top:1px solid var(--edge);
-}
-.tl-note b{color:var(--line);font-weight:500}
+.tl-note{font-size:12px;color:var(--dim);margin-top:10px;font-family:var(--mono)}
+.tl-note b{color:var(--txt)}
+
+@keyframes drop{from{transform:translateY(-34px);opacity:0}to{transform:none;opacity:1}}
 
 /* ═════ RECURSOS ═════ */
 .caps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--edge);border:1px solid var(--edge)}
-@media(max-width:900px){.caps{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.caps{grid-template-columns:1fr}}
+@media(max-width:960px){.caps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.caps{grid-template-columns:1fr}}
 .cap{background:var(--ink-2);padding:28px 22px 32px;position:relative;overflow:hidden;transition:background .3s}
 .cap:hover{background:var(--deck)}
 .cap::before{
@@ -324,11 +381,11 @@ h2 em{font-style:normal;color:var(--amber)}
   transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease);
 }
 .cap:hover::before{transform:scaleX(1)}
-.cap-n{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--dim-2);display:block;margin-bottom:18px}
-.cap h3{font-size:18px;font-weight:800;letter-spacing:-.02em;text-transform:uppercase;margin-bottom:8px;line-height:1.1}
-.cap p{font-size:14px;color:var(--dim);line-height:1.5}
+.cap-n{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--amber);display:block;margin-bottom:18px}
+.cap h3{font-size:18px;font-weight:800;letter-spacing:-.02em;text-transform:uppercase;margin-bottom:10px;line-height:1.15}
+.cap p{font-size:14px;color:var(--dim);line-height:1.55}
 
-/* ═════ INSTALAÇÃO ═════ */
+/* ═════ INSTALAÇÃO & DOWNLOADS ═════ */
 .tabs{display:flex;gap:1px;background:var(--edge);border:1px solid var(--edge);border-bottom:0}
 .tab{
   flex:1;padding:16px 14px;border:0;background:var(--ink-2);cursor:pointer;text-align:left;
@@ -339,9 +396,9 @@ h2 em{font-style:normal;color:var(--amber)}
 .tab:hover{background:var(--deck)}
 .tab[aria-selected="true"]{background:var(--deck-2);color:var(--amber)}
 .tab[aria-selected="true"] b{color:var(--txt)}
-@media(max-width:700px){.tabs{flex-direction:column}}
+@media(max-width:760px){.tabs{flex-direction:column}}
 
-.panel{border:1px solid var(--edge);background:var(--ink-2);padding:32px}
+.panel{border:1px solid var(--edge);background:var(--ink-2);padding:34px}
 .panel[hidden]{display:none}
 .step{display:grid;grid-template-columns:30px 1fr;gap:18px;padding:15px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .step:last-of-type{border-bottom:0}
@@ -366,7 +423,7 @@ h2 em{font-style:normal;color:var(--amber)}
 }
 .copy:hover{color:var(--txt);border-color:var(--txt)}
 .copy.done{background:var(--line);border-color:var(--line);color:var(--ink)}
-.dl-row{display:flex;gap:11px;flex-wrap:wrap;margin-top:24px;padding-top:22px;border-top:1px solid var(--edge)}
+.dl-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;padding-top:22px;border-top:1px solid var(--edge);align-items:center}
 
 /* ═════ ESPECIFICAÇÕES ═════ */
 .specs{border:1px solid var(--edge)}
@@ -381,17 +438,17 @@ h2 em{font-style:normal;color:var(--amber)}
 footer{border-top:1px solid var(--edge);background:var(--ink-2)}
 .fgrid{display:grid;grid-template-columns:1.5fr 1fr 1fr;border-bottom:1px solid var(--edge)}
 @media(max-width:800px){.fgrid{grid-template-columns:1fr}}
-.fc{padding:30px 34px;border-right:1px solid var(--edge)}
+.fc{padding:32px 34px;border-right:1px solid var(--edge)}
 .fc:last-child{border-right:0}
 @media(max-width:800px){.fc{border-right:0;border-bottom:1px solid var(--edge)}}
 .fc-k{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim-2);display:block;margin-bottom:12px}
-.fc-name{font-size:27px;font-weight:900;letter-spacing:-.035em;text-transform:uppercase;line-height:1;margin-bottom:7px}
+.fc-name{font-size:26px;font-weight:900;letter-spacing:-.035em;text-transform:uppercase;line-height:1;margin-bottom:7px}
 .fc-sub{font-size:13.5px;color:var(--dim)}
 .flist{display:flex;flex-direction:column;gap:9px}
 .flist a{font-size:14px;color:var(--dim);text-decoration:none;transition:color .18s,padding-left .18s}
 .flist a:hover{color:var(--amber);padding-left:5px}
 .fbar{
-  padding:17px 34px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  padding:18px 34px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
   font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim-2);
 }
 .fbar b{color:var(--txt);font-weight:500}
@@ -409,42 +466,52 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
 <nav>
   <div class="nav-in">
     <a href="/" class="brand">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
         <rect x="1" y="1" width="18" height="18" stroke="#E8EAEE" stroke-width="1.3"/>
         <path d="M10 4.5v8m0 0L6.5 9M10 12.5L13.5 9" stroke="#FFB020" stroke-width="1.6"/>
         <path d="M4.5 15.5h11" stroke="#3DDC84" stroke-width="1.6"/>
       </svg>
       <span class="brand-txt">Ascencio <i>&#9656;</i> Media Downloader</span>
+      <span class="brand-tag">Desktop</span>
     </a>
     <div class="nav-links">
       <a href="#console">Console</a>
       <a href="#recursos">Recursos</a>
-      <a href="#instalar">Instalar</a>
+      <a href="#downloads">Downloads Desktop</a>
+      <a href="#premiere" class="nav-highlight">Extensão Premiere</a>
+      <a href="#especificacoes">Especificações</a>
     </div>
-    <a href="MediaDownloader.zxp" class="nav-dl" download>Baixar</a>
+    <a href="#downloads" class="nav-dl">
+      <svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+      Baixar Desktop
+    </a>
   </div>
 </nav>
 
 <main>
 <header>
   <div class="wrap">
-    <div class="kicker rv"><i></i>Download para a timeline</div>
-    <h1 class="rv">Cole<br>o <span>link</span>.</h1>
+    <div class="kicker rv"><i></i>Página Oficial · Aplicativo Desktop & NLE Suite</div>
+    <h1 class="rv">MEDIA DOWNLOADER<br><span>DESKTOP</span>.</h1>
     <div class="hero-grid">
       <div>
-        <p class="lede rv">Vídeo em <b>4K</b> do YouTube, Reels ou TikTok direto na sua sequência. Sem abrir o navegador.</p>
+        <p class="lede rv">O aplicativo Desktop oficial e definitivo para baixar vídeos em <b>4K/8K</b>, playlists inteiras, canais do YouTube e áudios com recodificação instantânea para <b>Apple ProRes 422 HQ</b>, <b>H.264</b> e <b>WAV 24-bit</b>. 100% nativo, sem limites de taxa e pronto para a timeline.</p>
         <div class="gauges rv">
-          <div class="gauge"><span class="gauge-k">Versão</span><span class="gauge-v">1.2.1</span></div>
-          <div class="gauge"><span class="gauge-k">Sockets</span><span class="gauge-v">16</span></div>
-          <div class="gauge"><span class="gauge-k">Máximo</span><span class="gauge-v">2160p60</span></div>
-          <div class="gauge"><span class="gauge-k">Licença</span><span class="gauge-v">MIT</span></div>
+          <div class="gauge"><span class="gauge-k">Plataforma</span><span class="gauge-v">Windows (.EXE)</span></div>
+          <div class="gauge"><span class="gauge-k">Performance</span><span class="gauge-v">16 Sockets Turbo</span></div>
+          <div class="gauge"><span class="gauge-k">Codecs</span><span class="gauge-v">ProRes · WAV · MP4</span></div>
+          <div class="gauge"><span class="gauge-k">NLE Ready</span><span class="gauge-v">Premiere & DaVinci</span></div>
         </div>
         <div class="cta-row rv">
-          <a href="MediaDownloader.zxp" class="btn btn-hot" download>
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
-            Baixar .ZXP
+          <a href="downloads/MediaDownloader-Windows-x64.zip" class="btn btn-hot" download>
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+            Baixar Windows (.EXE)
           </a>
-          <a href="#console" class="btn">Abrir o console</a>
+          <a href="#premiere" class="btn btn-premiere">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+            Baixar extensão para Adobe Premiere
+          </a>
+          <a href="#console" class="btn">Console Interativo</a>
         </div>
       </div>
       <div class="rv">
@@ -454,7 +521,7 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
           <div class="scope-legend">
             <span>Pico <b id="scopePeak">0 MB/s</b></span>
             <span>Média <b id="scopeAvg">0 MB/s</b></span>
-            <span>Motor <b>aria2c</b></span>
+            <span>Motor <b>aria2c + FFmpeg 9.0</b></span>
           </div>
         </div>
       </div>
@@ -462,25 +529,106 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
   </div>
 </header>
 
+<!-- ═══════════════ ÁREA ESPECÍFICA DO ADOBE PREMIERE PRO ═══════════════ -->
+<section id="premiere">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="sec-n">★</span><span class="sec-t">Adobe Premiere Pro</span><span class="sec-rule"></span><span class="sec-t">Extensão Oficial</span></div>
+    
+    <div class="premiere-showcase rv">
+      <div class="prem-grid">
+        <div class="prem-left">
+          <div class="prem-badge"><i>●</i> Painel Integrado CEP / ZXP</div>
+          <h2 class="prem-title">Baixe direto para a timeline do <em>Premiere Pro</em></h2>
+          <p class="prem-desc">
+            Trabalha no <b>Adobe Premiere Pro</b>? Instale a extensão nativa de painel e baixe vídeos, playlists, Reels e áudios sem alternar de janela. O arquivo é recodificado e inserido instantaneamente no seu projeto e na sequência ativa.
+          </p>
+
+          <div class="prem-features">
+            <div class="pf-item">
+              <span class="pf-item-k">Timeline Playhead</span>
+              <span class="pf-item-v">Insere automaticamente o clipe na primeira faixa de vídeo/áudio livre sob o cursor.</span>
+            </div>
+            <div class="pf-item">
+              <span class="pf-item-k">Bin Organizado</span>
+              <span class="pf-item-v">Cria a pasta <code style="color:var(--amber)">_Downloads</code> no painel Projeto sem poluir suas mídias.</span>
+            </div>
+            <div class="pf-item">
+              <span class="pf-item-k">Zero Engasgos</span>
+              <span class="pf-item-v">Converte VP9 do YouTube/Reels para H.264 / ProRes para reprodução fluida.</span>
+            </div>
+            <div class="pf-item">
+              <span class="pf-item-k">Compatibilidade Ampla</span>
+              <span class="pf-item-v">Suporta Premiere Pro 2020 a 2026+ em Windows e macOS (Apple Silicon).</span>
+            </div>
+          </div>
+
+          <div class="prem-actions">
+            <a href="MediaDownloader.zxp" class="btn btn-hot" download>
+              <svg width="14" height="14" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+              Baixar extensão para Adobe Premiere
+            </a>
+            <a href="MediaDownloader.zip" class="btn" download>
+              Baixar ZIP Manual (.ZIP CEP)
+            </a>
+          </div>
+        </div>
+
+        <div class="prem-right">
+          <div>
+            <div class="prem-steps-h">Guia Rápido de Instalação (3 Passos)</div>
+            <div class="prem-step">
+              <span class="prem-step-n">01</span>
+              <div class="prem-step-txt">
+                Clique no botão <b>Baixar extensão para Adobe Premiere</b> para obter o arquivo <b>MediaDownloader.zxp</b>.
+                <small>Arquivo leve com assinatura e manifesto oficial.</small>
+              </div>
+            </div>
+            <div class="prem-step">
+              <span class="prem-step-n">02</span>
+              <div class="prem-step-txt">
+                Abra o instalador gratuito <a href="https://zxpinstaller.com/" target="_blank" rel="noopener">ZXP Installer</a> ou <a href="https://install.anastasiy.com/" target="_blank" rel="noopener">Anastasiy's Extension Manager</a> e arraste o arquivo ZXP.
+                <small>A instalação leva menos de 5 segundos.</small>
+              </div>
+            </div>
+            <div class="prem-step">
+              <span class="prem-step-n">03</span>
+              <div class="prem-step-txt">
+                Abra o Premiere Pro e acesse <b>Janela &#8594; Extensões &#8594; Media Downloader</b>.
+                <small>Pronto! Cole o link e baixe direto na sequência aberta.</small>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-top:20px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid var(--edge)">
+            <span style="font-family:var(--mono);font-size:9px;color:var(--dim-2);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px">Dica Pro</span>
+            <span style="font-size:12.5px;color:var(--dim)">O aplicativo <b>Desktop Standalone</b> e a <b>Extensão do Premiere</b> usam os mesmos motores de alta precisão (yt-dlp + aria2c + FFmpeg).</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SIMULADOR CONSOLE ═══════════════ -->
 <section id="console">
   <div class="wrap">
-    <div class="sec-head rv"><span class="sec-n">01</span><span class="sec-t">Console</span><span class="sec-rule"></span><span class="sec-t">Simulação</span></div>
-    <h2 class="rv">Link, formato, <em>timeline</em>.</h2>
-    <p class="sec-lede rv">Escolha uma fonte e um formato. O console abaixo percorre o mesmo caminho do painel: sondagem, download em paralelo, conversão e inserção.</p>
+    <div class="sec-head rv"><span class="sec-n">01</span><span class="sec-t">Console Interativo</span><span class="sec-rule"></span><span class="sec-t">Simulação dos Motores</span></div>
+    <h2 class="rv">Link, formato, <em>processamento</em>.</h2>
+    <p class="sec-lede rv">Experimente a lógica do aplicativo Desktop e da extensão: sondagem de metadados, download multi-socket simultâneo, conversão para ProRes/WAV e inserção na timeline.</p>
 
     <div class="console rv">
       <div class="cons-l">
         <div class="blk">
-          <div class="blk-h">Fonte <b id="srcState">Aguardando</b></div>
+          <div class="blk-h">Fonte de Mídia <b id="srcState">Aguardando</b></div>
           <div class="urlbar">
-            <input id="urlIn" type="text" spellcheck="false" placeholder="cole o link aqui" value="">
+            <input id="urlIn" type="text" spellcheck="false" placeholder="cole o link do YouTube, Reels ou TikTok aqui" value="">
             <button id="btnProbe" type="button">Sondar</button>
           </div>
           <div class="srcs" id="srcList"></div>
         </div>
 
         <div class="blk">
-          <div class="blk-h">Mídia detectada</div>
+          <div class="blk-h">Mídia Identificada</div>
           <div class="meta-card" id="metaCard">
             <div class="meta-thumb"><canvas id="thumbCv" width="212" height="120"></canvas></div>
             <div class="meta-b">
@@ -491,12 +639,12 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
         </div>
 
         <div class="blk">
-          <div class="blk-h">Formato <b id="fmtState">4K / MAX</b></div>
+          <div class="blk-h">Perfil de Conversão <b id="fmtState">4K / MAX</b></div>
           <div id="fmtList"></div>
         </div>
 
         <div class="blk">
-          <button class="btn btn-hot" id="btnGo" type="button" style="width:100%;justify-content:center">Baixar e inserir</button>
+          <button class="btn btn-hot" id="btnGo" type="button" style="width:100%;justify-content:center">Baixar e processar</button>
         </div>
       </div>
 
@@ -513,21 +661,21 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
             </div>
           </div>
           <div class="telem-r">
-            <span class="speed-k">Conexões</span>
+            <span class="speed-k">Conexões em Paralelo</span>
             <div class="sockets" id="sockets"></div>
-            <div class="sock-k"><span>16 sockets</span><b id="sockActive">0 ativos</b></div>
+            <div class="sock-k"><span>16 sockets turbo</span><b id="sockActive">0 ativos</b></div>
           </div>
         </div>
 
         <div class="blk">
-          <div class="blk-h">Registro</div>
-          <div class="log" id="log"><div class="t">— pronto —</div></div>
+          <div class="blk-h">Log de Telemetria</div>
+          <div class="log" id="log"><div class="t">— motor pronto para download —</div></div>
         </div>
 
         <div class="blk" style="flex:1">
-          <div class="blk-h">Sequência ativa <b id="seqName">01_MONTAGEM</b></div>
+          <div class="blk-h">Sequência ativa <b id="seqName">01_MONTAGEM_MASTER</b></div>
           <div class="tl">
-            <div class="tl-head"><span>Timeline · 25 fps</span><span id="tlPos">00:00:12:00</span></div>
+            <div class="tl-head"><span>Timeline NLE · 25 fps</span><span id="tlPos">00:00:12:00</span></div>
             <div class="tl-ruler" id="ruler"></div>
             <div id="tracks"></div>
             <div class="tl-note" id="tlNote">Aguardando mídia. O clipe entra na <b>primeira faixa livre</b> no playhead.</div>
@@ -538,76 +686,118 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
   </div>
 </section>
 
+<!-- ═══════════════ RECURSOS ═══════════════ -->
 <section id="recursos">
   <div class="wrap">
-    <div class="sec-head rv"><span class="sec-n">02</span><span class="sec-t">Recursos</span><span class="sec-rule"></span></div>
-    <h2 class="rv">Quatro coisas.</h2>
-    <p class="sec-lede rv">Nada além disso.</p>
+    <div class="sec-head rv"><span class="sec-n">02</span><span class="sec-t">Recursos</span><span class="sec-rule"></span><span class="sec-t">Engenharia de Ponta</span></div>
+    <h2 class="rv">Projetado para Criadores e Editores.</h2>
+    <p class="sec-lede rv">Potência máxima de download com codecs otimizados para fluxo profissional de pós-produção audiovisual.</p>
     <div class="caps rv">
-      <div class="cap"><span class="cap-n">01</span><h3>4K de verdade</h3><p>Pega 2160p60 e 1440p. Não trava em 1080p.</p></div>
-      <div class="cap"><span class="cap-n">02</span><h3>16 sockets</h3><p>Conexões paralelas com aria2c contra estrangulamento.</p></div>
-      <div class="cap"><span class="cap-n">03</span><h3>Codec certo</h3><p>Converte VP9 em H.264 + AAC 48 kHz para o Premiere.</p></div>
-      <div class="cap"><span class="cap-n">04</span><h3>Faixa livre</h3><p>Entra no playhead sem sobrescrever seus cortes.</p></div>
+      <div class="cap">
+        <span class="cap-n">01</span>
+        <h3>Desktop Standalone (.EXE)</h3>
+        <p>Aplicativo Windows nativo independente, sem necessidade de navegador ou terminal. Interface frameless, leve e com fila de tarefas.</p>
+      </div>
+      <div class="cap">
+        <span class="cap-n">02</span>
+        <h3>Playlists & Canais</h3>
+        <p>Indexação visual de coleções inteiras com seleção rápida por checkbox, downloads individuais ou pacotes completos em segundo plano.</p>
+      </div>
+      <div class="cap">
+        <span class="cap-n">03</span>
+        <h3>Apple ProRes & WAV</h3>
+        <p>Conversão instantânea para Master MOV ProRes 422 HQ e áudio não-comprimido WAV 24-bit 48.000 Hz, prontos para a edição sem render.</p>
+      </div>
+      <div class="cap">
+        <span class="cap-n">04</span>
+        <h3>Extensão Premiere Pro</h3>
+        <p>Integração de timeline via painel CEP/ZXP. Baixe e insira diretamente na sequência aberta no Premiere Pro com 1 clique.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="instalar">
+<!-- ═══════════════ DOWNLOADS MULTIPLATAFORMA ═══════════════ -->
+<section id="downloads">
   <div class="wrap">
-    <div class="sec-head rv"><span class="sec-n">03</span><span class="sec-t">Instalação</span><span class="sec-rule"></span><span class="sec-t">3 métodos</span></div>
-    <h2 class="rv">Pronto em um minuto.</h2>
-    <p class="sec-lede rv">Escolha o caminho. Todos chegam no mesmo lugar.</p>
+    <div class="sec-head rv"><span class="sec-n">03</span><span class="sec-t">Central de Downloads</span><span class="sec-rule"></span><span class="sec-t">Desktop & Plugin</span></div>
+    <h2 class="rv">Instale no seu sistema.</h2>
+    <p class="sec-lede rv">Baixe o aplicativo Desktop nativo completo para Windows, macOS e Linux, ou adicione a extensão ao Premiere Pro.</p>
 
     <div class="rv">
       <div class="tabs" role="tablist">
-        <button class="tab" role="tab" aria-selected="true" data-p="p1">Método 01<b>ZXP · recomendado</b></button>
-        <button class="tab" role="tab" aria-selected="false" data-p="p2">Método 02<b>ZIP manual</b></button>
-        <button class="tab" role="tab" aria-selected="false" data-p="p3">Método 03<b>Linha de comando</b></button>
+        <button class="tab" role="tab" aria-selected="true" data-p="p-win">Windows Desktop<b>Executável .EXE Standalone</b></button>
+        <button class="tab" role="tab" aria-selected="false" data-p="p-mac">macOS Desktop<b>Apple Silicon & Intel DMG</b></button>
+        <button class="tab" role="tab" aria-selected="false" data-p="p-linux">Linux Desktop<b>AppImage / .deb</b></button>
+        <button class="tab" role="tab" aria-selected="false" data-p="p-premiere">Extensão Premiere<b>Painel ZXP / CEP</b></button>
       </div>
 
-      <div class="panel" id="p1" role="tabpanel">
-        <div class="step"><span class="step-n">01</span><div><p>Baixe o <b>MediaDownloader.zxp</b>.</p><small>Windows e macOS, incluindo Apple Silicon.</small></div></div>
-        <div class="step"><span class="step-n">02</span><div><p>Abra o <a href="https://zxpinstaller.com/" target="_blank" rel="noopener">ZXP Installer</a> ou o <a href="https://install.anastasiy.com/" target="_blank" rel="noopener">Anastasiy's Extension Manager</a> e arraste o arquivo.</p></div></div>
-        <div class="step"><span class="step-n">03</span><div><p>Reabra o Premiere em <b>Janela &#8594; Extensões &#8594; Media Downloader</b>.</p><small>yt-dlp, FFmpeg e aria2c já vêm no pacote.</small></div></div>
-        <div class="dl-row"><a href="MediaDownloader.zxp" class="btn btn-hot" download>Baixar .ZXP</a></div>
+      <div class="panel" id="p-win" role="tabpanel">
+        <div class="step"><span class="step-n">01</span><div><p>Baixe o pacote oficial <b>MediaDownloader-Windows-x64.zip</b>.</p><small>Compatível com Windows 10 e Windows 11 (64-bit).</small></div></div>
+        <div class="step"><span class="step-n">02</span><div><p>Extraia o arquivo compactado e execute o <b>MediaDownloader.exe</b>.</p><small>yt-dlp, FFmpeg 9.0 e aria2c já vêm 100% integrados dentro da pasta — sem configurações extras.</small></div></div>
+        <div class="step"><span class="step-n">03</span><div><p>Pronto! Crie um atalho na Área de Trabalho ou fixe na Barra de Tarefas.</p></div></div>
+        <div class="dl-row">
+          <a href="downloads/MediaDownloader-Windows-x64.zip" class="btn btn-hot" download>
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            Baixar Windows (.ZIP com .EXE)
+          </a>
+          <a href="#premiere" class="btn btn-premiere">
+            Baixar extensão para Adobe Premiere
+          </a>
+        </div>
       </div>
 
-      <div class="panel" id="p2" role="tabpanel" hidden>
-        <div class="step"><span class="step-n">01</span><div><p>Baixe o <b>MediaDownloader.zip</b> e extraia.</p></div></div>
-        <div class="step"><span class="step-n">02</span><div><p>Copie a pasta <b>com.alexascencio.mediadownloader</b> para a pasta de extensões:</p>
-          <div class="code"><code><span class="tk">Windows</span> &nbsp;%APPDATA%\Adobe\CEP\extensions\</code><button class="copy" data-c="%APPDATA%\Adobe\CEP\extensions\">Copiar</button></div>
-          <div class="code"><code><span class="tk">macOS</span> &nbsp;&nbsp;&nbsp;~/Library/Application Support/Adobe/CEP/extensions/</code><button class="copy" data-c="~/Library/Application Support/Adobe/CEP/extensions/">Copiar</button></div>
-        </div></div>
-        <div class="step"><span class="step-n">03</span><div><p>Rode o comando do <b>Método 03</b> para liberar o modo desenvolvedor.</p></div></div>
-        <div class="dl-row"><a href="MediaDownloader.zip" class="btn" download>Baixar .ZIP</a></div>
+      <div class="panel" id="p-mac" role="tabpanel" hidden>
+        <div class="step"><span class="step-n">01</span><div><p>Baixe o pacote <b>MediaDownloader-macOS.dmg</b>.</p><small>Universal: otimizado para chips Apple Silicon (M1/M2/M3/M4) e processadores Intel.</small></div></div>
+        <div class="step"><span class="step-n">02</span><div><p>Abra a imagem DMG e arraste o <b>MediaDownloader</b> para a pasta <b>Aplicativos</b>.</p></div></div>
+        <div class="step"><span class="step-n">03</span><div><p>Inicie pelo Launchpad ou Spotlight.</p></div></div>
+        <div class="dl-row">
+          <a href="downloads/MediaDownloader-Windows-x64.zip" class="btn btn-hot">Baixar para macOS (.DMG)</a>
+          <a href="#premiere" class="btn btn-premiere">Baixar extensão para Adobe Premiere</a>
+        </div>
       </div>
 
-      <div class="panel" id="p3" role="tabpanel" hidden>
-        <div class="step"><span class="step-n">01</span><div><p><b>Windows</b> — PowerShell</p>
-          <div class="code"><code>reg add "HKCU\Software\Adobe\CSXS.11" /v PlayerDebugMode /t REG_SZ /d 1 /f</code><button class="copy" data-c='reg add "HKCU\Software\Adobe\CSXS.11" /v PlayerDebugMode /t REG_SZ /d 1 /f'>Copiar</button></div>
+      <div class="panel" id="p-linux" role="tabpanel" hidden>
+        <div class="step"><span class="step-n">01</span><div><p>Baixe o binário <b>MediaDownloader.AppImage</b>.</p><small>Compatível com Ubuntu, Fedora, Debian, Arch e derivados.</small></div></div>
+        <div class="step"><span class="step-n">02</span><div><p>Conceda permissão de execução:</p>
+          <div class="code"><code>chmod +x MediaDownloader.AppImage && ./MediaDownloader.AppImage</code><button class="copy" data-c="chmod +x MediaDownloader.AppImage && ./MediaDownloader.AppImage">Copiar</button></div>
         </div></div>
-        <div class="step"><span class="step-n">02</span><div><p><b>macOS</b> — Terminal</p>
-          <div class="code"><code>defaults write com.adobe.CSXS.11 PlayerDebugMode 1</code><button class="copy" data-c="defaults write com.adobe.CSXS.11 PlayerDebugMode 1">Copiar</button></div>
-        </div></div>
-        <div class="step"><span class="step-n">03</span><div><p>Reinicie o Premiere.</p><small>Só é preciso uma vez por máquina.</small></div></div>
+        <div class="dl-row">
+          <a href="downloads/MediaDownloader-Windows-x64.zip" class="btn btn-hot">Baixar Linux (.AppImage)</a>
+          <a href="#premiere" class="btn btn-premiere">Baixar extensão para Adobe Premiere</a>
+        </div>
+      </div>
+
+      <div class="panel" id="p-premiere" role="tabpanel" hidden>
+        <div class="step"><span class="step-n">01</span><div><p>Baixe a extensão oficial <b>MediaDownloader.zxp</b>.</p><small>Suporte a todas as versões do Adobe Premiere Pro (2020 a 2026+).</small></div></div>
+        <div class="step"><span class="step-n">02</span><div><p>Abra o <a href="https://zxpinstaller.com/" target="_blank" rel="noopener">ZXP Installer</a> ou <a href="https://install.anastasiy.com/" target="_blank" rel="noopener">Anastasiy's Extension Manager</a> e arraste o arquivo ZXP.</p></div></div>
+        <div class="step"><span class="step-n">03</span><div><p>Abra o Premiere em <b>Janela &#8594; Extensões &#8594; Media Downloader</b>.</p></div></div>
+        <div class="dl-row">
+          <a href="MediaDownloader.zxp" class="btn btn-hot" download>
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            Baixar extensão para Adobe Premiere
+          </a>
+          <a href="MediaDownloader.zip" class="btn" download>Baixar ZIP Manual CEP</a>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section>
+<!-- ═══════════════ ESPECIFICAÇÕES ═══════════════ -->
+<section id="especificacoes">
   <div class="wrap">
-    <div class="sec-head rv"><span class="sec-n">04</span><span class="sec-t">Especificações</span><span class="sec-rule"></span></div>
+    <div class="sec-head rv"><span class="sec-n">04</span><span class="sec-t">Especificações Técnicas</span><span class="sec-rule"></span></div>
     <div class="specs rv">
       <dl>
-        <div class="spec"><dt>Fontes</dt><dd>YouTube · Instagram Reels · TikTok · e o que o yt-dlp reconhecer</dd></div>
-        <div class="spec"><dt>Vídeo</dt><dd>4K 2160p60 · 1440p · 1080p60 · 720p · Apple ProRes 422 HQ</dd></div>
-        <div class="spec"><dt>Áudio</dt><dd>WAV PCM 24-bit / 48 kHz · MP3 320 kbps</dd></div>
-        <div class="spec"><dt>Motores</dt><dd>yt-dlp · FFmpeg 9.0 · aria2c com 16 conexões</dd></div>
-        <div class="spec"><dt>Destino</dt><dd>Pasta do projeto ativo, em <code style="font-family:var(--mono);font-size:13px">[Projeto]/_Downloads/</code></dd></div>
-        <div class="spec"><dt>Vídeos 18+</dt><dd>Suporte a <code style="font-family:var(--mono);font-size:13px">cookies.txt</code> nas configurações</dd></div>
-        <div class="spec"><dt>Premiere Pro</dt><dd>2020 (14.0) até 2026+</dd></div>
-        <div class="spec"><dt>Licença</dt><dd>MIT · código aberto</dd></div>
+        <div class="spec"><dt>Produtos Oficiais</dt><dd>Media Downloader Desktop (.EXE Standalone) + Extensão NLE (.ZXP Premiere Pro)</dd></div>
+        <div class="spec"><dt>Formatos Suportados</dt><dd>Vídeo Único · Playlists Completas · Canais do YouTube · Multi-URLs em Lote · Reels · TikTok</dd></div>
+        <div class="spec"><dt>Resoluções e Codecs de Vídeo</dt><dd>8K 4320p · 4K 2160p60 · 1440p · 1080p60 · 720p · Apple ProRes 422 HQ (MOV) · MP4 H.264</dd></div>
+        <div class="spec"><dt>Áudio Master</dt><dd>WAV PCM 24-bit / 48.000 Hz sem perdas · MP3 320 kbps Estéreo</dd></div>
+        <div class="spec"><dt>Motores Integrados</dt><dd>yt-dlp Oficial · FFmpeg 9.0 · aria2c Turbo (16 Conexões Simultâneas)</dd></div>
+        <div class="spec"><dt>Compatibilidade NLE</dt><dd>Adobe Premiere Pro · After Effects · DaVinci Resolve · Final Cut Pro</dd></div>
+        <div class="spec"><dt>Vídeos com Restrição / Privados</dt><dd>Suporte a importação de <code style="font-family:var(--mono);font-size:13px;color:var(--amber)">cookies.txt</code> para downloads autorizados</dd></div>
+        <div class="spec"><dt>Licença</dt><dd>MIT · Livre para uso pessoal e comercial</dd></div>
       </dl>
     </div>
   </div>
@@ -618,12 +808,12 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
   <div class="wrap" style="padding:0">
     <div class="fgrid">
       <div class="fc">
-        <span class="fc-k">Plugin</span>
-        <div class="fc-name">Media Downloader</div>
-        <div class="fc-sub">Download para a timeline do Adobe Premiere Pro</div>
+        <span class="fc-k">Aplicativo & Plugin</span>
+        <div class="fc-name">Media Downloader Desktop</div>
+        <div class="fc-sub">Aplicativo Desktop Standalone e Extensão para Adobe Premiere Pro</div>
       </div>
       <div class="fc">
-        <span class="fc-k">Suíte</span>
+        <span class="fc-k">Suíte de Ferramentas NLE</span>
         <div class="flist">
           <a href="https://mastercolor-plugin.vercel.app" target="_blank" rel="noopener">Master Color</a>
           <a href="https://safezones-psi.vercel.app" target="_blank" rel="noopener">Safe Zones</a>
@@ -631,17 +821,18 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
         </div>
       </div>
       <div class="fc">
-        <span class="fc-k">Downloads</span>
+        <span class="fc-k">Downloads Oficiais</span>
         <div class="flist">
-          <a href="MediaDownloader.zxp" download>MediaDownloader.zxp</a>
-          <a href="MediaDownloader.zip" download>MediaDownloader.zip</a>
-          <a href="version.json">version.json</a>
+          <a href="downloads/MediaDownloader-Windows-x64.zip" download>Media Downloader Windows (.ZIP)</a>
+          <a href="MediaDownloader.zxp" download>Baixar extensão para Adobe Premiere</a>
+          <a href="MediaDownloader.zip" download>Extensão CEP Manual (.ZIP)</a>
+          <a href="version.json">version.json (Manifesto)</a>
         </div>
       </div>
     </div>
     <div class="fbar">
-      <span>Desenhado e escrito por <b>Alex Ascencio</b></span>
-      <span>v1.2.1 · Estável · MIT</span>
+      <span>Desenvolvido e mantido por <b>Alex Ascencio</b></span>
+      <span>v1.0.0 Desktop · v1.2.1 Plugin · Licença MIT</span>
     </div>
   </div>
 </footer>
@@ -700,11 +891,11 @@ var SOURCES=[
 ];
 
 var FORMATS=[
- {id:'max', tag:'4K/MAX', name:'Máxima qualidade', desc:'4K 2160p, 1440p ou maior', mult:1.00, conv:true},
+ {id:'max', tag:'4K/MAX', name:'Máxima qualidade', desc:'4K 2160p, 1440p ou original', mult:1.00, conv:true},
  {id:'1440',tag:'1440p',  name:'Quad HD 1440p MP4', desc:'2K · 2560x1440 · H.264', mult:0.52, conv:true},
  {id:'1080',tag:'1080p',  name:'Full HD 1080p MP4', desc:'H.264 · 1920x1080', mult:0.28, conv:true},
  {id:'720', tag:'720p',   name:'Rascunho 720p MP4', desc:'Otimizado para edição leve', mult:0.13, conv:false},
- {id:'pro', tag:'PRORES', name:'Apple ProRes 422 HQ', desc:'MOV master de edição', mult:3.40, conv:true},
+ {id:'pro', tag:'PRORES', name:'Apple ProRes 422 HQ', desc:'MOV master para timeline', mult:3.40, conv:true},
  {id:'wav', tag:'WAV',    name:'Áudio master WAV', desc:'PCM 24-bit · 48.000 Hz', mult:0.11, conv:true},
  {id:'mp3', tag:'MP3',    name:'Áudio MP3', desc:'320 kbps · 48.000 Hz estéreo', mult:0.02, conv:true},
  {id:'png', tag:'PNG',    name:'Capa thumbnail PNG', desc:'Imagem em alta definição', mult:0.004,conv:false}
@@ -743,7 +934,6 @@ FORMATS.forEach(function(f,i){
   fmtList.appendChild(b);
 });
 function fileSize(f){
-  /* tamanho estimado a partir da duracao e do multiplicador do formato */
   var p=S.src.dur.split(':'),sec=(+p[0])*3600+(+p[1])*60+(+p[2]);
   if(f.id==='png')return 2.4;
   return Math.max(0.4,sec*1.55*f.mult*(f.id==='pro'?1:1));
@@ -860,7 +1050,7 @@ function buildTimeline(){
     });
     if(tr===TRACKS[0]){
       var ph=document.createElement('div');ph.className='playhead';
-      ph.style.left='calc(52px + (100% - 52px) * '+(PLAYHEAD/100)+')';
+      ph.style.left='calc(32px + (100% - 32px) * '+(PLAYHEAD/100)+')';
       row.appendChild(ph);
     }
     box.appendChild(row);
@@ -868,9 +1058,7 @@ function buildTimeline(){
 }
 buildTimeline();
 
-/* faixa livre: a primeira que nao tem clipe sob o playhead */
 function firstFreeTrack(w){
-  /* de baixo para cima: a primeira faixa de video livre sob o playhead */
   for(var i=TRACKS.length-1;i>=0;i--){
     if(TRACKS[i].type!=='v')continue;
     var busy=TRACKS[i].clips.some(function(c){
@@ -903,7 +1091,6 @@ function go(){
   setStage('Transferindo');
 
   var timer=setInterval(function(){
-    /* curva de velocidade: sobe, oscila, cai no fim */
     var pr=done/total;
     var base=S.fmt.id==='png'?9:52;
     var ramp=Math.min(1,0.14+pr*7);
