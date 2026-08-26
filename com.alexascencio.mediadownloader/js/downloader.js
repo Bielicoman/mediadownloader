@@ -87,7 +87,8 @@
             }
 
             var home = os.homedir();
-            var videosDir = path.join(home, "Videos", "PremiereDownloads");
+            // No macOS a pasta padrao de video e ~/Movies; ~/Videos nao existe.
+            var videosDir = path.join(home, process.platform === "darwin" ? "Movies" : "Videos", "PremiereDownloads");
             if (!fs.existsSync(videosDir)) {
                 try {
                     fs.mkdirSync(videosDir, { recursive: true });

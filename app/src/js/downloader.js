@@ -72,7 +72,8 @@
       if (!isNode) return "C:/Users/Editor/Videos/MediaDownloader";
 
       var home = os ? os.homedir() : process.env.USERPROFILE;
-      var videosDir = path.join(home, "Videos", "MediaDownloader");
+      // No macOS a pasta padrao de video e ~/Movies; ~/Videos nao existe.
+      var videosDir = path.join(home, process.platform === "darwin" ? "Movies" : "Videos", "MediaDownloader");
       if (!fs.existsSync(videosDir)) {
         try { fs.mkdirSync(videosDir, { recursive: true }); } catch (e) {}
       }
