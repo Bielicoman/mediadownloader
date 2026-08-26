@@ -1,6 +1,7 @@
 # Avisos de terceiros
 
-O código-fonte do Media Downloader é licenciado sob [MIT](LICENSE).
+O código-fonte do Media Downloader é licenciado sob [MIT](LICENSE). Essa licença
+cobre **apenas o código deste projeto**.
 
 Os pacotes distribuídos (`.zip`, `.dmg`, `.AppImage`) **empacotam programas de
 terceiros**, cada um sob a sua própria licença. Alguns são copyleft (GPL) e essas

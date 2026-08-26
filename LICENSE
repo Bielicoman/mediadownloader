@@ -19,14 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-NOTE ON BUNDLED COMPONENTS
-
-The MIT license above covers the source code of this project only.
-
-The distributed packages also bundle third-party programs under their own
-licenses, some of them copyleft (GPL). Those licenses are not superseded by
-this one. See THIRD-PARTY-NOTICES.md for the full list, the license of each
-component, and where to obtain their corresponding source code.
