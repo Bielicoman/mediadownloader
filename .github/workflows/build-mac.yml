@@ -110,9 +110,32 @@ jobs:
             --app-bundle-id=com.alexascencio.mediadownloader.desktop \
             --app-version=1.0.0 \
             --icon=app/icon.icns \
+            --no-asar \
             --overwrite \
             --out=out
           ls -la "out/Media Downloader-darwin-${{ matrix.arch }}"
+
+      - name: Conferir layout do bundle
+        run: |
+          set -euo pipefail
+          APP="out/Media Downloader-darwin-${{ matrix.arch }}/Media Downloader.app"
+          echo "::group::Contents"
+          ls -la "$APP/Contents"
+          echo "::endgroup::"
+          echo "::group::Resources"
+          ls -la "$APP/Contents/Resources" | head -30
+          echo "::endgroup::"
+          du -sh "$APP"
+
+          RES="$APP/Contents/Resources"
+          if [ -f "$RES/app.asar" ]; then
+            echo "ERRO: app foi empacotado em asar; binarios em bin/ nao seriam executaveis"
+            exit 1
+          fi
+          for b in yt-dlp ffmpeg ffprobe; do
+            test -x "$RES/app/bin/$b" || { echo "ERRO: $b ausente ou sem permissao de execucao"; exit 1; }
+          done
+          echo "OK: bin/ presente e executavel dentro do bundle"
 
       - name: Assinatura ad-hoc
         run: |
