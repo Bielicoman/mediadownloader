@@ -424,6 +424,19 @@ h2 em{font-style:normal;color:var(--amber)}
 }
 .copy:hover{color:var(--txt);border-color:var(--txt)}
 .copy.done{background:var(--line);border-color:var(--line);color:var(--ink)}
+.gate{
+  margin:22px 0 4px;border:1px solid var(--amber);border-left-width:3px;
+  background:rgba(255,176,32,.06);padding:16px 18px;
+}
+.gate-h{
+  display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;
+}
+.gate p{margin:10px 0 0;font-size:13.5px;line-height:1.62}
+.gate ol{margin:9px 0 0;padding-left:19px;font-size:13.5px;line-height:1.75}
+.gate ol li{margin-bottom:3px}
+.gate .alt{margin-top:15px;padding-top:13px;border-top:1px solid rgba(255,176,32,.22)}
+.gate .alt-k{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
 .dl-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;padding-top:22px;border-top:1px solid var(--edge);align-items:center}
 
 /* ═════ ESPECIFICAÇÕES ═════ */
@@ -755,7 +768,23 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
       <div class="panel" id="p-mac" role="tabpanel" hidden>
         <div class="step"><span class="step-n">01</span><div><p>Escolha o pacote do seu Mac.</p><small>No menu Apple, em <b>Sobre Este Mac</b>: se aparecer <b>Chip Apple M1/M2/M3/M4</b>, use Apple&nbsp;Silicon. Se aparecer <b>Processador Intel</b>, use Intel.</small></div></div>
         <div class="step"><span class="step-n">02</span><div><p>Abra o <b>.DMG</b> e arraste o <b>Media Downloader</b> para a pasta <b>Aplicativos</b>.</p></div></div>
-        <div class="step"><span class="step-n">03</span><div><p>Na primeira abertura, o macOS vai bloquear o app.</p><small>Isso é esperado: o app tem assinatura ad-hoc, não um certificado pago da Apple. Vá em <b>Ajustes do Sistema › Privacidade e Segurança</b>, role até o aviso sobre o Media Downloader e clique em <b>Abrir Assim Mesmo</b>. Só é necessário uma vez.</small></div></div>
+        <div class="gate">
+          <div class="gate-h">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L12.8 12H1.2L7 1.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M7 5.6v2.9M7 10.1v.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Passo 03 &middot; O macOS vai bloquear na primeira abertura
+          </div>
+          <p>Vai aparecer <b>&ldquo;O item Media Downloader não foi aberto&rdquo;</b>, dizendo que a Apple não pôde verificar o app. <b>Isso é esperado e não significa que o app esteja danificado</b> — ele só não passou pela notarização paga da Apple. O botão <b>OK</b> é a única opção do aviso; o desbloqueio fica nos Ajustes:</p>
+          <ol>
+            <li>Clique em <b>OK</b> para fechar o aviso.</li>
+            <li>Abra <b>Ajustes do Sistema › Privacidade e Segurança</b>.</li>
+            <li>Role até o fim: vai haver a linha <i>&ldquo;Media Downloader foi bloqueado&rdquo;</i> com o botão <b>Abrir Assim Mesmo</b>.</li>
+            <li>Confirme com Touch ID ou senha e clique em <b>Abrir</b>. Só é preciso fazer isso uma vez.</li>
+          </ol>
+          <div class="alt">
+            <span class="alt-k">Alternativa pelo Terminal &middot; resolve de uma vez</span>
+            <div class="code"><code>xattr -dr com.apple.quarantine &quot;/Applications/Media Downloader.app&quot;</code><button class="copy" data-c="xattr -dr com.apple.quarantine &quot;/Applications/Media Downloader.app&quot;">Copiar</button></div>
+          </div>
+        </div>
         <div class="step"><span class="step-n">04</span><div><p>Pronto! Abra pelo Launchpad ou Spotlight.</p><small>yt-dlp, FFmpeg e ffprobe já vêm integrados dentro do pacote — sem Homebrew, sem terminal.</small></div></div>
         <div class="dl-row">
           <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-AppleSilicon.dmg" class="btn btn-hot" download>
