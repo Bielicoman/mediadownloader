@@ -1,4 +1,4 @@
-name: Build macOS
+name: Build Desktop (Windows + macOS)
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
   push:
     paths:
       - "app/**"
-      - ".github/workflows/build-mac.yml"
+      - ".github/workflows/build-desktop.yml"
 
 permissions:
   contents: write
@@ -20,7 +20,8 @@ env:
   FFMPEG_TAG: "b6.1.1"
 
 jobs:
-  build:
+  macos:
+    name: macOS
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -183,3 +184,95 @@ jobs:
           gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
           echo "Publicado em $TAG:"
           ls dist/
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Baixar binarios nativos de Windows
+        working-directory: app
+        run: |
+          set -euo pipefail
+          mkdir -p bin
+
+          curl -sSL -o bin/yt-dlp.exe             https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe
+
+          # Estaticos, mesma fonte usada no build de macOS: mantem as plataformas
+          # em paridade e troca o build "full" de 212 MB por um de 79 MB que tem
+          # todos os codecs usados pelo app (libx264, prores, aac, pcm_s24le, mp3).
+          curl -sSL -o bin/ffmpeg.exe             "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_TAG}/ffmpeg-win32-x64"
+          curl -sSL -o bin/ffprobe.exe             "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_TAG}/ffprobe-win32-x64"
+
+          curl -sSL -o aria2.zip             https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip
+          7z e -y aria2.zip -obin "*/aria2c.exe" >/dev/null
+          rm -f aria2.zip
+
+          for b in yt-dlp.exe ffmpeg.exe ffprobe.exe aria2c.exe; do
+            size=$(stat -c%s "bin/$b")
+            echo "$b: $size bytes"
+            if [ "$size" -lt 1000000 ]; then
+              echo "ERRO: bin/$b tem apenas $size bytes - download falhou"
+              exit 1
+            fi
+          done
+
+          # Confirma que os codecs que o app usa existem neste build
+          for c in libx264 prores_ks aac pcm_s24le libmp3lame; do
+            ./bin/ffmpeg.exe -hide_banner -encoders 2>/dev/null | grep -qw "$c"               || { echo "ERRO: codec $c ausente no ffmpeg"; exit 1; }
+            echo "codec OK: $c"
+          done
+
+      - name: Empacotar .exe
+        run: |
+          set -euo pipefail
+          npx --yes @electron/packager@20 app "Media Downloader"             --platform=win32             --arch=x64             --electron-version="$ELECTRON_VERSION"             --app-version=1.0.0             --icon=app/icons/icon.ico             --no-asar             --overwrite             --out=out
+          ls -la "out/Media Downloader-win32-x64"
+
+      - name: Enxugar o pacote
+        run: |
+          set -euo pipefail
+          DIR="out/Media Downloader-win32-x64"
+
+          echo "antes: $(du -sm "$DIR" | cut -f1) MB"
+
+          # O build antigo copiava bin/ duas vezes, dobrando 431 MB a toa.
+          # Aqui existe uma copia so, dentro de resources/app.
+          RES="$DIR/resources/app"
+          test -x "$RES/bin/ffmpeg.exe" || { echo "ERRO: bin/ ausente no pacote"; exit 1; }
+          if [ -d "$DIR/bin" ]; then rm -rf "$DIR/bin"; echo "removida copia duplicada de bin/"; fi
+
+          # 55 idiomas do Chromium, dos quais o app usa dois.
+          find "$DIR/locales" -name "*.pak" ! -name "en-US.pak" ! -name "pt-BR.pak" -delete
+          echo "idiomas mantidos: $(ls "$DIR/locales")"
+
+          rm -f "$DIR/LICENSES.chromium.html"
+
+          echo "depois: $(du -sm "$DIR" | cut -f1) MB"
+
+      - name: Gerar .zip
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          # Deflate e nao LZMA2 de proposito: o Explorer do Windows so abre
+          # Deflate nativamente, e um zip que exige 7-Zip instalado trava o usuario.
+          7z a -tzip -mx=9 "dist/MediaDownloader-Windows-x64.zip"             "./out/Media Downloader-win32-x64/*" >/dev/null
+          ls -lh dist/
+
+      - name: Publicar na release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.inputs.release_tag || 'v1.0.0' }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
+          echo "Publicado em $TAG"
