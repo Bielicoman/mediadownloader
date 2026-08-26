@@ -233,7 +233,12 @@ Baixar conteúdo de plataformas como o YouTube pode violar os termos de serviço
 
 ## Licença
 
-MIT.
+O código deste projeto é [MIT](LICENSE) — use, modifique e redistribua à vontade.
+
+Os pacotes distribuídos empacotam **FFmpeg** e **aria2**, que são GPL, e a
+licença MIT não substitui a deles. A lista completa de componentes, suas
+licenças e onde obter o código-fonte correspondente está em
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 Criado por **[Alex Ascencio](https://github.com/Bielicoman)**.
 

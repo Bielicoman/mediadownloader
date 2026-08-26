@@ -255,7 +255,8 @@ jobs:
           find "$DIR/locales" -name "*.pak" ! -name "en-US.pak" ! -name "pt-BR.pak" -delete
           echo "idiomas mantidos: $(ls "$DIR/locales")"
 
-          rm -f "$DIR/LICENSES.chromium.html"
+          # LICENSES.chromium.html fica: a licenca BSD do Chromium obriga a
+          # distribuir os avisos de copyright junto com o binario.
 
           echo "depois: $(du -sm "$DIR" | cut -f1) MB"
 
@@ -338,7 +339,8 @@ jobs:
           echo "antes: $(du -sm "$DIR" | cut -f1) MB"
           find "$DIR/locales" -name "*.pak" ! -name "en-US.pak" ! -name "pt-BR.pak" -delete
           echo "idiomas mantidos:"; ls "$DIR/locales"
-          rm -f "$DIR/LICENSES.chromium.html"
+          # LICENSES.chromium.html fica: a licenca BSD do Chromium obriga a
+          # distribuir os avisos de copyright junto com o binario.
           echo "depois: $(du -sm "$DIR" | cut -f1) MB"
 
       - name: Montar AppDir
