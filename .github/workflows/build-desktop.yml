@@ -1,4 +1,4 @@
-name: Build Desktop (Windows + macOS)
+name: Build Desktop (Windows + macOS + Linux)
 
 on:
   workflow_dispatch:
@@ -275,4 +275,129 @@ jobs:
         run: |
           set -euo pipefail
           gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
+          echo "Publicado em $TAG"
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Baixar binarios nativos de Linux
+        working-directory: app
+        run: |
+          set -euo pipefail
+          mkdir -p bin
+
+          curl -sSL -o bin/yt-dlp             https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux
+          curl -sSL -o bin/ffmpeg             "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_TAG}/ffmpeg-linux-x64"
+          curl -sSL -o bin/ffprobe             "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_TAG}/ffprobe-linux-x64"
+
+          # aria2 nao publica binario para Linux nas releases oficiais, so Android.
+          # O downloader trata aria2 como opcional, entao o yt-dlp usa o motor nativo.
+
+          chmod +x bin/yt-dlp bin/ffmpeg bin/ffprobe
+
+          for b in yt-dlp ffmpeg ffprobe; do
+            size=$(stat -c%s "bin/$b")
+            echo "$b: $size bytes"
+            if [ "$size" -lt 1000000 ]; then
+              echo "ERRO: bin/$b tem apenas $size bytes - download falhou"
+              exit 1
+            fi
+          done
+
+          for c in libx264 prores_ks aac pcm_s24le libmp3lame; do
+            ./bin/ffmpeg -hide_banner -encoders 2>/dev/null | grep -qw "$c"               || { echo "ERRO: codec $c ausente no ffmpeg"; exit 1; }
+            echo "codec OK: $c"
+          done
+
+      - name: Empacotar aplicacao
+        run: |
+          set -euo pipefail
+          npx --yes @electron/packager@20 app "Media Downloader"             --platform=linux             --arch=x64             --electron-version="$ELECTRON_VERSION"             --app-version=1.0.0             --executable-name=media-downloader             --no-asar             --overwrite             --out=out
+          ls -la "out/Media Downloader-linux-x64"
+
+      - name: Enxugar o pacote
+        run: |
+          set -euo pipefail
+          DIR="out/Media Downloader-linux-x64"
+          echo "antes: $(du -sm "$DIR" | cut -f1) MB"
+          find "$DIR/locales" -name "*.pak" ! -name "en-US.pak" ! -name "pt-BR.pak" -delete
+          echo "idiomas mantidos:"; ls "$DIR/locales"
+          rm -f "$DIR/LICENSES.chromium.html"
+          echo "depois: $(du -sm "$DIR" | cut -f1) MB"
+
+      - name: Montar AppDir
+        run: |
+          set -euo pipefail
+          DIR="out/Media Downloader-linux-x64"
+          APPDIR=AppDir
+          rm -rf "$APPDIR"
+          mkdir -p "$APPDIR/usr/bin"
+          cp -r "$DIR/." "$APPDIR/usr/bin/"
+
+          # O Electron exige que chrome-sandbox seja setuid root, o que um AppImage
+          # nao consegue garantir. Passar --no-sandbox e o padrao adotado por apps
+          # Electron distribuidos em AppImage.
+          cat > "$APPDIR/AppRun" <<'APPRUN'
+          #!/bin/sh
+          HERE="$(dirname "$(readlink -f "$0")")"
+          exec "$HERE/usr/bin/media-downloader" --no-sandbox "$@"
+          APPRUN
+          chmod +x "$APPDIR/AppRun"
+
+          cat > "$APPDIR/media-downloader.desktop" <<'DESKTOP'
+          [Desktop Entry]
+          Type=Application
+          Name=Media Downloader
+          Comment=Baixe videos, audios, playlists e canais com qualidade maxima
+          Exec=media-downloader
+          Icon=media-downloader
+          Categories=AudioVideo;Video;
+          Terminal=false
+          DESKTOP
+
+          cp app/icon-source.png "$APPDIR/media-downloader.png"
+          ls -la "$APPDIR"
+
+      - name: Gerar AppImage
+        run: |
+          set -euo pipefail
+          curl -sSL -o appimagetool             https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool
+
+          mkdir -p dist
+          # Os runners atuais do Ubuntu nao trazem libfuse2, entao o appimagetool
+          # roda em modo de extracao em vez de montar via FUSE.
+          APPIMAGE_EXTRACT_AND_RUN=1 ./appimagetool AppDir             dist/MediaDownloader-Linux-x86_64.AppImage
+          chmod +x dist/MediaDownloader-Linux-x86_64.AppImage
+          ls -lh dist/
+
+      - name: Conferir o AppImage gerado
+        run: |
+          set -euo pipefail
+          cd dist
+          ./MediaDownloader-Linux-x86_64.AppImage --appimage-extract >/dev/null
+          RES=squashfs-root/usr/bin/resources/app
+          test -x "$RES/bin/ffmpeg"  || { echo "ERRO: ffmpeg ausente no AppImage";  exit 1; }
+          test -x "$RES/bin/ffprobe" || { echo "ERRO: ffprobe ausente no AppImage"; exit 1; }
+          test -x "$RES/bin/yt-dlp"  || { echo "ERRO: yt-dlp ausente no AppImage";  exit 1; }
+          test -f "$RES/src/index.html" || { echo "ERRO: fonte do app ausente"; exit 1; }
+          "$RES/bin/ffmpeg" -hide_banner -version | head -1
+          echo "OK: AppImage contem os motores e o app"
+          rm -rf squashfs-root
+
+      - name: Publicar na release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.inputs.release_tag || 'v1.0.0' }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" dist/MediaDownloader-Linux-x86_64.AppImage             --clobber --repo "$GITHUB_REPOSITORY"
           echo "Publicado em $TAG"
