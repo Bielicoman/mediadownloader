@@ -13,3 +13,11 @@ dist/
 
 # Certificado de assinatura do ZXP: nunca versionar a chave privada.
 .signing/
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/keystore.jks
+android/keystore.properties

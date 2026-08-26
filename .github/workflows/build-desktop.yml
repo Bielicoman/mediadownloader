@@ -1,4 +1,4 @@
-name: Build Desktop (Windows + macOS + Linux)
+name: Build (Windows + macOS + Linux + Android)
 
 on:
   workflow_dispatch:
@@ -10,6 +10,7 @@ on:
   push:
     paths:
       - "app/**"
+      - "android/**"
       - ".github/workflows/build-desktop.yml"
 
 permissions:
@@ -412,4 +413,90 @@ jobs:
           cp installers/linux/instalar.sh    dist/
           cp installers/linux/desinstalar.sh dist/
           gh release upload "$TAG"             dist/MediaDownloader-Linux-x86_64.AppImage             dist/instalar.sh             dist/desinstalar.sh             --clobber --repo "$GITHUB_REPOSITORY"
+          echo "Publicado em $TAG"
+
+  android:
+    name: Android
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+
+      - name: Restaurar o keystore de assinatura
+        working-directory: android
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "${KEYSTORE_B64:-}" ]; then
+            echo "::warning::Sem keystore nos secrets. O APK sai assinado em modo debug:"
+            echo "::warning::instala normalmente, mas nao atualiza por cima de outra chave."
+            exit 0
+          fi
+          echo "$KEYSTORE_B64" | base64 -d > keystore.jks
+          cat > keystore.properties <<PROPS
+          storePassword=$STORE_PASS
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASS
+          PROPS
+          echo "Keystore de release restaurado."
+
+      - name: Compilar o APK
+        working-directory: android
+        run: |
+          set -euo pipefail
+          gradle --no-daemon assembleRelease
+          find app/build/outputs/apk/release -name "*.apk" -exec ls -lh {} \;
+
+      - name: Renomear os artefatos
+        working-directory: android
+        run: |
+          set -euo pipefail
+          mkdir -p ../dist
+          cd app/build/outputs/apk/release
+          for f in *.apk; do
+            case "$f" in
+              *arm64-v8a*)   novo="MediaDownloader-Android-arm64.apk" ;;
+              *armeabi-v7a*) novo="MediaDownloader-Android-arm32.apk" ;;
+              *x86_64*)      novo="MediaDownloader-Android-x86_64.apk" ;;
+              *universal*)   novo="MediaDownloader-Android-universal.apk" ;;
+              *)             novo="MediaDownloader-Android.apk" ;;
+            esac
+            cp "$f" "../../../../../../dist/$novo"
+          done
+          ls -lh ../../../../../../dist/
+
+      - name: Conferir os APKs
+        run: |
+          set -euo pipefail
+          cd dist
+          for apk in *.apk; do
+            # Um APK e um zip: se abrir e tiver o manifesto e o binario do yt-dlp,
+            # o empacotamento funcionou.
+            unzip -l "$apk" > /tmp/lista.txt
+            grep -q "AndroidManifest.xml" /tmp/lista.txt || { echo "ERRO: $apk sem manifesto"; exit 1; }
+            grep -q "classes.dex"         /tmp/lista.txt || { echo "ERRO: $apk sem codigo"; exit 1; }
+            grep -qE "lib/.*/libpython|assets/python" /tmp/lista.txt               || echo "AVISO: $apk pode nao conter o Python do yt-dlp"
+            echo "OK: $apk"
+          done
+
+      - name: Publicar na release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.inputs.release_tag || 'v1.0.0' }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" dist/*.apk --clobber --repo "$GITHUB_REPOSITORY"
           echo "Publicado em $TAG"
