@@ -499,14 +499,18 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
         <p class="lede rv">O aplicativo Desktop oficial e definitivo para baixar vídeos em <b>4K/8K</b>, playlists inteiras, canais do YouTube e áudios com recodificação instantânea para <b>Apple ProRes 422 HQ</b>, <b>H.264</b> e <b>WAV 24-bit</b>. 100% nativo, sem limites de taxa e pronto para a timeline.</p>
         <div class="gauges rv">
           <div class="gauge"><span class="gauge-k">Plataforma</span><span class="gauge-v">Windows &middot; macOS</span></div>
-          <div class="gauge"><span class="gauge-k">Performance</span><span class="gauge-v">16 Sockets Turbo</span></div>
+          <div class="gauge"><span class="gauge-k">Performance</span><span class="gauge-v">Multi-conexão Turbo</span></div>
           <div class="gauge"><span class="gauge-k">Codecs</span><span class="gauge-v">ProRes · WAV · MP4</span></div>
           <div class="gauge"><span class="gauge-k">NLE Ready</span><span class="gauge-v">Premiere & DaVinci</span></div>
         </div>
         <div class="cta-row rv">
-          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Windows-x64.zip" class="btn btn-hot" download>
+          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Windows-x64.zip" class="btn btn-hot" id="ctaWin" download>
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
             Baixar Windows (.EXE)
+          </a>
+          <a href="#downloads" class="btn btn-hot" id="ctaMac" data-goto-tab="p-mac">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+            Baixar macOS (.DMG)
           </a>
           <a href="#premiere" class="btn btn-premiere">
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
@@ -522,7 +526,7 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
           <div class="scope-legend">
             <span>Pico <b id="scopePeak">0 MB/s</b></span>
             <span>Média <b id="scopeAvg">0 MB/s</b></span>
-            <span>Motor <b>aria2c + FFmpeg 9.0</b></span>
+            <span>Motor <b>yt-dlp + FFmpeg</b></span>
           </div>
         </div>
       </div>
@@ -1166,6 +1170,28 @@ function finish(){
 $('#btnGo').onclick=go;
 $('#btnProbe').onclick=probe;
 $('#urlIn').addEventListener('keydown',function(e){if(e.key==='Enter')probe()});
+
+/* ═══════════════ CTA POR PLATAFORMA ═══════════════ */
+/* Botao do topo abre a aba correspondente ao chegar na secao de downloads. */
+[].forEach.call(document.querySelectorAll('[data-goto-tab]'),function(el){
+  el.addEventListener('click',function(){
+    var alvo=document.querySelector('.tab[data-p="'+el.dataset.gotoTab+'"]');
+    if(alvo) alvo.click();
+  });
+});
+
+/* Num Mac, o botao de macOS vem primeiro e o de Windows recua para secundario.
+   Nao adivinhamos Apple Silicon x Intel: o Safari em ARM se declara Intel por
+   compatibilidade, entao a escolha do chip fica na aba de downloads, onde
+   explicamos como conferir em Sobre Este Mac. */
+(function(){
+  var p=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.platform||navigator.userAgent||'';
+  if(!/Mac/i.test(p)) return;
+  var win=document.getElementById('ctaWin'), mac=document.getElementById('ctaMac');
+  if(!win||!mac||!win.parentNode) return;
+  win.parentNode.insertBefore(mac,win);
+  win.classList.remove('btn-hot');
+})();
 
 /* ═══════════════ ABAS / COPIAR / REVELAÇÃO ═══════════════ */
 [].forEach.call(document.querySelectorAll('.tab'),function(t){
