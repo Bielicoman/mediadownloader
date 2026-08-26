@@ -1,0 +1,18 @@
+# Scripts de shell precisam de LF: com CRLF o Linux le o shebang como
+# "bash\r" e recusa executar com "bad interpreter".
+*.sh   text eol=lf
+
+# Batch do Windows espera CRLF.
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# Workflows sao lidos por runners Linux.
+*.yml  text eol=lf
+*.yaml text eol=lf
+
+# Binarios nunca devem ser convertidos.
+*.png  binary
+*.ico  binary
+*.zxp  binary
+*.zip  binary
+*.exe  binary
