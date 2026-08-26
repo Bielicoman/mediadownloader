@@ -32,6 +32,36 @@
             }
         },
 
+        /**
+         * Caminhos onde os motores existem no macOS.
+         *
+         * Necessario porque apps de GUI no macOS nao herdam o PATH do shell:
+         * dentro do Premiere, "which ffmpeg" roda com PATH minimo e nao enxerga
+         * /opt/homebrew/bin. O primeiro candidato e o app Desktop, que ja traz
+         * yt-dlp, ffmpeg e ffprobe assinados dentro do proprio bundle.
+         */
+        macCandidates: function (name) {
+            if (!isNode || process.platform !== "darwin") return [];
+            var home = process.env.HOME || "";
+            var dentroDoApp = "/Contents/Resources/app/bin/" + name;
+            return [
+                "/Applications/Media Downloader.app" + dentroDoApp,
+                home + "/Applications/Media Downloader.app" + dentroDoApp,
+                "/Applications/MediaDownloader.app" + dentroDoApp,
+                "/opt/homebrew/bin/" + name,
+                "/usr/local/bin/" + name,
+                "/opt/local/bin/" + name,
+                "/usr/bin/" + name
+            ];
+        },
+
+        /** bin/ da extensao primeiro, depois os caminhos conhecidos de macOS. */
+        candidatosLocais: function (name) {
+            if (!isNode) return [];
+            var lista = [path.join(this.getLocalBinDir(), process.platform === "win32" ? name + ".exe" : name)];
+            return lista.concat(this.macCandidates(name));
+        },
+
         getLocalBinDir: function () {
             if (!isNode) return "";
             var extDir = this.getExtensionDir();
@@ -61,13 +91,15 @@
                 }
 
                 // 2. Verifica pasta bin/ local da extensão
-                var localBin = self.getLocalBinDir();
-                var localExe = path.join(localBin, process.platform === "win32" ? "yt-dlp.exe" : "yt-dlp");
-                if (fs.existsSync(localExe)) {
-                    self.cachedYtDlpPath = localExe;
-                    return self.checkBinaryVersion(localExe).then(function (ver) {
-                        resolve({ found: true, path: localExe, version: ver, source: "local" });
-                    });
+                var locais = self.candidatosLocais("yt-dlp");
+                for (var L = 0; L < locais.length; L++) {
+                    if (fs.existsSync(locais[L])) {
+                        var achado = locais[L];
+                        self.cachedYtDlpPath = achado;
+                        return self.checkBinaryVersion(achado).then(function (ver) {
+                            resolve({ found: true, path: achado, version: ver, source: "local" });
+                        });
+                    }
                 }
 
                 // 3. Procura no PATH do sistema
@@ -130,13 +162,15 @@
                     });
                 }
 
-                var localBin = self.getLocalBinDir();
-                var localExe = path.join(localBin, process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg");
-                if (fs.existsSync(localExe)) {
-                    self.cachedFfmpegPath = localExe;
-                    return self.checkBinaryVersion(localExe, true).then(function (ver) {
-                        resolve({ found: true, path: localExe, version: ver, source: "local" });
-                    });
+                var locaisF = self.candidatosLocais("ffmpeg");
+                for (var F = 0; F < locaisF.length; F++) {
+                    if (fs.existsSync(locaisF[F])) {
+                        var achadoF = locaisF[F];
+                        self.cachedFfmpegPath = achadoF;
+                        return self.checkBinaryVersion(achadoF, true).then(function (ver) {
+                            resolve({ found: true, path: achadoF, version: ver, source: "local" });
+                        });
+                    }
                 }
 
                 var cmd = process.platform === "win32" ? "where ffmpeg" : "which ffmpeg";
@@ -197,10 +231,11 @@
 
         findAria2: function () {
             if (!isNode) return Promise.resolve({ found: false, path: null });
-            var localBin = this.getLocalBinDir();
-            var localExe = path.join(localBin, process.platform === "win32" ? "aria2c.exe" : "aria2c");
-            if (fs.existsSync(localExe)) {
-                return Promise.resolve({ found: true, path: localExe, source: "local" });
+            var locaisA = this.candidatosLocais("aria2c");
+            for (var A = 0; A < locaisA.length; A++) {
+                if (fs.existsSync(locaisA[A])) {
+                    return Promise.resolve({ found: true, path: locaisA[A], source: "local" });
+                }
             }
             return new Promise(function (resolve) {
                 var cmd = process.platform === "win32" ? "where aria2c" : "which aria2c";

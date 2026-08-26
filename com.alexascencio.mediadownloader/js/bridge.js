@@ -178,12 +178,16 @@
                 }
             } catch (e) {}
 
-            // Nível 2: Node.js PowerShell Get-Clipboard
+            // Nível 2: leitura via processo nativo do sistema
             if (typeof require !== "undefined") {
                 try {
                     var child_process = require("child_process");
+                    // pbpaste no macOS; PowerShell no Windows.
+                    var cmdClipboard = process.platform === "darwin"
+                        ? "pbpaste"
+                        : 'powershell.exe -NoProfile -Command "Get-Clipboard"';
                     return new Promise(function (resolve) {
-                        child_process.exec('powershell.exe -NoProfile -Command "Get-Clipboard"', { timeout: 1000 }, function (err, stdout) {
+                        child_process.exec(cmdClipboard, { timeout: 1000 }, function (err, stdout) {
                             if (!err && stdout && stdout.trim()) {
                                 return resolve(stdout.trim());
                             }

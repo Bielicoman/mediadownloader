@@ -814,6 +814,33 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
         <div class="step"><span class="step-n">01</span><div><p>Baixe a extensão oficial <b>MediaDownloader.zxp</b>.</p><small>Suporte a todas as versões do Adobe Premiere Pro (2020 a 2026+).</small></div></div>
         <div class="step"><span class="step-n">02</span><div><p>Abra o <a href="https://zxpinstaller.com/" target="_blank" rel="noopener">ZXP Installer</a> ou <a href="https://install.anastasiy.com/" target="_blank" rel="noopener">Anastasiy's Extension Manager</a> e arraste o arquivo ZXP.</p></div></div>
         <div class="step"><span class="step-n">03</span><div><p>Abra o Premiere em <b>Janela &#8594; Extensões &#8594; Media Downloader</b>.</p></div></div>
+        <div class="gate">
+          <div class="gate-h">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L12.8 12H1.2L7 1.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M7 5.6v2.9M7 10.1v.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            No macOS &middot; leia antes de instalar
+          </div>
+
+          <p><b>1. Os motores de download.</b> No macOS o Premiere não enxerga programas instalados pelo Homebrew, porque apps de interface não herdam o <span style="font-family:var(--mono);font-size:12px">PATH</span> do Terminal. A forma que funciona sem dor de cabeça é <b>instalar o app Desktop para macOS</b> — a extensão detecta e usa o yt-dlp e o FFmpeg que já vêm dentro dele, sem configurar nada.</p>
+          <p style="color:var(--dim);font-size:12.5px">Se preferir não instalar o app Desktop, instale os motores manualmente. A extensão também procura em <span style="font-family:var(--mono)">/opt/homebrew/bin</span> e <span style="font-family:var(--mono)">/usr/local/bin</span>:</p>
+          <div class="code"><code>brew install ffmpeg yt-dlp</code><button class="copy" data-c="brew install ffmpeg yt-dlp">Copiar</button></div>
+
+          <div class="alt">
+            <span class="alt-k">2. Se o ZXP Installer recusar o arquivo</span>
+            <p style="margin-top:9px">A extensão não é assinada com certificado pago da Adobe, então alguns instaladores rejeitam. Nesse caso use o <b>ZIP Manual CEP</b> e instale à mão:</p>
+            <ol>
+              <li>Abra a pasta de extensões do CEP:</li>
+            </ol>
+            <div class="code"><code>open ~/Library/Application\ Support/Adobe/CEP/extensions/</code><button class="copy" data-c="open ~/Library/Application\ Support/Adobe/CEP/extensions/">Copiar</button></div>
+            <ol start="2">
+              <li>Extraia o ZIP lá dentro, numa pasta chamada <span style="font-family:var(--mono);font-size:12px">com.alexascencio.mediadownloader</span>.</li>
+              <li>Autorize extensões não assinadas:</li>
+            </ol>
+            <div class="code"><code>for v in 9 10 11 12; do defaults write com.adobe.CSXS.$v PlayerDebugMode 1; done</code><button class="copy" data-c="for v in 9 10 11 12; do defaults write com.adobe.CSXS.$v PlayerDebugMode 1; done">Copiar</button></div>
+            <ol start="4">
+              <li>Feche e reabra o Premiere Pro. O painel aparece em <b>Janela &#8594; Extensões</b>.</li>
+            </ol>
+          </div>
+        </div>
         <div class="dl-row">
           <a href="MediaDownloader.zxp" class="btn btn-hot" download>
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
