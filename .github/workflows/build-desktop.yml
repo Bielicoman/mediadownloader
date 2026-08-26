@@ -498,5 +498,21 @@ jobs:
           TAG: ${{ github.event.inputs.release_tag || 'v1.0.0' }}
         run: |
           set -euo pipefail
-          gh release upload "$TAG" dist/*.apk --clobber --repo "$GITHUB_REPOSITORY"
+          # Os quatro jobs publicam na mesma release em paralelo, e uploads
+          # simultaneos com --clobber colidem na API (HTTP 400). Envia um por
+          # vez, com reenvio espacado.
+          for apk in dist/*.apk; do
+            for tentativa in 1 2 3 4 5; do
+              if gh release upload "$TAG" "$apk" --clobber --repo "$GITHUB_REPOSITORY"; then
+                echo "enviado: $(basename "$apk")"
+                break
+              fi
+              if [ "$tentativa" = "5" ]; then
+                echo "ERRO: falha ao enviar $apk apos 5 tentativas"
+                exit 1
+              fi
+              echo "colisao ao enviar $(basename "$apk"), tentativa $tentativa; aguardando..."
+              sleep $((tentativa * 15))
+            done
+          done
           echo "Publicado em $TAG"
