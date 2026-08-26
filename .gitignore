@@ -10,3 +10,6 @@ app/bin/
 app/icon.icns
 out/
 dist/
+
+# Certificado de assinatura do ZXP: nunca versionar a chave privada.
+.signing/

@@ -6,6 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const { execSync } = require('child_process');
 
 console.log('📦 Empacotando Media Downloader para ZXP (Pure Node.js)...');
 
@@ -153,21 +154,64 @@ function createZxp(sourceDir, outputFile) {
   fs.writeFileSync(outputFile, finalBuffer);
 }
 
+/**
+ * Assina o ZXP com o certificado autoassinado do projeto.
+ *
+ * Sem assinatura o ZXP Installer recusa com "status = -404": ele verifica a
+ * assinatura antes de instalar, e um zip renomeado nao tem nenhuma. O
+ * certificado nao e confiavel pelo sistema (e autoassinado), entao o instalador
+ * ainda avisa sobre editor desconhecido - mas instala.
+ *
+ * O .p12 nao entra no repositorio. Para recriar:
+ *   ZXPSignCmd -selfSignedCert BR SP "Alex Ascencio" "Alex Ascencio" <senha>  *     .signing/mediadownloader.p12 -validityDays 9125
+ */
+function assinarZxp(dirExtensao, saida) {
+  const p12 = path.join(__dirname, '.signing', 'mediadownloader.p12');
+  const senha = process.env.ZXP_CERT_PASSWORD || 'MediaDownloader2026';
+  const ferramenta = process.env.ZXPSIGNCMD || 'ZXPSignCmd';
+
+  if (!fs.existsSync(p12)) {
+    console.warn('[AVISO] Certificado nao encontrado em .signing/mediadownloader.p12.');
+    console.warn('[AVISO] O ZXP sai SEM ASSINATURA e o ZXP Installer recusa com -404.');
+    return false;
+  }
+
+  try {
+    execSync(
+      `"${ferramenta}" -sign "${dirExtensao}" "${saida}" "${p12}" "${senha}" -tsa "http://timestamp.digicert.com"`,
+      { stdio: 'pipe' }
+    );
+    execSync(`"${ferramenta}" -verify "${saida}"`, { stdio: 'pipe' });
+    console.log('🔏 ZXP assinado e verificado.');
+    return true;
+  } catch (e) {
+    console.warn('[AVISO] Falha ao assinar:', String(e.message).split('\n')[0]);
+    console.warn('[AVISO] Instale o ZXPSignCmd da Adobe e deixe no PATH, ou aponte');
+    console.warn('[AVISO] a variavel ZXPSIGNCMD para o executavel.');
+    return false;
+  }
+}
+
 try {
-  createZxp(extDir, zxpOutput);
-  
+  // Assinar produz o proprio .zxp. Sem certificado, cai no empacotador interno,
+  // que gera um arquivo instalavel apenas pela via manual do CEP.
+  if (!assinarZxp(extDir, zxpOutput)) {
+    createZxp(extDir, zxpOutput);
+  }
+
   const zipOutput = path.join(__dirname, 'MediaDownloader.zip');
-  fs.copyFileSync(zxpOutput, zipOutput);
+  // O ZIP manual do CEP nao usa assinatura: e a pasta crua para copiar a mao.
+  createZxp(extDir, zipOutput);
 
   if (!fs.existsSync(dlDir)) fs.mkdirSync(dlDir, { recursive: true });
   if (!fs.existsSync(webDlDir)) fs.mkdirSync(webDlDir, { recursive: true });
 
   fs.copyFileSync(zxpOutput, path.join(dlDir, 'MediaDownloader.zxp'));
-  fs.copyFileSync(zxpOutput, path.join(dlDir, 'MediaDownloader.zip'));
+  fs.copyFileSync(zipOutput, path.join(dlDir, 'MediaDownloader.zip'));
   fs.copyFileSync(zxpOutput, path.join(webDir, 'MediaDownloader.zxp'));
-  fs.copyFileSync(zxpOutput, path.join(webDir, 'MediaDownloader.zip'));
+  fs.copyFileSync(zipOutput, path.join(webDir, 'MediaDownloader.zip'));
   fs.copyFileSync(zxpOutput, path.join(webDlDir, 'MediaDownloader.zxp'));
-  fs.copyFileSync(zxpOutput, path.join(webDlDir, 'MediaDownloader.zip'));
+  fs.copyFileSync(zipOutput, path.join(webDlDir, 'MediaDownloader.zip'));
 
   const sizeKb = (fs.statSync(zxpOutput).size / 1024).toFixed(1);
   console.log(`✅ MediaDownloader.zxp e MediaDownloader.zip criados e sincronizados com sucesso! (${sizeKb} KB)`);
