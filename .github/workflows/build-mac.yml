@@ -1,0 +1,151 @@
+name: Build macOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Tag da release onde publicar os artefatos"
+        required: true
+        default: "v1.0.0"
+  push:
+    paths:
+      - "app/**"
+      - ".github/workflows/build-mac.yml"
+
+permissions:
+  contents: write
+
+env:
+  ELECTRON_VERSION: "33.4.11"
+  FFMPEG_TAG: "b6.1.1"
+
+jobs:
+  build:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            label: AppleSilicon
+          - arch: x64
+            label: Intel
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Baixar binarios nativos de macOS
+        working-directory: app
+        run: |
+          set -euo pipefail
+          mkdir -p bin
+
+          echo "::group::yt-dlp (universal)"
+          curl -sSL -o bin/yt-dlp \
+            https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos
+          echo "::endgroup::"
+
+          echo "::group::ffmpeg + ffprobe (estaticos, ${{ matrix.arch }})"
+          curl -sSL -o bin/ffmpeg \
+            "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_TAG}/ffmpeg-darwin-${{ matrix.arch }}"
+          curl -sSL -o bin/ffprobe \
+            "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_TAG}/ffprobe-darwin-${{ matrix.arch }}"
+          echo "::endgroup::"
+
+          chmod +x bin/yt-dlp bin/ffmpeg bin/ffprobe
+
+          # Falha cedo se algum download vier vazio ou como pagina de erro
+          for b in yt-dlp ffmpeg ffprobe; do
+            size=$(stat -f%z "bin/$b")
+            echo "$b: $size bytes"
+            if [ "$size" -lt 1000000 ]; then
+              echo "ERRO: bin/$b tem apenas $size bytes - download falhou"
+              exit 1
+            fi
+          done
+
+          # ffmpeg/ffprobe rodam na arquitetura do runner? Só valida a nativa.
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            ./bin/ffmpeg -version | head -1
+            ./bin/ffprobe -version | head -1
+          fi
+
+      - name: Gerar icone .icns a partir do PNG oficial
+        working-directory: app
+        run: |
+          set -euo pipefail
+          ICONSET=icon.iconset
+          mkdir -p "$ICONSET"
+          SRC=logo.png
+          for s in 16 32 64 128 256 512; do
+            sips -z $s $s      "$SRC" --out "$ICONSET/icon_${s}x${s}.png"      >/dev/null
+            sips -z $((s*2)) $((s*2)) "$SRC" --out "$ICONSET/icon_${s}x${s}@2x.png" >/dev/null
+          done
+          iconutil -c icns "$ICONSET" -o icon.icns
+          rm -rf "$ICONSET"
+          ls -la icon.icns
+
+      - name: Empacotar .app
+        run: |
+          set -euo pipefail
+          npx --yes @electron/packager@20 app "Media Downloader" \
+            --platform=darwin \
+            --arch=${{ matrix.arch }} \
+            --electron-version="$ELECTRON_VERSION" \
+            --app-bundle-id=com.alexascencio.mediadownloader.desktop \
+            --app-version=1.0.0 \
+            --icon=app/icon.icns \
+            --overwrite \
+            --out=out
+          ls -la "out/Media Downloader-darwin-${{ matrix.arch }}"
+
+      - name: Assinatura ad-hoc
+        run: |
+          set -euo pipefail
+          APP="out/Media Downloader-darwin-${{ matrix.arch }}/Media Downloader.app"
+
+          # Assina de dentro para fora: binarios embutidos primeiro
+          for f in "$APP/Contents/Resources/app/bin/"*; do
+            codesign --force --sign - "$f"
+          done
+
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --verbose=2 "$APP"
+
+      - name: Gerar .dmg e .zip
+        run: |
+          set -euo pipefail
+          ARCH="${{ matrix.arch }}"
+          LABEL="${{ matrix.label }}"
+          APPDIR="out/Media Downloader-darwin-$ARCH"
+          APP="$APPDIR/Media Downloader.app"
+          mkdir -p dist
+
+          # ZIP preservando metadados e assinatura do bundle
+          ditto -c -k --sequesterRsrc --keepParent \
+            "$APP" "dist/MediaDownloader-macOS-$LABEL.zip"
+
+          # DMG com atalho para /Applications
+          STAGE=$(mktemp -d)
+          cp -R "$APP" "$STAGE/"
+          ln -s /Applications "$STAGE/Applications"
+          hdiutil create -volname "Media Downloader" \
+            -srcfolder "$STAGE" -ov -format ULFO \
+            "dist/MediaDownloader-macOS-$LABEL.dmg"
+          rm -rf "$STAGE"
+
+          ls -lh dist/
+
+      - name: Publicar na release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.inputs.release_tag || 'v1.0.0' }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
+          echo "Publicado em $TAG:"
+          ls dist/

@@ -1,0 +1,10 @@
+{
+  "name": "mediadownloader-desktop",
+  "productName": "Media Downloader",
+  "version": "1.0.0",
+  "description": "Baixe videos, audios, playlists e canais com qualidade maxima e compatibilidade para Premiere Pro, After Effects e DaVinci Resolve",
+  "main": "src/main.js",
+  "author": "Alex Ascencio",
+  "license": "MIT",
+  "private": true
+}

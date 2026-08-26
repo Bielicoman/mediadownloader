@@ -6,3 +6,7 @@ scratch/
 test_*.mp4
 test_*.webm
 downloads/
+app/bin/
+app/icon.icns
+out/
+dist/
