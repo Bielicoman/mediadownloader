@@ -259,6 +259,14 @@ jobs:
 
           echo "depois: $(du -sm "$DIR" | cut -f1) MB"
 
+      - name: Incluir o instalador
+        run: |
+          set -euo pipefail
+          DIR="out/Media Downloader-win32-x64"
+          cp installers/windows/Instalar.bat    "$DIR/"
+          cp installers/windows/Desinstalar.bat "$DIR/"
+          ls -la "$DIR"/*.bat
+
       - name: Gerar .zip
         run: |
           set -euo pipefail
@@ -399,5 +407,7 @@ jobs:
           TAG: ${{ github.event.inputs.release_tag || 'v1.0.0' }}
         run: |
           set -euo pipefail
-          gh release upload "$TAG" dist/MediaDownloader-Linux-x86_64.AppImage             --clobber --repo "$GITHUB_REPOSITORY"
+          cp installers/linux/instalar.sh    dist/
+          cp installers/linux/desinstalar.sh dist/
+          gh release upload "$TAG"             dist/MediaDownloader-Linux-x86_64.AppImage             dist/instalar.sh             dist/desinstalar.sh             --clobber --repo "$GITHUB_REPOSITORY"
           echo "Publicado em $TAG"
