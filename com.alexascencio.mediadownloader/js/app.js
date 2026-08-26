@@ -41,6 +41,7 @@
     var elBtnCloseSettings = document.getElementById("btnCloseSettings");
     var elYtDlpStatus = document.getElementById("ytDlpStatus");
     var elFfmpegStatus = document.getElementById("ffmpegStatus");
+    var elBtnInstallFfmpeg = document.getElementById("btnInstallFfmpeg");
     var elBtnUpdateYtDlp = document.getElementById("btnUpdateYtDlp");
     var elInputDownloadDir = document.getElementById("inputDownloadDir");
     var elInputBinName = document.getElementById("inputBinName");
@@ -105,7 +106,7 @@
                     elFfmpegStatus.textContent = "✅ Pronto (" + (status.ffmpeg.version || "OK") + ")";
                     elFfmpegStatus.style.color = "var(--accent-emerald)";
                 } else {
-                    elFfmpegStatus.textContent = "⚠️ Opcional (usado para remux H.264)";
+                    elFfmpegStatus.textContent = "⚠️ Ausente — limita a resolução e impede ProRes";
                     elFfmpegStatus.style.color = "var(--accent-amber)";
                 }
             }
@@ -638,11 +639,31 @@
         });
     }
 
+    function installFfmpeg() {
+        if (elBtnInstallFfmpeg) elBtnInstallFfmpeg.disabled = true;
+        showToast("Baixando FFmpeg e ffprobe (cerca de 160 MB)...", "info");
+
+        window.BinManager.downloadStandaloneFfmpeg(function (pct, nome, i, total) {
+            if (elFfmpegStatus) {
+                elFfmpegStatus.textContent = "Baixando " + nome + " (" + i + "/" + total + "): " + pct + "%";
+            }
+        }).then(function () {
+            if (elBtnInstallFfmpeg) elBtnInstallFfmpeg.disabled = false;
+            showToast("FFmpeg instalado na extensão!", "success");
+            checkEnvironment();
+        }).catch(function (err) {
+            if (elBtnInstallFfmpeg) elBtnInstallFfmpeg.disabled = false;
+            showToast("Erro ao baixar FFmpeg: " + err.message, "error");
+            checkEnvironment();
+        });
+    }
+
     // ==========================================
     // 7. EVENT LISTENERS SETUP
     // ==========================================
     function setupEventListeners() {
         if (elBtnPaste) elBtnPaste.addEventListener("click", handlePasteClick);
+        if (elBtnInstallFfmpeg) elBtnInstallFfmpeg.addEventListener("click", installFfmpeg);
         if (elUrlInput) elUrlInput.addEventListener("input", handleUrlInput);
         if (elBtnDownload) elBtnDownload.addEventListener("click", startDownload);
         if (elBtnCancelDownload) elBtnCancelDownload.addEventListener("click", cancelDownload);

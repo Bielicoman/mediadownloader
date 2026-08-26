@@ -345,6 +345,114 @@
             });
         },
 
+        /**
+         * Baixa um binario unico, seguindo redirecionamentos.
+         */
+        baixarBinario: function (url, destino, onProgress) {
+            var agent = new https.Agent({ rejectUnauthorized: false });
+            var temp = destino + ".tmp";
+
+            return new Promise(function (resolve, reject) {
+                function follow(u, redirects) {
+                    if (redirects > 6) {
+                        return reject(new Error("Muitos redirecionamentos ao baixar " + path.basename(destino)));
+                    }
+                    var isHttps = u.indexOf("https") === 0;
+                    var client = isHttps ? https : http;
+                    var options = {
+                        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
+                        agent: isHttps ? agent : undefined,
+                        rejectUnauthorized: false
+                    };
+
+                    var req = client.get(u, options, function (res) {
+                        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+                            return follow(res.headers.location, (redirects || 0) + 1);
+                        }
+                        if (res.statusCode !== 200) {
+                            return reject(new Error("HTTP " + res.statusCode + " ao baixar " + path.basename(destino)));
+                        }
+
+                        var total = parseInt(res.headers["content-length"], 10) || 0;
+                        var recebido = 0;
+                        var fileStream = fs.createWriteStream(temp);
+
+                        res.on("data", function (chunk) {
+                            recebido += chunk.length;
+                            fileStream.write(chunk);
+                            if (onProgress) onProgress(recebido, total);
+                        });
+
+                        res.on("end", function () {
+                            fileStream.end(function () {
+                                try {
+                                    if (fs.existsSync(destino)) fs.unlinkSync(destino);
+                                    fs.renameSync(temp, destino);
+                                    if (process.platform !== "win32") {
+                                        fs.chmodSync(destino, "755");
+                                    }
+                                    resolve(destino);
+                                } catch (err) {
+                                    reject(err);
+                                }
+                            });
+                        });
+                    });
+
+                    req.on("error", function (e) {
+                        try { if (fs.existsSync(temp)) fs.unlinkSync(temp); } catch (ex) {}
+                        reject(e);
+                    });
+                }
+
+                follow(url, 0);
+            });
+        },
+
+        /**
+         * Baixa ffmpeg e ffprobe estaticos para a pasta bin/ da extensao.
+         *
+         * O ffmpeg nao e opcional: sem ele o yt-dlp nao consegue juntar os fluxos
+         * separados de video e audio do YouTube, o que trava o download nas
+         * resolucoes baixas, e a conversao para ProRes e H.264 e pulada.
+         *
+         * Usa os mesmos binarios estaticos do app Desktop, entao o resultado e
+         * identico nas duas plataformas.
+         */
+        downloadStandaloneFfmpeg: function (onProgress) {
+            if (!isNode) return Promise.reject(new Error("Apenas suportado no ambiente Node.js / CEP."));
+
+            var self = this;
+            var localBin = self.getLocalBinDir();
+            var ext = process.platform === "win32" ? ".exe" : "";
+            var alvo = process.platform === "win32"
+                ? "win32-x64"
+                : (process.arch === "arm64" ? "darwin-arm64" : "darwin-x64");
+            var base = "https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/";
+            var nomes = ["ffmpeg", "ffprobe"];
+
+            function passo(i) {
+                if (i >= nomes.length) {
+                    var final = path.join(localBin, "ffmpeg" + ext);
+                    self.cachedFfmpegPath = final;
+                    return self.checkBinaryVersion(final, true).then(function (v) {
+                        return { path: final, version: v };
+                    });
+                }
+                var nome = nomes[i];
+                var destino = path.join(localBin, nome + ext);
+                return self.baixarBinario(base + nome + "-" + alvo, destino, function (recebido, total) {
+                    if (onProgress && total) {
+                        onProgress(Math.round((recebido / total) * 100), nome, i + 1, nomes.length);
+                    }
+                }).then(function () {
+                    return passo(i + 1);
+                });
+            }
+
+            return passo(0);
+        },
+
         getStatus: function () {
             var self = this;
             return Promise.all([this.findYtDlp(), this.findFfmpeg()]).then(function (results) {
