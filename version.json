@@ -39,6 +39,12 @@
         "zip": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-Intel.zip",
         "aria2c": false,
         "signing": "ad-hoc"
+      },
+      "linux-x64": {
+        "format": "AppImage",
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Linux-x86_64.AppImage",
+        "aria2c": false,
+        "notes": "Requer libfuse2 ou --appimage-extract-and-run"
       }
     }
   },

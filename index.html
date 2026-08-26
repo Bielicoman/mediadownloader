@@ -800,12 +800,30 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
       </div>
 
       <div class="panel" id="p-linux" role="tabpanel" hidden>
-        <div class="step"><span class="step-n">01</span><div><p>Baixe o binário <b>MediaDownloader.AppImage</b>.</p><small>Compatível com Ubuntu, Fedora, Debian, Arch e derivados.</small></div></div>
-        <div class="step"><span class="step-n">02</span><div><p>Conceda permissão de execução:</p>
-          <div class="code"><code>chmod +x MediaDownloader.AppImage && ./MediaDownloader.AppImage</code><button class="copy" data-c="chmod +x MediaDownloader.AppImage && ./MediaDownloader.AppImage">Copiar</button></div>
+        <div class="step"><span class="step-n">01</span><div><p>Baixe o binário <b>MediaDownloader-Linux-x86_64.AppImage</b>.</p><small>x86_64, compatível com Ubuntu, Fedora, Debian, Arch e derivados. Não instala nada no sistema — é um arquivo único e autocontido.</small></div></div>
+        <div class="step"><span class="step-n">02</span><div><p>Conceda permissão de execução e abra:</p>
+          <div class="code"><code>chmod +x MediaDownloader-Linux-x86_64.AppImage &amp;&amp; ./MediaDownloader-Linux-x86_64.AppImage</code><button class="copy" data-c="chmod +x MediaDownloader-Linux-x86_64.AppImage &amp;&amp; ./MediaDownloader-Linux-x86_64.AppImage">Copiar</button></div>
         </div></div>
+        <div class="step"><span class="step-n">03</span><div><p>Pronto! yt-dlp e FFmpeg já vêm dentro do arquivo.</p><small>Sem apt, sem snap, sem dependências. O aria2c não é incluído no Linux — o projeto aria2 não publica binário para a plataforma —, então o download usa o motor nativo do yt-dlp.</small></div></div>
+
+        <div class="gate">
+          <div class="gate-h">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L12.8 12H1.2L7 1.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M7 5.6v2.9M7 10.1v.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Se o AppImage não abrir
+          </div>
+          <p>Distribuições recentes deixaram de trazer a biblioteca <span style="font-family:var(--mono);font-size:12px">libfuse2</span>, que o formato AppImage usa para se montar. O sintoma é uma mensagem sobre <i>FUSE</i> ou <i>dlopen</i>. Instale a biblioteca:</p>
+          <div class="code"><code>sudo apt install libfuse2   # Ubuntu 22.04+ / Debian 12+</code><button class="copy" data-c="sudo apt install libfuse2   # Ubuntu 22.04+ / Debian 12+">Copiar</button></div>
+          <div class="alt">
+            <span class="alt-k">Ou rode sem instalar nada</span>
+            <div class="code"><code>./MediaDownloader-Linux-x86_64.AppImage --appimage-extract-and-run</code><button class="copy" data-c="./MediaDownloader-Linux-x86_64.AppImage --appimage-extract-and-run">Copiar</button></div>
+          </div>
+        </div>
+
         <div class="dl-row">
-          <a class="btn btn-soon" aria-disabled="true" role="link" title="Build para Linux ainda nao disponivel">Baixar Linux (.AppImage) — Em breve</a>
+          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Linux-x86_64.AppImage" class="btn btn-hot" download>
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            Baixar Linux (.AppImage)
+          </a>
           <a href="#premiere" class="btn btn-premiere">Baixar extensão para Adobe Premiere</a>
         </div>
       </div>
@@ -895,6 +913,7 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
           <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Windows-x64.zip" download>Media Downloader Windows (.ZIP)</a>
           <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-AppleSilicon.dmg" download>Media Downloader macOS Apple Silicon (.DMG)</a>
           <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-Intel.dmg" download>Media Downloader macOS Intel (.DMG)</a>
+          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Linux-x86_64.AppImage" download>Media Downloader Linux (.AppImage)</a>
           <a href="MediaDownloader.zxp" download>Baixar extensão para Adobe Premiere</a>
           <a href="MediaDownloader.zip" download>Extensão CEP Manual (.ZIP)</a>
           <a href="version.json">version.json (Manifesto)</a>
