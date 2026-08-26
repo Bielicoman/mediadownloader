@@ -18,10 +18,29 @@
   "mandatory": false,
   "desktop": {
     "version": "1.0.0",
-    "platform": "win32-x64",
     "releaseDate": "2026-08-26",
-    "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Windows-x64.zip",
-    "releasePage": "https://github.com/Bielicoman/mediadownloader/releases/tag/v1.0.0"
+    "releasePage": "https://github.com/Bielicoman/mediadownloader/releases/tag/v1.0.0",
+    "builds": {
+      "win32-x64": {
+        "format": "zip",
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Windows-x64.zip",
+        "aria2c": true
+      },
+      "darwin-arm64": {
+        "format": "dmg",
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-AppleSilicon.dmg",
+        "zip": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-AppleSilicon.zip",
+        "aria2c": false,
+        "signing": "ad-hoc"
+      },
+      "darwin-x64": {
+        "format": "dmg",
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-Intel.dmg",
+        "zip": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-Intel.zip",
+        "aria2c": false,
+        "signing": "ad-hoc"
+      }
+    }
   },
   "changelog": {
     "1.2.1": "Novo site com simulador de download e timeline",

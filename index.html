@@ -498,7 +498,7 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
       <div>
         <p class="lede rv">O aplicativo Desktop oficial e definitivo para baixar vídeos em <b>4K/8K</b>, playlists inteiras, canais do YouTube e áudios com recodificação instantânea para <b>Apple ProRes 422 HQ</b>, <b>H.264</b> e <b>WAV 24-bit</b>. 100% nativo, sem limites de taxa e pronto para a timeline.</p>
         <div class="gauges rv">
-          <div class="gauge"><span class="gauge-k">Plataforma</span><span class="gauge-v">Windows (.EXE)</span></div>
+          <div class="gauge"><span class="gauge-k">Plataforma</span><span class="gauge-v">Windows &middot; macOS</span></div>
           <div class="gauge"><span class="gauge-k">Performance</span><span class="gauge-v">16 Sockets Turbo</span></div>
           <div class="gauge"><span class="gauge-k">Codecs</span><span class="gauge-v">ProRes · WAV · MP4</span></div>
           <div class="gauge"><span class="gauge-k">NLE Ready</span><span class="gauge-v">Premiere & DaVinci</span></div>
@@ -602,7 +602,7 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
           
           <div style="margin-top:20px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid var(--edge)">
             <span style="font-family:var(--mono);font-size:9px;color:var(--dim-2);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px">Dica Pro</span>
-            <span style="font-size:12.5px;color:var(--dim)">O aplicativo <b>Desktop Standalone</b> e a <b>Extensão do Premiere</b> usam os mesmos motores de alta precisão (yt-dlp + aria2c + FFmpeg).</span>
+            <span style="font-size:12.5px;color:var(--dim)">O aplicativo <b>Desktop Standalone</b> e a <b>Extensão do Premiere</b> usam os mesmos motores de alta precisão (yt-dlp + FFmpeg, com aria2c no Windows).</span>
           </div>
         </div>
       </div>
@@ -749,11 +749,19 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
       </div>
 
       <div class="panel" id="p-mac" role="tabpanel" hidden>
-        <div class="step"><span class="step-n">01</span><div><p>Baixe o pacote <b>MediaDownloader-macOS.dmg</b>.</p><small>Universal: otimizado para chips Apple Silicon (M1/M2/M3/M4) e processadores Intel.</small></div></div>
-        <div class="step"><span class="step-n">02</span><div><p>Abra a imagem DMG e arraste o <b>MediaDownloader</b> para a pasta <b>Aplicativos</b>.</p></div></div>
-        <div class="step"><span class="step-n">03</span><div><p>Inicie pelo Launchpad ou Spotlight.</p></div></div>
+        <div class="step"><span class="step-n">01</span><div><p>Escolha o pacote do seu Mac.</p><small>No menu Apple, em <b>Sobre Este Mac</b>: se aparecer <b>Chip Apple M1/M2/M3/M4</b>, use Apple&nbsp;Silicon. Se aparecer <b>Processador Intel</b>, use Intel.</small></div></div>
+        <div class="step"><span class="step-n">02</span><div><p>Abra o <b>.DMG</b> e arraste o <b>Media Downloader</b> para a pasta <b>Aplicativos</b>.</p></div></div>
+        <div class="step"><span class="step-n">03</span><div><p>Na primeira abertura, o macOS vai bloquear o app.</p><small>Isso é esperado: o app tem assinatura ad-hoc, não um certificado pago da Apple. Vá em <b>Ajustes do Sistema › Privacidade e Segurança</b>, role até o aviso sobre o Media Downloader e clique em <b>Abrir Assim Mesmo</b>. Só é necessário uma vez.</small></div></div>
+        <div class="step"><span class="step-n">04</span><div><p>Pronto! Abra pelo Launchpad ou Spotlight.</p><small>yt-dlp, FFmpeg e ffprobe já vêm integrados dentro do pacote — sem Homebrew, sem terminal.</small></div></div>
         <div class="dl-row">
-          <a class="btn btn-soon" aria-disabled="true" role="link" title="Build para macOS ainda nao disponivel">Baixar para macOS (.DMG) — Em breve</a>
+          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-AppleSilicon.dmg" class="btn btn-hot" download>
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            Apple Silicon (.DMG)
+          </a>
+          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-Intel.dmg" class="btn btn-hot" download>
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            Intel (.DMG)
+          </a>
           <a href="#premiere" class="btn btn-premiere">Baixar extensão para Adobe Premiere</a>
         </div>
       </div>
@@ -795,7 +803,7 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
         <div class="spec"><dt>Formatos Suportados</dt><dd>Vídeo Único · Playlists Completas · Canais do YouTube · Multi-URLs em Lote · Reels · TikTok</dd></div>
         <div class="spec"><dt>Resoluções e Codecs de Vídeo</dt><dd>8K 4320p · 4K 2160p60 · 1440p · 1080p60 · 720p · Apple ProRes 422 HQ (MOV) · MP4 H.264</dd></div>
         <div class="spec"><dt>Áudio Master</dt><dd>WAV PCM 24-bit / 48.000 Hz sem perdas · MP3 320 kbps Estéreo</dd></div>
-        <div class="spec"><dt>Motores Integrados</dt><dd>yt-dlp Oficial · FFmpeg 9.0 · aria2c Turbo (16 Conexões Simultâneas)</dd></div>
+        <div class="spec"><dt>Motores Integrados</dt><dd>yt-dlp Oficial · FFmpeg · aria2c Turbo com 16 conexões simultâneas no Windows; no macOS o download usa o motor nativo do yt-dlp, sem aria2c</dd></div>
         <div class="spec"><dt>Compatibilidade NLE</dt><dd>Adobe Premiere Pro · After Effects · DaVinci Resolve · Final Cut Pro</dd></div>
         <div class="spec"><dt>Vídeos com Restrição / Privados</dt><dd>Suporte a importação de <code style="font-family:var(--mono);font-size:13px;color:var(--amber)">cookies.txt</code> para downloads autorizados</dd></div>
         <div class="spec"><dt>Licença</dt><dd>MIT · Livre para uso pessoal e comercial</dd></div>
@@ -825,6 +833,8 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
         <span class="fc-k">Downloads Oficiais</span>
         <div class="flist">
           <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Windows-x64.zip" download>Media Downloader Windows (.ZIP)</a>
+          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-AppleSilicon.dmg" download>Media Downloader macOS Apple Silicon (.DMG)</a>
+          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-Intel.dmg" download>Media Downloader macOS Intel (.DMG)</a>
           <a href="MediaDownloader.zxp" download>Baixar extensão para Adobe Premiere</a>
           <a href="MediaDownloader.zip" download>Extensão CEP Manual (.ZIP)</a>
           <a href="version.json">version.json (Manifesto)</a>
