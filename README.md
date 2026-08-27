@@ -6,7 +6,7 @@
 
 **Baixe vídeos, áudios, playlists e canais em qualidade máxima — prontos para a timeline.**
 
-Aplicativo Desktop para Windows, macOS e Linux · Extensão nativa para o Adobe Premiere Pro
+Aplicativo para Windows, macOS, Linux e Android · Extensão nativa para o Adobe Premiere Pro
 
 [![Site oficial](https://img.shields.io/badge/site-mediadownloader-FFB020?style=for-the-badge)](https://mediadownloader-blush.vercel.app)
 [![Downloads](https://img.shields.io/badge/downloads-v1.0.0-10b981?style=for-the-badge)](https://github.com/Bielicoman/mediadownloader/releases/tag/v1.0.0)
@@ -28,6 +28,8 @@ Todos os pacotes são autocontidos: os motores de download e conversão vêm den
 | **macOS** Apple Silicon (M1–M4) | [MediaDownloader-macOS-AppleSilicon.dmg](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-AppleSilicon.dmg) | 165 MB |
 | **macOS** Intel | [MediaDownloader-macOS-Intel.dmg](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-Intel.dmg) | 185 MB |
 | **Linux** x86_64 | [MediaDownloader-Linux-x86_64.AppImage](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Linux-x86_64.AppImage) | 186 MB |
+| **Android** ARM64 (a maioria dos celulares) | [MediaDownloader-Android-arm64.apk](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-arm64.apk) | 47 MB |
+| **Android** ARM32 (aparelhos antigos) | [MediaDownloader-Android-arm32.apk](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-arm32.apk) | 44 MB |
 | **Adobe Premiere Pro** | [MediaDownloader.zxp](https://mediadownloader-blush.vercel.app/MediaDownloader.zxp) | 3 MB |
 
 Versões `.zip` do macOS também estão na [página da release](https://github.com/Bielicoman/mediadownloader/releases/tag/v1.0.0), para quem prefere não usar DMG.
@@ -109,6 +111,32 @@ Ou rode sem instalar nada:
 </details>
 
 <details>
+<summary><b>Android</b> — instalação por APK</summary>
+
+<br>
+
+1. Baixe o APK da arquitetura do seu aparelho. Quase todo celular dos últimos
+   anos é **ARM64**; para aparelhos antigos, use o ARM32. Há também um
+   [universal](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-universal.apk)
+   de 110 MB que roda em qualquer um.
+2. Abra o arquivo e confirme. O Android vai pedir permissão para instalar de
+   **fontes desconhecidas** — normal para aplicativos fora da Play Store, e a
+   permissão vale só para o app que abriu o arquivo.
+3. Na primeira execução ele descompacta os motores, o que leva alguns segundos.
+
+Os arquivos são salvos na galeria, em **Filmes › MediaDownloader** ou
+**Música › MediaDownloader**. A partir do Android 10 isso passa pelo MediaStore
+e **não exige permissão de armazenamento**.
+
+O app também aceita links compartilhados: no YouTube, toque em Compartilhar e
+escolha Media Downloader.
+
+**Não está e não estará na Play Store** — a política do Google não permite
+aplicativos de download de vídeo. A distribuição é por APK, aqui e no site.
+
+</details>
+
+<details>
 <summary><b>Extensão do Adobe Premiere Pro</b> — Windows e macOS</summary>
 
 <br>
@@ -156,11 +184,11 @@ No macOS o Premiere não enxerga programas instalados por Homebrew, porque aplic
 
 O que vai dentro de cada pacote. A tabela é literal — nada é prometido onde não existe.
 
-| Motor | Windows | macOS | Linux | Extensão Premiere |
-|---|:---:|:---:|:---:|:---:|
-| **yt-dlp** | incluso | incluso | incluso | incluso |
-| **FFmpeg + ffprobe** | incluso | incluso | incluso | sob demanda |
-| **aria2c** (16 conexões) | incluso | — | — | Windows |
+| Motor | Windows | macOS | Linux | Android | Extensão Premiere |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **yt-dlp** | incluso | incluso | incluso | incluso | incluso |
+| **FFmpeg + ffprobe** | incluso | incluso | incluso | incluso | sob demanda |
+| **aria2c** (16 conexões) | incluso | — | — | incluso | Windows |
 
 O `aria2c` não entra no macOS nem no Linux porque o projeto aria2 **não publica binários para essas plataformas** — só Windows e Android. Onde ele falta, o yt-dlp usa o próprio motor de download: o resultado é o mesmo arquivo, com throughput menor.
 
@@ -175,6 +203,7 @@ Tudo sai do [GitHub Actions](.github/workflows/build-desktop.yml), em runners na
 | `windows` | `windows-latest` | `.zip` portátil |
 | `macos` | `macos-latest` | `.dmg` e `.zip`, arm64 e x64 |
 | `linux` | `ubuntu-latest` | `.AppImage` x86_64 |
+| `android` | `ubuntu-latest` | `.apk` por arquitetura, e universal |
 
 O macOS **exige** runner Apple: em Apple Silicon o sistema recusa binários sem assinatura de código válida, e o `codesign` só existe no macOS.
 
@@ -200,7 +229,9 @@ Cada job verifica antes de publicar, e falha em vez de subir algo quebrado:
 │   ├── CSXS/manifest.xml             declaração da extensão
 │   ├── jsx/host.jsx                  ExtendScript: import e timeline
 │   └── js/
-├── .github/workflows/                build das três plataformas
+├── android/                          app nativo Android (Kotlin + Compose)
+│   └── app/src/main/java/…           MainActivity e DownloadViewModel
+├── .github/workflows/                build das quatro plataformas
 ├── index.html                        site oficial
 └── package-zxp.js                    empacotador de ZXP, em Node puro
 ```

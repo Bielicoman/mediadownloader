@@ -511,7 +511,7 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
       <div>
         <p class="lede rv">O aplicativo Desktop oficial e definitivo para baixar vídeos em <b>4K/8K</b>, playlists inteiras, canais do YouTube e áudios com recodificação instantânea para <b>Apple ProRes 422 HQ</b>, <b>H.264</b> e <b>WAV 24-bit</b>. 100% nativo, sem limites de taxa e pronto para a timeline.</p>
         <div class="gauges rv">
-          <div class="gauge"><span class="gauge-k">Plataforma</span><span class="gauge-v">Windows &middot; macOS</span></div>
+          <div class="gauge"><span class="gauge-k">Plataforma</span><span class="gauge-v">Win &middot; Mac &middot; Linux &middot; Android</span></div>
           <div class="gauge"><span class="gauge-k">Performance</span><span class="gauge-v">Multi-conexão Turbo</span></div>
           <div class="gauge"><span class="gauge-k">Codecs</span><span class="gauge-v">ProRes · WAV · MP4</span></div>
           <div class="gauge"><span class="gauge-k">NLE Ready</span><span class="gauge-v">Premiere & DaVinci</span></div>
@@ -747,6 +747,7 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
         <button class="tab" role="tab" aria-selected="true" data-p="p-win">Windows Desktop<b>Executável .EXE Standalone</b></button>
         <button class="tab" role="tab" aria-selected="false" data-p="p-mac">macOS Desktop<b>Apple Silicon & Intel DMG</b></button>
         <button class="tab" role="tab" aria-selected="false" data-p="p-linux">Linux Desktop<b>AppImage / .deb</b></button>
+        <button class="tab" role="tab" aria-selected="false" data-p="p-android">Android<b>APK · 5.0 ou superior</b></button>
         <button class="tab" role="tab" aria-selected="false" data-p="p-premiere">Extensão Premiere<b>Painel ZXP / CEP</b></button>
       </div>
 
@@ -825,6 +826,22 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
             Baixar Linux (.AppImage)
           </a>
           <a href="#premiere" class="btn btn-premiere">Baixar extensão para Adobe Premiere</a>
+        </div>
+      </div>
+
+      <div class="panel" id="p-android" role="tabpanel" hidden>
+        <div class="step"><span class="step-n">01</span><div><p>Escolha o pacote do seu aparelho.</p><small>Quase todo celular dos últimos anos é <b>ARM64</b>. Se o seu for antigo, use o ARM32. Na dúvida, o <b>universal</b> funciona em qualquer um — só pesa o dobro.</small></div></div>
+        <div class="step"><span class="step-n">02</span><div><p>Abra o arquivo baixado e confirme a instalação.</p><small>O Android vai pedir para você permitir a instalação de fontes desconhecidas: é normal para aplicativos fora da Play Store. A permissão é concedida só ao app que está abrindo o arquivo, geralmente o navegador ou o gerenciador de arquivos.</small></div></div>
+        <div class="step"><span class="step-n">03</span><div><p>Na primeira abertura ele prepara os motores.</p><small>Leva alguns segundos, uma única vez. Depois é só colar o link e baixar. Os arquivos vão para a galeria, em <b>Filmes › MediaDownloader</b> ou <b>Música › MediaDownloader</b>.</small></div></div>
+        <div class="step"><span class="step-n">04</span><div><p>Dica: compartilhe o link direto do YouTube para o Media Downloader.</p><small>No app do YouTube, toque em Compartilhar e escolha Media Downloader — o link já chega colado.</small></div></div>
+
+        <div class="dl-row">
+          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-arm64.apk" class="btn btn-hot" id="ctaAndroid" download>
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8m0 0L3 5.5M6.5 9L10 5.5M1.5 11.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            ARM64 · 47 MB
+          </a>
+          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-arm32.apk" class="btn" download>ARM32 · 44 MB</a>
+          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-universal.apk" class="btn" download>Universal · 110 MB</a>
         </div>
       </div>
 
@@ -914,6 +931,7 @@ footer{border-top:1px solid var(--edge);background:var(--ink-2)}
           <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-AppleSilicon.dmg" download>Media Downloader macOS Apple Silicon (.DMG)</a>
           <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-Intel.dmg" download>Media Downloader macOS Intel (.DMG)</a>
           <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Linux-x86_64.AppImage" download>Media Downloader Linux (.AppImage)</a>
+          <a href="https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-arm64.apk" download>Media Downloader Android (.APK)</a>
           <a href="MediaDownloader.zxp" download>Baixar extensão para Adobe Premiere</a>
           <a href="MediaDownloader.zip" download>Extensão CEP Manual (.ZIP)</a>
           <a href="version.json">version.json (Manifesto)</a>
@@ -1260,7 +1278,26 @@ $('#urlIn').addEventListener('keydown',function(e){if(e.key==='Enter')probe()});
    compatibilidade, entao a escolha do chip fica na aba de downloads, onde
    explicamos como conferir em Sobre Este Mac. */
 (function(){
-  var p=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.platform||navigator.userAgent||'';
+  var ua=navigator.userAgent||'';
+  /* Num celular Android o botao do topo vira o do APK. */
+  if(/Android/i.test(ua)){
+    var win=document.getElementById('ctaWin');
+    if(win){
+      win.setAttribute('href','#downloads');
+      win.setAttribute('data-goto-tab','p-android');
+      win.removeAttribute('download');
+      win.addEventListener('click',function(){
+        var t=document.querySelector('.tab[data-p="p-android"]'); if(t) t.click();
+      });
+      var rotulo=win.lastChild;
+      if(rotulo && rotulo.nodeType===3) rotulo.nodeValue=' Baixar Android (.APK) ';
+    }
+    var mac=document.getElementById('ctaMac');
+    if(mac) mac.classList.remove('btn-hot');
+    return;
+  }
+
+  var p=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.platform||ua;
   if(!/Mac/i.test(p)) return;
   var win=document.getElementById('ctaWin'), mac=document.getElementById('ctaMac');
   if(!win||!mac||!win.parentNode) return;
