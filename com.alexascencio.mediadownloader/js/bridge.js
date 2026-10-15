@@ -15,6 +15,8 @@
     var Bridge = {
         isCEP: isCEP,
         csInterface: csInterface,
+        hostId: csInterface && csInterface.hostEnvironment ? csInterface.hostEnvironment.appId : "",
+        hostName: csInterface && csInterface.hostEnvironment && csInterface.hostEnvironment.appId === "AEFT" ? "After Effects" : "Premiere Pro",
 
         /**
          * Executa uma função no ExtendScript de forma assíncrona com Promise
@@ -22,64 +24,31 @@
         eval: function (functionName, args) {
             return new Promise(function (resolve, reject) {
                 if (!isCEP || !csInterface) {
-                    console.warn("[Bridge] Modo Dev/Browser simulando chamada ExtendScript:", functionName, args);
-                    if (functionName === "getProjectInfo") {
-                        return resolve({
-                            isOpen: true,
-                            projectName: "Projeto_Exemplo_Edicao.prproj",
-                            projectPath: "C:/Users/Editor/Projects/Projeto_Exemplo_Edicao.prproj",
-                            projectFolder: "C:/Users/Editor/Projects",
-                            activeSequence: {
-                                name: "Sequencia Principal 4K",
-                                sequenceID: "1",
-                                width: 3840,
-                                height: 2160,
-                                playheadSeconds: 14.5,
-                                videoTracksCount: 4,
-                                audioTracksCount: 4
-                            }
-                        });
-                    }
-                    if (functionName === "importMediaFile" || functionName === "insertMediaToTimeline") {
-                        return resolve({
-                            imported: true,
-                            inserted: true,
-                            name: args && args[0] ? args[0].split(/[\\/]/).pop() : "media_baixada.mp4",
-                            mediaPath: args ? args[0] : "",
-                            binName: "_Downloads"
-                        });
-                    }
-                    return resolve({ success: true, mocked: true });
+                    return reject(new Error("A integração exige abrir o painel dentro do Premiere Pro ou After Effects."));
                 }
 
-                var serializedArgs = "";
-                if (args && args.length > 0) {
-                    serializedArgs = args.map(function (arg) {
-                        if (typeof arg === "string") {
-                            return "'" + arg.replace(/\\/g, "\\\\").replace(/'/g, "\\'") + "'";
-                        }
-                        if (typeof arg === "object") {
-                            return "'" + JSON.stringify(arg).replace(/\\/g, "\\\\").replace(/'/g, "\\'") + "'";
-                        }
-                        return String(arg);
-                    }).join(", ");
+                if (!/^(getProjectInfo|importMediaFile|insertMediaToTimeline|createSequenceFromMedia)$/.test(functionName)) {
+                    return reject(new Error("Operação de host não permitida."));
                 }
-
+                var serializedArgs = (args || []).map(function (arg) {
+                    return JSON.stringify(arg).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+                }).join(", ");
                 var scriptCall = functionName + "(" + serializedArgs + ")";
+                var settled = false;
+                var timer = setTimeout(function () { settled = true; reject(new Error("Resultado não confirmado: o editor não respondeu em 30 segundos. Confira o projeto antes de repetir; a operação pode ainda concluir.")); }, 30000);
 
                 csInterface.evalScript(scriptCall, function (result) {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
                     if (result === "EvalScript error." || result === undefined || result === "undefined") {
                         return reject(new Error("Erro ao executar ExtendScript: " + scriptCall));
                     }
-                    try {
-                        var parsed = JSON.parse(result);
-                        if (parsed && parsed.success === false) {
-                            return reject(new Error(parsed.error || "Falha no Premiere Pro"));
-                        }
-                        resolve(parsed ? parsed.data : result);
-                    } catch (e) {
-                        resolve(result);
-                    }
+                    var parsed;
+                    try { parsed = JSON.parse(result); }
+                    catch (e) { return reject(new Error("Resposta inválida do editor.")); }
+                    if (!parsed || parsed.success !== true) return reject(new Error(parsed && parsed.error || "Falha no editor Adobe"));
+                    resolve(parsed.data);
                 });
             });
         },

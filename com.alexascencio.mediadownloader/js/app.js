@@ -84,7 +84,20 @@
     // ==========================================
     // 2. INITIALIZATION & SYSTEM CHECK
     // ==========================================
+    var isAfterEffects = window.Bridge && window.Bridge.hostId === "AEFT";
+    var hostName = isAfterEffects ? "After Effects" : "Premiere Pro";
+    var folderTerm = isAfterEffects ? "na pasta" : "no bin";
+    function configureHostUI() {
+        if (isAfterEffects) {
+            document.getElementById("hostImportLabel").textContent = "Importar no projeto";
+            document.getElementById("hostInsertLabel").textContent = "Inserir na composição";
+            document.getElementById("hostFolderLabel").textContent = "Pasta no projeto do After Effects";
+            elToggleImportBin.closest("label").title = "Importa para uma pasta no painel Projeto";
+            elToggleInsertTimeline.closest("label").title = "Cria uma nova camada na composição ativa, no tempo atual, sem alterar as camadas existentes";
+        }
+    }
     function init() {
+        configureHostUI();
         loadSettings();
         loadHistory();
         checkEnvironment();
@@ -491,16 +504,16 @@
         // Inserir na timeline exige importar; "Importar no bin" sozinho so importa.
         if (shouldInsert) {
             window.Bridge.insertMediaToTimeline(filePath, binName).then(function (res) {
-                showToast(res && res.inserted ? "Inserido na timeline e no bin " + binName + "." :
-                    "Importado no bin " + binName + ". " + ((res && (res.note || res.warning)) || ""), "success");
+                showToast(res && res.inserted ? "Inserido " + (isAfterEffects ? "na composição e na pasta " : "na timeline e no bin ") + binName + "." :
+                    "Importado " + folderTerm + " " + binName + ". " + ((res && (res.note || res.warning)) || ""), "success");
             }).catch(function (err) {
-                showToast("Baixado, mas o Premiere recusou a importação: " + err.message, "error");
+                showToast("Baixado, mas o " + hostName + " recusou a importação: " + err.message, "error");
             });
         } else if (shouldImport) {
             window.Bridge.importMediaFile(filePath, binName).then(function () {
-                showToast("Importado no bin " + binName + ".", "success");
+                showToast("Importado " + folderTerm + " " + binName + ".", "success");
             }).catch(function (err) {
-                showToast("Baixado, mas o Premiere recusou a importação: " + err.message, "error");
+                showToast("Baixado, mas o " + hostName + " recusou a importação: " + err.message, "error");
             });
         } else {
             showToast("Salvo em " + result.outputDir, "success");
@@ -621,7 +634,7 @@
                     </div>\
                 </div>\
                 <div class="history-actions">\
-                    <button class="action-btn-3d btn-timeline" title="Inserir no Playhead da Timeline">\
+                    <button class="action-btn-3d btn-timeline" title="Inserir no tempo atual do editor">\
                         <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>\
                     </button>\
                     <button class="action-btn-3d btn-folder" title="Mostrar o arquivo na pasta">\
@@ -649,7 +662,7 @@
                 e.stopPropagation();
                 var hb = localStorage.getItem("mediadownloader_bin_name") || "_Downloads";
                 window.Bridge.insertMediaToTimeline(item.filePath, hb).then(function (res) {
-                    showToast(res && res.inserted ? "Inserido na timeline." : "Importado no bin " + hb + " (sem sequência ativa).", "success");
+                    showToast(res && res.inserted ? isAfterEffects ? "Inserido na composição." : "Inserido na timeline." : "Importado " + folderTerm + " " + hb + " (sem destino ativo).", "success");
                 }).catch(function (err) {
                     showToast("Erro ao inserir: " + err.message, "error");
                 });

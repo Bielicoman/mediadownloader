@@ -16,7 +16,7 @@
                     <svg viewBox="0 0 20 20" fill="none"><rect x="1" y="1" width="18" height="18" stroke="#e8eaee" stroke-width="1.3"/><path d="M10 4.5v8m0 0L6.5 9M10 12.5L13.5 9" stroke="#ffb020" stroke-width="1.6"/><path d="M4.5 15.5h11" stroke="#3ddc84" stroke-width="1.6"/></svg>
                 </div>
                 <span id="pluginBrandTitle">MEDIA DOWNLOADER</span>
-                <span class="panel-version brand-version-badge" id="pluginVersionTag">v1.3.0</span>
+                <span class="panel-version brand-version-badge" id="pluginVersionTag">v1.4.0</span>
                 <span class="brand-status-dot" id="systemStatusDot" title="Verificando motores..."></span>
             </div>
             <div class="header-actions">
@@ -93,14 +93,14 @@
 
             <div class="toggles-inline-bar">
                 <label class="toggle-chip" title="Importa o arquivo para o bin do projeto (nome definido nas Configurações)">
-                    <span>Importar no bin</span>
+                    <span id="hostImportLabel">Importar no bin</span>
                     <span class="switch">
                         <input type="checkbox" id="toggleImportBin" checked>
                         <span class="slider"></span>
                     </span>
                 </label>
                 <label class="toggle-chip" title="Coloca o clipe na sequência ativa, na primeira faixa livre sob o indicador de reprodução">
-                    <span>Inserir na timeline</span>
+                    <span id="hostInsertLabel">Inserir na timeline</span>
                     <span class="switch">
                         <input type="checkbox" id="toggleInsertTimeline" checked>
                         <span class="slider"></span>
@@ -154,7 +154,7 @@
                 </div>
 
                 <div class="modal-row">
-                    <label for="inputBinName">Nome do bin no Premiere</label>
+                    <label id="hostFolderLabel" for="inputBinName">Nome do bin no Premiere</label>
                     <input type="text" id="inputBinName" class="modal-input" placeholder="_Downloads" value="_Downloads" />
                 </div>
 

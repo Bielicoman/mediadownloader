@@ -470,3 +470,8 @@ function insertMediaToTimeline(filePath, binName) {
         return safeReturn(false, null, "Erro na inserção: " + err.toString());
     }
 }
+
+// Host-specific adapter; Premiere functions above remain unchanged.
+if (typeof CompItem !== "undefined" && typeof ImportOptions !== "undefined") {
+    $.evalFile(new File(new File($.fileName).parent.fsName + "/host-aftereffects.jsx"));
+}

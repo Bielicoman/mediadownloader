@@ -49,4 +49,4 @@ if (!$SkipDebugMode) {
 }
 Write-Host "Media Downloader instalado em: $destination"
 if ($hadPrevious) { Write-Host "Backup anterior preservado em: $backup" }
-Write-Host 'Se o Premiere estiver aberto, reinicie quando puder. Abra Janela > Extensões (Legado) > Media Downloader.'
+Write-Host 'Se o Premiere ou After Effects estiver aberto, reinicie o editor quando puder. Abra Janela > Extensões (Legado) > Media Downloader.'

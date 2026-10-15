@@ -16,7 +16,7 @@ Planejar um adaptador de host separado para o After Effects, aproveitando o moto
 
 Antes de anunciar suporte: validar manifesto/instalação, abertura do painel, destino dos arquivos, importação no projeto e tratamento de erros no After Effects real. O manifesto e os scripts atuais do Premiere não constituem suporte automático ao After Effects.
 
-**Situação:** planejado; integração funcional não entregue nem validada.
+**Situação:** adaptador implementado na prévia Adobe 1.4.0. Importação e inserção testadas nativamente no After Effects 26.3x87/Windows; painel instalado por usuário. Abertura e fluxo completo do painel ainda pendentes; macOS não testado. Detalhes em [AFTER-EFFECTS.md](AFTER-EFFECTS.md).
 
 ## 3. DaVinci Resolve
 

@@ -1,5 +1,14 @@
 # Histórico de mudanças
 
+## Adobe 1.4.0 — prévia em desenvolvimento
+
+- Adaptador separado para After Effects 2026: importação no projeto e nova camada na composição ativa.
+- Importação WAV e inserção testadas no After Effects 26.3x87/Windows. Fluxo completo no painel e macOS pendentes.
+- Bridge identifica appId, valida respostas e rejeita chamadas fora do host em vez de simular sucesso.
+- Pacote e instaladores compartilhados Premiere/After Effects; Desktop estável permanece 1.3.0.
+- Sete testes novos de contratos do host e interface.
+
+
 ## 1.3.0 — 2026-10-15
 
 Entrega Windows/CEP em preparação para publicação. A disponibilidade dos artefatos depende da release no GitHub.

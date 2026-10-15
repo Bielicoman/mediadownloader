@@ -84,3 +84,11 @@ O layout foi exercitado em 1040×820 com a prévia e o progresso ativos: as caix
 ## Conferência após publicação
 
 Site oficial e as seis páginas institucionais responderam HTTP200. CSP da produção conferida. Instalador público baixado integralmente: SHA2569C9EA9D026192FDBA3DA5A77FB99B4CC859E2BEFCC50D5FD10A37AE65C12901C, igual ao artefato local. Instalação real na pasta padrão do usuário retornou0, com executável1.3.0 e runtime44.7.2; fontes instaladas comparadas por hash. A consulta ao Premiere não recebeu resposta do MCPBridge, portanto não registramos importação nativa como validada.
+
+## Prévia Adobe 1.4.0 — After Effects
+
+Em 15/10/2026, sete novos testes de bridge/adaptador passaram junto à suíte anterior e à revisão independente de código. Identificação usa appId AEFT, sem sucesso simulado fora da Adobe. A instalação Windows por usuário preservou backup; o SHA256 do adaptador instalado coincidiu com o fonte.
+
+Execução nativa no After Effects 26.3x87: importação WAV sem duplicação (duas chamadas, um footage), camada em t=2 com outPoint=10, preservação de camada anterior bloqueada e erro real para arquivo inexistente. Removidos somente os itens de teste; contagem do projeto: 92 antes e 92 depois. Não foi salvo o projeto. Relatório local smoke.json; não publicado por conter caminhos locais.
+
+Pendente: abertura e download/importação através do painel CEP instalado, além de macOS. O teste do adaptador via linha de comando não equivale a validar o painel completo.

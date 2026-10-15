@@ -40,4 +40,4 @@ for VERSION in 9 10 11 12; do
 done
 printf '\nMedia Downloader instalado em:\n%s\n' "$DESTINATION"
 if [ "$HAD_PREVIOUS" -eq 1 ]; then printf 'Backup anterior preservado em:\n%s\n' "$BACKUP"; fi
-printf '\nSe o Premiere estiver aberto, reinicie quando puder. Abra Janela > Extensões (Legado) > Media Downloader.\n'
+printf '\nSe o Premiere ou After Effects estiver aberto, reinicie o editor quando puder. Abra Janela > Extensões (Legado) > Media Downloader.\n'

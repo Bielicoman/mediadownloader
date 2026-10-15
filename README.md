@@ -4,6 +4,10 @@ Aplicativo gratuito para baixar vídeos, áudios e capas, com seleção de quali
 
 Criado por **Alex Ascencio**. [Site e instalação](https://mediadownloader-blush.vercel.app) · [Releases](https://github.com/Bielicoman/mediadownloader/releases) · [Documentação de instalação](docs/INSTALACAO.md)
 
+## Prévia After Effects
+
+A branch `feat/after-effects-adapter` contém o painel Adobe 1.4.0 em prévia. O adaptador de importação e camada foi testado no After Effects 26.3x87/Windows; o fluxo completo pelo painel e macOS ainda precisam de validação. O Desktop e os downloads estáveis continuam na 1.3.0. [Instalação e evidências](docs/AFTER-EFFECTS.md).
+
 ## Baixar e instalar
 
 | Plataforma | Pacote | Situação desta entrega |

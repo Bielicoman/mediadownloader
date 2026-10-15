@@ -1,17 +1,27 @@
 {
   "pluginId": "com.alexascencio.mediadownloader",
   "name": "Media Downloader",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "minPremiereVersion": "2020",
   "releaseDate": "2026-10-15",
-  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.3.0/MediaDownloader.zip",
-  "zipUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.3.0/MediaDownloader.zip",
+  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.0-preview/MediaDownloader-Adobe-1.4.0-preview.zip",
+  "zipUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.0-preview/MediaDownloader-Adobe-1.4.0-preview.zip",
   "mandatory": false,
   "changelog": [
-    "Interface glass e fonte local",
-    "15 formatos; qualidade padrão salva",
-    "Download direto sem aria2; atualização na pasta do usuário",
-    "ZIP com instaladores por usuário Windows e Mac"
+    "Adaptador After Effects 2026: importar e inserir na composição",
+    "Bridge sem simulação e com validação estrita das respostas",
+    "Prévia: teste nativo no After Effects pendente"
   ],
-  "fullName": "Media Downloader 1.3.0"
+  "fullName": "Media Downloader Adobe 1.4.0 (prévia)",
+  "channel": "preview",
+  "hosts": {
+    "PPRO": {
+      "min": "14.0",
+      "max": "99.9"
+    },
+    "AEFT": {
+      "min": "26.0",
+      "max": "26.9"
+    }
+  }
 }
