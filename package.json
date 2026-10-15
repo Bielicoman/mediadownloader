@@ -2,7 +2,7 @@
   "name": "media-downloader",
   "version": "1.3.0",
   "private": true,
-  "description": "Site, documenta\u00c3\u00a7\u00c3\u00a3o e ferramentas do Media Downloader",
+  "description": "Site, documentação e ferramentas do Media Downloader",
   "license": "MIT",
   "author": "Alex Ascencio",
   "scripts": {
