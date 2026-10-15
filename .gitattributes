@@ -1,6 +1,7 @@
 # Scripts de shell precisam de LF: com CRLF o Linux le o shebang como
 # "bash\r" e recusa executar com "bad interpreter".
 *.sh   text eol=lf
+*.command text eol=lf
 
 # Batch do Windows espera CRLF.
 *.bat  text eol=crlf

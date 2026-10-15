@@ -80,3 +80,7 @@ O runtime Windows foi atualizado para Electron 44.7.2 e seu ZIP conferido pelo S
 Os testes de diagnóstico, downloads truncados, escrita, rollback, erros de certificado e cache de confiança passaram. A auditoria npm de produção registrou zero vulnerabilidades no seu escopo. Isso não certifica os binários de terceiros ou ausência total de falhas.
 
 O layout foi exercitado em 1040×820 com a prévia e o progresso ativos: as caixas não se sobrepõem. O histórico fica ao lado, e o conteúdo usa rolagem em alturas menores. Endereços de miniaturas do YouTube são normalizados para o vídeo correspondente.
+
+## Conferência após publicação
+
+Site oficial e as seis páginas institucionais responderam HTTP200. CSP da produção conferida. Instalador público baixado integralmente: SHA2569C9EA9D026192FDBA3DA5A77FB99B4CC859E2BEFCC50D5FD10A37AE65C12901C, igual ao artefato local. Instalação real na pasta padrão do usuário retornou0, com executável1.3.0 e runtime44.7.2; fontes instaladas comparadas por hash. A consulta ao Premiere não recebeu resposta do MCPBridge, portanto não registramos importação nativa como validada.

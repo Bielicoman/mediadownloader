@@ -15,7 +15,7 @@ Criado por **Alex Ascencio**. [Site e instalação](https://mediadownloader-blus
 | Linux x86_64 | [AppImage v1.0.0](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Linux-x86_64.AppImage) | Pacote publicado anterior |
 | Android ARM64 | [APK v1.0.0](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-arm64.apk) | Pacote publicado anterior |
 
-Os links v1.3.0 identificam os artefatos desta entrega. Até a publicação da release, esses links podem ainda não estar disponíveis. Consulte a [página da versão](https://github.com/Bielicoman/mediadownloader/releases/tag/v1.3.0) antes de compartilhar.
+A [release v1.3.0](https://github.com/Bielicoman/mediadownloader/releases/tag/v1.3.0) está publicada. O instalador foi baixado pelo endereço público e seu SHA256 corresponde ao pacote instalado e verificado no Windows.
 
 No Windows, abra o EXE e mantenha **Somente para mim** para instalar no seu usuário. O Desktop inclui yt-dlp, FFmpeg e FFprobe; o usuário final não precisa instalar Python ou Node.js. Para o Premiere, extraia o ZIP inteiro e use o instalador do seu sistema. [Passo a passo](docs/INSTALACAO.md).
 
