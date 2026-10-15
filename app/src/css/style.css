@@ -1,3 +1,4 @@
+@font-face{font-family:Manrope;src:url(../fonts/Manrope.ttf) format("truetype");font-weight:200 800;font-display:swap}
 /* ==========================================================================
    MediaDownloader Desktop — Minimalist Obsidian Pro Design System
    Multiplatform: Windows, macOS, Linux
@@ -28,16 +29,16 @@
 
   --text-main: #e8eaee;
   --text-secondary: #c2c8d2;
-  --text-muted: #7e8798;
-  --text-dim: #525b6c;
+  --text-muted: #9a9eaa;
+  --text-dim: #7d8391;
 
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  --radius-xs: 9px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
   --radius-pill: 999px;
 
-  --font-sans: "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Manrope", "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "DM Mono", "Cascadia Mono", Consolas, monospace;
 
   --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.45);
@@ -1228,4 +1229,147 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 2px 0;
+}
+
+
+/* Studio surface system: shared identity, offline system typography. */
+body {
+  background: radial-gradient(ellipse at 5% 0%, rgba(255,176,32,.085), transparent 47%),
+    radial-gradient(ellipse at 98% 85%, rgba(61,220,132,.045), transparent 45%), #090b0f;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+button,input,textarea,select {font-family:var(--font-sans)}
+button {touch-action:manipulation}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible {
+  outline:2px solid var(--accent-amber);outline-offset:3px;
+}
+button:disabled {opacity:.48;cursor:not-allowed;box-shadow:none;transform:none}
+.titlebar {
+  height:51px;min-height:51px;padding:0 14px 0 22px;
+  background:rgba(12,14,19,.7);border-color:rgba(255,255,255,.065);
+}
+.titlebar-brand {font-size:12px;letter-spacing:.8px;gap:11px}
+.titlebar-icon {width:23px;height:23px}
+.brand-badge {border-radius:6px;font-size:9px;padding:3px 6px;letter-spacing:.5px}
+.brand-status-dot {width:6px;height:6px;box-shadow:0 0 10px rgba(61,220,132,.35)}
+.titlebar-btn {width:36px;height:30px;border-radius:8px}
+.app-container {padding:24px 28px 14px;gap:17px;overflow-y:auto;overflow-x:hidden;min-height:0}
+.workspace-heading {padding:2px 2px 3px}
+.workspace-heading h1 {font-size:27px;line-height:1.2;letter-spacing:-1px;font-weight:650;color:#f5f3ee}
+.workspace-heading p {font-size:12px;line-height:1.6;color:var(--text-muted);margin-top:7px}
+.tabs-container {padding:5px;gap:4px;border-radius:15px;background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.065)}
+.nav-tab {min-height:38px;padding:8px 15px;border:1px solid transparent;border-radius:10px;font-size:12px;font-weight:600;gap:8px}
+.nav-tab.active {background:linear-gradient(135deg,rgba(255,176,32,.14),rgba(255,176,32,.055));border-color:rgba(255,176,32,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.icon-btn {width:39px;height:39px;border-radius:13px;background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.08)}
+.dir-bar {padding:11px 14px;border-radius:14px;background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.065);gap:12px}
+.dir-label {font-size:10px;color:var(--text-muted)}
+.dir-path {font-size:11px;color:#cfd0d5;user-select:text}
+.btn-dir {min-height:29px;padding:5px 10px;border-radius:8px;font-size:10px;background:rgba(255,255,255,.035)}
+.tab-content.active {min-width:0}
+.main-card,.history-section,.progress-card,.playlist-header-card {
+  border-radius:22px;background:linear-gradient(145deg,rgba(31,34,40,.66),rgba(16,19,24,.8));
+  border:1px solid rgba(255,255,255,.085);box-shadow:0 14px 38px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.025);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+}
+.main-card {padding:21px;gap:17px;overflow:visible}
+.field-caption,.format-caption {display:block;font-size:10px;font-weight:650;letter-spacing:1px;text-transform:uppercase;color:#a8a9b1;margin:0 0 9px 2px}
+.input-capsule {min-height:53px;padding:6px 7px 6px 15px;border-radius:14px;background:rgba(0,0,0,.19);border-color:rgba(255,255,255,.1);gap:12px}
+.input-capsule:focus-within {border-color:rgba(255,176,32,.6);box-shadow:0 0 0 3px rgba(255,176,32,.06)}
+.url-input {font-size:12px;letter-spacing:.05px;color:#eee;user-select:text}
+.url-input::placeholder {color:#777f8b}
+.btn-paste {height:35px;padding:0 13px;border-radius:10px;background:rgba(255,255,255,.055);font-size:11px;border-color:rgba(255,255,255,.08)}
+.preview-box {padding:12px;gap:14px;border-radius:15px;background:rgba(0,0,0,.17);border-color:rgba(255,255,255,.055)}
+.preview-thumb-container {width:112px;height:65px;border-radius:10px}
+.preview-title {font-size:13px;line-height:1.5;font-weight:650}
+.preview-meta {font-size:11px;color:#9ba2ae;line-height:1.7}
+.preview-platform-tag {font-size:8px;border-radius:5px;letter-spacing:.5px;padding:2px 5px}
+.controls-row {gap:11px;align-items:stretch}
+.custom-select-trigger {min-height:48px;border-radius:13px;padding:0 14px;background:rgba(0,0,0,.21);border-color:rgba(255,255,255,.105);font-size:12px}
+.select-current-option {gap:9px;min-width:0}
+.select-current-option .opt-label {font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.custom-select-wrapper {min-width:0;z-index:12}
+.custom-select-wrapper.open {z-index:90}
+.custom-select-dropdown {max-height:min(390px,48vh);overflow-y:auto;overscroll-behavior:contain;padding:7px;border-radius:15px;background:#191c23;border-color:rgba(255,255,255,.14);box-shadow:0 22px 55px rgba(0,0,0,.6);z-index:100;left:0;right:0}
+.select-option {padding:11px 10px;gap:10px;border-radius:10px;min-height:48px}
+.select-option:hover {background:rgba(255,255,255,.055)}
+.select-option.active {background:rgba(255,176,32,.105)}
+.opt-title {font-size:11px;font-weight:600}
+.opt-desc {font-size:10px;line-height:1.5;color:#a3a8b3}
+.opt-badge {font-size:8px;padding:3px 5px;border-radius:5px}
+.select-divider {margin:6px 4px;border-color:rgba(255,255,255,.07)}
+.btn-download-primary {min-height:48px;padding:0 21px;border-radius:13px;font-size:12px;font-weight:750;letter-spacing:.2px;white-space:nowrap;background:linear-gradient(145deg,#ffc442,#f0a900);color:#201600;border:1px solid rgba(255,211,101,.5);box-shadow:0 5px 18px rgba(255,176,32,.14),inset 0 1px 0 rgba(255,255,255,.3)}
+.btn-download-primary:hover {background:linear-gradient(145deg,#ffd066,#ffba20);box-shadow:0 7px 22px rgba(255,176,32,.22);transform:translateY(-1px)}
+.btn-download-primary:active {transform:translateY(0)}
+.progress-card {padding:17px 20px}
+.progress-title {font-size:12px;font-weight:600}
+.progress-percent {font-size:12px}
+.progress-bar-bg {height:5px;border-radius:20px;background:rgba(255,255,255,.065);margin:12px 0}
+.progress-bar-fill {border-radius:20px;background:linear-gradient(90deg,#b57c14,#ffc34b)}
+.progress-stats {font-size:10px;color:var(--text-muted)}
+.history-section {padding:18px 15px;min-height:180px;flex:1;gap:14px}
+.history-header {padding:0 3px;font-size:10px;letter-spacing:1px;color:#a3a7b1;gap:9px;flex-wrap:wrap}
+.history-count {font-size:9px;padding:2px 6px;background:rgba(255,176,32,.09);border:1px solid rgba(255,176,32,.13)}
+.btn-clear-history {font-size:10px;color:#9da3b0}
+.history-list {gap:7px;min-height:110px;overflow-y:auto;min-width:0}
+.history-item {padding:10px;gap:11px;border-radius:13px;background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.045);min-height:66px}
+.history-item:hover {background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.1)}
+.history-item-thumb {width:63px;height:39px;border-radius:7px}
+.history-item-title {font-size:11px;line-height:1.45;font-weight:600}
+.history-item-meta {font-size:9px;color:#959daa;margin-top:5px}
+.btn-history-action {width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.06)}
+.history-empty {min-height:160px;font-size:12px;color:#8f97a5;line-height:1.7}
+.history-empty svg {opacity:.3;width:34px;height:34px;margin-bottom:13px}
+.author-footer {font-size:8px;letter-spacing:1.4px;color:#87816f;padding:5px 12px 13px;opacity:.7}
+.batch-textarea {border-radius:13px;padding:14px;font-size:12px;background:rgba(0,0,0,.18);line-height:1.8}
+.playlist-items-list {border-radius:14px;padding:7px;max-height:235px}
+.playlist-item-row {padding:9px;border-radius:9px}
+.playlist-item-title {font-size:11px}
+.modal-backdrop {background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.modal-dialog {width:min(530px,calc(100vw - 48px));max-height:85vh;overflow:auto;border-radius:23px;background:#15181f;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 100px rgba(0,0,0,.5)}
+.modal-header {padding:21px 23px;border-bottom-color:rgba(255,255,255,.07)}
+.modal-title {font-size:15px;letter-spacing:-.3px}
+.modal-body {padding:23px;gap:20px}
+.modal-row label {font-size:11px;color:#bfc3cd}
+.modal-input {font:12px var(--font-sans);color:var(--text-main);background:var(--bg-input);border:1px solid var(--border-default);padding:10px;border-radius:10px}
+.toast {padding:13px 18px;border-radius:13px;font-size:12px;max-width:600px;background:#24272e;box-shadow:0 15px 35px rgba(0,0,0,.35)}
+@media (min-width:920px) {
+  .app-container {display:grid;grid-template-columns:minmax(0,1fr) 290px;grid-template-rows:auto auto auto minmax(0,auto) auto;align-content:start;column-gap:20px;row-gap:17px}
+  .workspace-heading {grid-column:1 / -1;grid-row:1}
+  .nav-row {grid-column:1 / -1;grid-row:2}
+  .dir-bar {grid-column:1 / -1;grid-row:3}
+  .tab-content.active {grid-column:1;grid-row:4}
+  .progress-card.active {grid-column:1;grid-row:5}
+  .history-section {grid-column:2;grid-row:4 / span 2;min-height:330px;max-height:calc(100vh - 288px);margin:0}
+  .history-item {flex-wrap:wrap;gap:8px;padding:10px}
+  .history-item-thumb {width:52px;height:33px}
+  .history-item-info {min-width:0;flex:1}
+  .history-item-actions {margin-left:auto}
+  .history-item-title {max-width:162px;font-size:10px}
+  .history-header {letter-spacing:.6px;font-size:9px}
+  .main-card {min-height:260px}
+  .controls-row {flex-wrap:wrap}
+  .custom-select-wrapper {flex-basis:100%}
+  .btn-download-primary {width:100%;justify-content:center}
+}
+@media (max-width:740px) {
+  .app-container {padding:18px;gap:13px}
+  .workspace-heading h1 {font-size:23px}
+  .main-card {padding:17px}
+  .nav-tab {padding:7px 10px;font-size:11px}
+}
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after {transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+.workspace-heading {display:flex;align-items:center;justify-content:space-between;gap:20px}
+.workspace-heading .workspace-kicker {font-size:9px;line-height:1.4;text-transform:uppercase;letter-spacing:1.8px;color:#c69c51;margin:0 0 9px;font-weight:600}
+.workspace-signature {font-size:10px;color:#8a909c;white-space:nowrap;align-self:flex-start;margin-top:3px;padding:6px 10px;border:1px solid rgba(255,255,255,.055);border-radius:20px;background:rgba(255,255,255,.02)}
+@media (min-width:920px) {.author-footer {grid-column:1 / -1;grid-row:6;padding-bottom:0}}
+@media (max-width:740px) {.workspace-signature {display:none}}
+/* Keep download content and progress in separate, intrinsic-height grid rows. */
+@media (min-width:920px){
+ .app-container{grid-template-rows:repeat(6,max-content);grid-auto-rows:max-content;align-items:start}
+ .tab-content.active{align-self:start;min-height:min-content}
+ .progress-card.active{position:relative;align-self:start;height:auto;min-height:0;margin:0}
+ .history-section{align-self:stretch;height:auto}
 }

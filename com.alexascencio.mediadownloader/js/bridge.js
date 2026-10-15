@@ -113,15 +113,15 @@
                     var isFile = fs.existsSync(filePath) && fs.statSync(filePath).isFile();
                     if (process.platform === "darwin") {
                         if (isFile) {
-                            child_process.exec('open -R "' + filePath + '"');
+                            child_process.execFile("open", ["-R", filePath]);
                         } else {
-                            child_process.exec('open "' + dir + '"');
+                            child_process.execFile("open", [dir]);
                         }
                     } else {
                         if (isFile) {
-                            child_process.exec('explorer.exe /select,"' + filePath.replace(/\//g, "\\") + '"');
+                            child_process.execFile("explorer.exe", ["/select,", filePath.replace(/\//g, "\\")]);
                         } else {
-                            child_process.exec('explorer.exe "' + dir.replace(/\//g, "\\") + '"');
+                            child_process.execFile("explorer.exe", [dir.replace(/\//g, "\\")]);
                         }
                     }
                 }
@@ -157,7 +157,7 @@
         /**
          * Lê texto da área de transferência sem bloqueio de permissão
          */
-        readClipboard: function () {
+        readClipboard: function (cheapOnly) {
             // Nível 1: DOM execCommand('paste') com textarea temporário (funciona no CEP CEF sem permissão)
             try {
                 var textarea = document.createElement("textarea");
@@ -177,6 +177,8 @@
                     return Promise.resolve(val.trim());
                 }
             } catch (e) {}
+
+            if (cheapOnly) return Promise.resolve("");
 
             // Nível 2: leitura via processo nativo do sistema
             if (typeof require !== "undefined") {

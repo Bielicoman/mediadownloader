@@ -1,0 +1,22 @@
+name: Sugerir uma melhoria
+description: Propor uma melhoria para o aplicativo ou plugin.
+title: "[Melhoria] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Qual problema você precisa resolver?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Como a melhoria deveria funcionar?
+      description: "Informe a plataforma e o fluxo de uso. Não inclua dados privados."
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas que você já tentou

@@ -17,6 +17,7 @@
     var elPreviewPlatform = document.getElementById("previewPlatform");
     
     var elSelectPreset = document.getElementById("selectPreset");
+    var elDefaultPreset = document.getElementById("selectDefaultPreset");
     var elToggleImportBin = document.getElementById("toggleImportBin");
     var elToggleInsertTimeline = document.getElementById("toggleInsertTimeline");
     var elBtnDownload = document.getElementById("btnDownload");
@@ -55,6 +56,7 @@
     var currentDownloadId = null;
     var isFetchingMeta = false;
     var isDownloading = false;
+    var downloadGeneration = 0;
     var historyItems = [];
 
     // ==========================================
@@ -89,41 +91,116 @@
         setupEventListeners();
     }
 
+    var elEngineCard = document.getElementById("engineCard");
+    var elEngineCardText = document.getElementById("engineCardText");
+    var elBtnInstallEngines = document.getElementById("btnInstallEngines");
+    var elEncoderStatus = document.getElementById("encoderStatus");
+    var lastStatus = null;
+
+    var ENCODER_NAMES = {
+        h264_nvenc: "GPU NVIDIA (NVENC)",
+        h264_amf: "GPU AMD (AMF)",
+        h264_videotoolbox: "VideoToolbox (Apple)",
+        libx264: "Processador (x264)"
+    };
+
     function checkEnvironment() {
-        window.BinManager.getStatus().then(function (status) {
+        return window.BinManager.getStatus().then(function (status) {
+            lastStatus = status;
             if (elYtDlpStatus) {
-                if (status.ytdlp.found) {
-                    elYtDlpStatus.textContent = "✅ Pronto (" + (status.ytdlp.version || "OK") + ")";
-                    elYtDlpStatus.style.color = "var(--accent-emerald)";
+                elYtDlpStatus.textContent = status.ytdlp.found ? (status.ytdlp.version || "Pronto") : "Não encontrado";
+                elYtDlpStatus.style.color = status.ytdlp.found ? "var(--accent-emerald)" : "var(--accent-rose)";
+            }
+            if (elFfmpegStatus) {
+                elFfmpegStatus.textContent = status.ffmpeg.found ? (status.ffmpeg.version || "Pronto") : "Não encontrado";
+                elFfmpegStatus.style.color = status.ffmpeg.found ? "var(--accent-emerald)" : "var(--accent-rose)";
+            }
+            if (elEncoderStatus) {
+                if (status.ffmpeg.found) {
+                    window.Downloader.detectEncoder().then(function (enc) {
+                        elEncoderStatus.textContent = ENCODER_NAMES[enc] || enc;
+                        elEncoderStatus.style.color = "var(--text-secondary)";
+                    });
                 } else {
-                    elYtDlpStatus.textContent = "❌ Não detectado (clique em Baixar)";
-                    elYtDlpStatus.style.color = "var(--accent-rose)";
+                    elEncoderStatus.textContent = "--";
                 }
             }
 
-            if (elFfmpegStatus) {
-                if (status.ffmpeg.found) {
-                    elFfmpegStatus.textContent = "✅ Pronto (" + (status.ffmpeg.version || "OK") + ")";
-                    elFfmpegStatus.style.color = "var(--accent-emerald)";
+            if (elEngineCard) {
+                var missing = [];
+                if (!status.ytdlp.found) missing.push("yt-dlp");
+                if (!status.ffmpeg.found) missing.push("FFmpeg");
+                if (missing.length) {
+                    elEngineCardText.innerHTML = "Falta <b>" + missing.join(" e ") + "</b> para baixar. " +
+                        "Instale aqui (~" + (status.ffmpeg.found ? "18" : "160") + " MB, uma vez) ou instale o app Desktop do Media Downloader, que a extensão usa automaticamente.";
+                    elEngineCard.className = "engine-card active";
                 } else {
-                    elFfmpegStatus.textContent = "⚠️ Ausente — limita a resolução e impede ProRes";
-                    elFfmpegStatus.style.color = "var(--accent-amber)";
+                    elEngineCard.className = "engine-card";
                 }
             }
 
             if (elSystemStatusDot) {
-                if (status.ready) {
-                    elSystemStatusDot.style.background = "var(--accent-emerald)";
-                    elSystemStatusDot.style.boxShadow = "0 0 8px var(--accent-emerald)";
-                } else {
-                    elSystemStatusDot.style.background = "var(--accent-amber)";
-                    elSystemStatusDot.style.boxShadow = "0 0 8px var(--accent-amber)";
-                }
+                var color = status.ready ? "var(--accent-emerald)" : "var(--accent-amber)";
+                elSystemStatusDot.style.background = color;
+                elSystemStatusDot.style.boxShadow = "0 0 8px " + color;
+                elSystemStatusDot.title = status.ready ? "Motores prontos" : "Faltam motores de download";
             }
+            return status;
         });
     }
 
+    /** Instala o que faltar: yt-dlp primeiro, depois FFmpeg. */
+    function installEngines() {
+        if (!lastStatus) return;
+        elBtnInstallEngines.disabled = true;
+        var chain = Promise.resolve();
+        if (!lastStatus.ytdlp.found) {
+            chain = chain.then(function () {
+                return window.BinManager.downloadStandaloneYtDlp(function (pct) {
+                    elBtnInstallEngines.textContent = "Baixando yt-dlp: " + pct + "%";
+                });
+            });
+        }
+        if (!lastStatus.ffmpeg.found) {
+            chain = chain.then(function () {
+                return window.BinManager.downloadStandaloneFfmpeg(function (pct, nome, i, total) {
+                    elBtnInstallEngines.textContent = "Baixando " + nome + " (" + i + "/" + total + "): " + pct + "%";
+                });
+            });
+        }
+        chain.then(function () {
+            showToast("Motores instalados.", "success");
+        }).catch(function (err) {
+            showToast("Falha ao instalar: " + err.message, "error");
+        }).then(function () {
+            elBtnInstallEngines.disabled = false;
+            elBtnInstallEngines.textContent = "Instalar motores";
+            checkEnvironment();
+        });
+    }
+
+    function validDefaultPreset(value) {
+      return elDefaultPreset && Array.prototype.some.call(elDefaultPreset.options, function (option) { return option.value === value; }) ? value : "best";
+    }
+
+    function loadDefaultPreset() {
+      var preset = validDefaultPreset(localStorage.getItem("mediadownloader_default_preset"));
+      if (elDefaultPreset) elDefaultPreset.value = preset;
+      document.querySelectorAll(".custom-select-wrapper").forEach(function (wrapper) {
+        var input = wrapper.querySelector('input[type="hidden"]');
+        var selected = wrapper.querySelector('.select-option[data-value="' + preset + '"]');
+        if (!input || !selected) return;
+        input.value = preset;
+        wrapper.querySelector(".opt-label").textContent = selected.getAttribute("data-label");
+        wrapper.querySelectorAll(".select-option").forEach(function (option) { option.classList.toggle("active", option === selected); });
+        var currentIcon = wrapper.querySelector(".custom-select-trigger .opt-icon");
+        var selectedIcon = selected.querySelector(".opt-icon");
+        if (currentIcon && selectedIcon) currentIcon.innerHTML = selectedIcon.innerHTML;
+      });
+    }
+
     function loadSettings() {
+      loadDefaultPreset();
         var savedDir = localStorage.getItem("mediadownloader_download_dir");
         if (elInputDownloadDir) {
             elInputDownloadDir.value = savedDir || window.Downloader.getDefaultDownloadDir();
@@ -151,6 +228,7 @@
     }
 
     function saveSettings() {
+      if (elDefaultPreset) localStorage.setItem("mediadownloader_default_preset", validDefaultPreset(elDefaultPreset.value));
         if (elInputDownloadDir) {
             localStorage.setItem("mediadownloader_download_dir", elInputDownloadDir.value.trim());
         }
@@ -215,6 +293,8 @@
     }
 
     function handleUrlChange(url) {
+    var thumbnailLink = String(url || "").match(/^https?:\/\/(?:i|img)\.ytimg\.com\/(?:vi|vi_webp)\/([A-Za-z0-9_-]{11})(?:\/|$)/i);
+    if (thumbnailLink) { url = "https://www.youtube.com/watch?v=" + thumbnailLink[1]; if (elUrlInput) elUrlInput.value = url; }
         if (!url || (!url.startsWith("http://") && !url.startsWith("https://"))) return;
 
         var platform = window.Downloader.detectPlatform(url);
@@ -247,8 +327,15 @@
 
         // ETAPA 2: Busca metadados refinados em segundo plano sem travar a interface
         isFetchingMeta = true;
-        window.Downloader.fetchMetadata(url).then(function (meta) {
+        window.Downloader.fetchMetadata(url, function (quick) {
+            if (elUrlInput.value.trim() !== url) return;
+            if (!currentMetadata || currentMetadata.isInstant) {
+                currentMetadata = quick;
+                displayPreview(quick);
+            }
+        }).then(function (meta) {
             isFetchingMeta = false;
+            if (elUrlInput.value.trim() !== url) return;
             currentMetadata = meta;
             displayPreview(meta);
         }).catch(function (err) {
@@ -313,157 +400,139 @@
             elUrlInput.focus();
             return;
         }
-
         if (isDownloading) {
             showToast("Um download já está em andamento.", "info");
             return;
         }
+        if (lastStatus && !lastStatus.ready) {
+            showToast("Instale os motores antes de baixar (aviso no topo do painel).", "error");
+            return;
+        }
 
         isDownloading = true;
+        var generation = ++downloadGeneration;
         elBtnDownload.disabled = true;
         elProgressCard.className = "progress-card active";
-        elProgressTitle.textContent = currentMetadata ? currentMetadata.title : "Iniciando download...";
+        elProgressTitle.textContent = currentMetadata && !currentMetadata.isInstant ? currentMetadata.title : "Preparando...";
         elProgressPercent.textContent = "0%";
         elProgressBarFill.style.width = "0%";
-        elProgressStatus.textContent = "Localizando pasta do projeto no Premiere...";
+        elProgressStatus.textContent = "Localizando a pasta do projeto...";
         elProgressSpeed.textContent = "--";
-        elProgressEta.textContent = "--";
+        elProgressEta.textContent = "";
+        elBtnCancelDownload.textContent = "Cancelar";
 
         var preset = elSelectPreset ? elSelectPreset.value : "best";
+        var meta = currentMetadata;
 
-        // Obtém automaticamente a pasta do projeto ativo no Premiere Pro
-        window.Bridge.getProjectInfo().then(function (projInfo) {
-            var projectFolder = (projInfo && projInfo.projectFolder) ? projInfo.projectFolder : null;
-            var outputDir = window.Downloader.getDefaultDownloadDir(projectFolder);
-
-            var options = {
+        // Projeto salvo: grava em <pasta do projeto>/<bin>. Sem projeto: pasta das Configurações.
+        window.Bridge.getProjectInfo().then(function (info) {
+            return info && info.projectFolder ? info.projectFolder : null;
+        }, function () {
+            return null;
+        }).then(function (projectFolder) {
+            if (generation !== downloadGeneration) throw new Error("Download cancelado");
+            var job = window.Downloader.startDownload({
                 url: url,
                 preset: preset,
-                outputDir: outputDir,
-                title: currentMetadata ? currentMetadata.title : null
-            };
-
-            window.Downloader.startDownload(options, function (progress) {
+                outputDir: window.Downloader.getDefaultDownloadDir(projectFolder),
+                title: meta && !meta.isInstant ? meta.title : null,
+                id: meta && meta.id ? meta.id : null
+            }, function (progress) {
+                if (generation !== downloadGeneration) return;
                 if (progress.percent !== undefined) {
                     elProgressPercent.textContent = Math.round(progress.percent) + "%";
                     elProgressBarFill.style.width = Math.min(progress.percent, 100) + "%";
                 }
                 if (progress.status) elProgressStatus.textContent = progress.status;
-                if (progress.speed) elProgressSpeed.textContent = progress.speed;
-                if (progress.eta) elProgressEta.textContent = "ETA: " + progress.eta;
+                elProgressSpeed.textContent = progress.speed || "";
+                elProgressEta.textContent = progress.eta && progress.eta !== "--" ? "faltam " + progress.eta : "";
             }, function (statusMsg) {
+                if (generation !== downloadGeneration) return;
                 elProgressStatus.textContent = statusMsg;
-            }).then(function (result) {
-                isDownloading = false;
-                elBtnDownload.disabled = false;
-                currentDownloadId = null;
-
-                showToast("Download salvo na pasta do projeto!", "success");
-
-                handlePostDownload(result);
-            }).catch(function (err) {
-                isDownloading = false;
-                elBtnDownload.disabled = false;
-                currentDownloadId = null;
-                elProgressStatus.textContent = "Erro: " + err.message;
-                elProgressBarFill.style.background = "var(--accent-rose)";
-                showToast("Falha no download: " + err.message, "error");
             });
-        }).catch(function () {
-            // Fallback caso não haja projeto salvo aberto
-            var outputDir = window.Downloader.getDefaultDownloadDir(null);
-            var options = {
-                url: url,
-                preset: preset,
-                outputDir: outputDir,
-                title: currentMetadata ? currentMetadata.title : null
-            };
-
-            window.Downloader.startDownload(options, function (progress) {
-                if (progress.percent !== undefined) {
-                    elProgressPercent.textContent = Math.round(progress.percent) + "%";
-                    elProgressBarFill.style.width = Math.min(progress.percent, 100) + "%";
-                }
-                if (progress.status) elProgressStatus.textContent = progress.status;
-                if (progress.speed) elProgressSpeed.textContent = progress.speed;
-                if (progress.eta) elProgressEta.textContent = "ETA: " + progress.eta;
-            }, function (statusMsg) {
-                elProgressStatus.textContent = statusMsg;
-            }).then(function (result) {
-                isDownloading = false;
-                elBtnDownload.disabled = false;
-                currentDownloadId = null;
-
-                showToast("Download e conversão finalizados!", "success");
-
-                handlePostDownload(result);
-            }).catch(function (err) {
-                isDownloading = false;
-                elBtnDownload.disabled = false;
-                currentDownloadId = null;
-                elProgressStatus.textContent = "Erro: " + err.message;
-                elProgressBarFill.style.background = "var(--accent-rose)";
-                showToast("Falha no download: " + err.message, "error");
-            });
+            currentDownloadId = job.downloadId;
+            return job;
+        }).then(function (result) {
+            if (generation !== downloadGeneration) return;
+            finishDownloadState();
+            handlePostDownload(result, meta);
+        }).catch(function (err) {
+            if (generation !== downloadGeneration) return;
+            var cancelled = /cancelado/i.test(err.message);
+            finishDownloadState();
+            if (cancelled) {
+                elProgressCard.className = "progress-card";
+                return;
+            }
+            elProgressCard.className = "progress-card active error";
+            elBtnCancelDownload.textContent = "Fechar";
+            elProgressStatus.textContent = err.message;
+            elProgressSpeed.textContent = "";
+            elProgressEta.textContent = "";
+            showToast("Falha no download: " + err.message, "error");
         });
     }
 
-    function handlePostDownload(result) {
+    function finishDownloadState() {
+        isDownloading = false;
+        currentDownloadId = null;
+        elBtnDownload.disabled = false;
+    }
+
+    function handlePostDownload(result, meta) {
         var filePath = result.filePath;
         if (!filePath) return;
 
         var binName = localStorage.getItem("mediadownloader_bin_name") || "_Downloads";
         var shouldInsert = elToggleInsertTimeline ? elToggleInsertTimeline.checked : true;
+        var shouldImport = elToggleImportBin ? elToggleImportBin.checked : true;
+        var fileName = filePath.split(/[\\/]/).pop();
 
-        // Sempre importa automaticamente para a pasta dedicada no Projeto
+        // Inserir na timeline exige importar; "Importar no bin" sozinho so importa.
         if (shouldInsert) {
             window.Bridge.insertMediaToTimeline(filePath, binName).then(function (res) {
-                if (res && res.inserted) {
-                    showToast("🎬 Importado para '" + binName + "' e inserido no Playhead!", "success");
-                } else {
-                    showToast("📁 Vídeo importado para a pasta '" + binName + "' no Projeto!", "success");
-                }
+                showToast(res && res.inserted ? "Inserido na timeline e no bin " + binName + "." :
+                    "Importado no bin " + binName + ". " + ((res && (res.note || res.warning)) || ""), "success");
             }).catch(function (err) {
-                console.warn("[App] Inserção na timeline:", err);
-                window.Bridge.importMediaFile(filePath, binName).then(function () {
-                    showToast("📁 Importado para a pasta '" + binName + "' no Projeto!", "success");
-                }).catch(function () {});
+                showToast("Baixado, mas o Premiere recusou a importação: " + err.message, "error");
+            });
+        } else if (shouldImport) {
+            window.Bridge.importMediaFile(filePath, binName).then(function () {
+                showToast("Importado no bin " + binName + ".", "success");
+            }).catch(function (err) {
+                showToast("Baixado, mas o Premiere recusou a importação: " + err.message, "error");
             });
         } else {
-            window.Bridge.importMediaFile(filePath, binName).then(function () {
-                showToast("📁 Vídeo importado para a pasta '" + binName + "' no Projeto!", "success");
-            }).catch(function (err) {
-                console.warn("[App] Importação para o Bin:", err);
-            });
+            showToast("Salvo em " + result.outputDir, "success");
         }
 
-        // Registra no Histórico
         addToHistory({
             id: "hist_" + Date.now(),
-            title: result.title || filePath.split(/[\\/]/).pop(),
+            title: result.title || fileName,
             filePath: filePath,
             preset: result.preset,
-            thumbnail: currentMetadata ? currentMetadata.thumbnail : "",
-            platform: currentMetadata ? currentMetadata.platform : window.Downloader.detectPlatform(result.url),
+            thumbnail: meta ? meta.thumbnail : "",
+            platform: meta ? meta.platform : window.Downloader.detectPlatform(""),
             timestamp: Date.now()
         });
 
-        // Limpa input
         elUrlInput.value = "";
         hidePreview();
+        elProgressStatus.textContent = "Concluído: " + fileName;
         setTimeout(function () {
-            elProgressCard.className = "progress-card";
-            elProgressBarFill.style.width = "0%";
-            elProgressBarFill.style.background = "linear-gradient(90deg, #b87a00, #ffb020)";
-        }, 3500);
+            if (!isDownloading) {
+                elProgressCard.className = "progress-card";
+                elProgressBarFill.style.width = "0%";
+            }
+        }, 4000);
     }
 
     function cancelDownload() {
+        downloadGeneration++;
         if (currentDownloadId) {
             window.Downloader.cancelDownload(currentDownloadId);
         }
-        isDownloading = false;
-        elBtnDownload.disabled = false;
+        finishDownloadState();
         elProgressCard.className = "progress-card";
         showToast("Download cancelado.", "info");
     }
@@ -474,7 +543,8 @@
     function loadHistory() {
         try {
             var raw = localStorage.getItem("mediadownloader_history");
-            historyItems = raw ? JSON.parse(raw) : [];
+            var parsed = raw ? JSON.parse(raw) : [];
+            historyItems = Array.isArray(parsed) ? parsed.filter(function (item) { return item && typeof item === "object" && typeof item.filePath === "string"; }).slice(0, 50) : [];
         } catch (e) {
             historyItems = [];
         }
@@ -532,28 +602,21 @@
             // Drag-and-Drop Nativo do Adobe CEP
             card.addEventListener("dragstart", function (e) {
                 if (item.filePath) {
-                    e.dataTransfer.setData("com.adobe.cep.dnd.file.0", item.filePath.replace(/\//g, "\\"));
+                    e.dataTransfer.setData("com.adobe.cep.dnd.file.0", typeof process !== "undefined" && process.platform === "win32" ? item.filePath.replace(/\//g, "\\") : item.filePath);
                 }
             });
 
-            var thumbHtml = item.thumbnail
-                ? '<img src="' + item.thumbnail + '" class="history-thumb" alt="thumb" />'
-                : '<div class="history-thumb" style="display:flex;align-items:center;justify-content:center;color:#666;"><svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
-
-            var badgeText = "MP4 H.264";
-            if (item.preset === "prores") badgeText = "ProRes 422";
-            else if (item.preset === "audio_wav") badgeText = "WAV 24b";
-            else if (item.preset === "audio_mp3") badgeText = "MP3 320k";
-            else if (item.preset === "1080p") badgeText = "1080p MP4";
-            else if (item.preset === "720p") badgeText = "720p MP4";
-            else if (item.preset === "thumbnail") badgeText = "PNG";
+            // External metadata must never become markup or event-handler attributes.
+            var thumbHtml = '<div class="history-thumb" style="display:flex;align-items:center;justify-content:center;color:#666;"><svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
+            var badges = { best: "Máxima · MP4", "4320p": "Até 8K", "2160p": "Até 4K", "1440p": "Até 1440p", "1080p": "Até 1080p", "720p": "Até 720p", "480p": "Até 480p", "360p": "Até 360p", prores: "ProRes 422 HQ", audio_wav: "WAV 24-bit", audio_flac: "FLAC", audio_mp3: "MP3", audio_m4a: "M4A", audio_original: "Áudio original", thumbnail: "PNG" };
+            var badgeText = badges[item.preset] || "Mídia";
 
             card.innerHTML = '\
                 ' + thumbHtml + '\
                 <div class="history-info">\
                     <div class="history-title">' + escapeHtml(item.title) + '</div>\
                     <div class="history-sub">\
-                        <span class="platform-pill ' + (item.platform ? item.platform.id : "x") + '" style="font-size:8px; padding:1px 4px;">' + (item.platform ? item.platform.badge || item.platform.name : "Vídeo") + '</span>\
+                        <span class="platform-pill ' + (item.platform ? String(item.platform.id || "x").replace(/[^a-z0-9_-]/gi, "") : "x") + '" style="font-size:8px; padding:1px 4px;">' + escapeHtml(item.platform ? item.platform.badge || item.platform.name : "Vídeo") + '</span>\
                         <span class="history-format-badge">' + badgeText + '</span>\
                     </div>\
                 </div>\
@@ -561,7 +624,7 @@
                     <button class="action-btn-3d btn-timeline" title="Inserir no Playhead da Timeline">\
                         <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>\
                     </button>\
-                    <button class="action-btn-3d btn-folder" title="Abrir pasta no Windows">\
+                    <button class="action-btn-3d btn-folder" title="Mostrar o arquivo na pasta">\
                         <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>\
                     </button>\
                     <button class="action-btn-3d btn-copy" title="Copiar caminho do arquivo">\
@@ -572,11 +635,21 @@
                     </button>\
                 </div>';
 
+            if (typeof item.thumbnail === "string" && /^(https?:\/\/|file:\/\/\/)/i.test(item.thumbnail)) {
+                var thumbnail = document.createElement("img");
+                thumbnail.className = "history-thumb";
+                thumbnail.alt = "Capa da mídia";
+                thumbnail.src = item.thumbnail;
+                var placeholder = card.querySelector(".history-thumb");
+                placeholder.parentNode.replaceChild(thumbnail, placeholder);
+            }
+
             var btnInsert = card.querySelector(".btn-timeline");
             btnInsert.addEventListener("click", function (e) {
                 e.stopPropagation();
-                window.Bridge.insertMediaToTimeline(item.filePath, "_Downloads").then(function () {
-                    showToast("🎬 Inserido na Timeline no Playhead!", "success");
+                var hb = localStorage.getItem("mediadownloader_bin_name") || "_Downloads";
+                window.Bridge.insertMediaToTimeline(item.filePath, hb).then(function (res) {
+                    showToast(res && res.inserted ? "Inserido na timeline." : "Importado no bin " + hb + " (sem sequência ativa).", "success");
                 }).catch(function (err) {
                     showToast("Erro ao inserir: " + err.message, "error");
                 });
@@ -607,7 +680,7 @@
 
     function escapeHtml(str) {
         if (!str) return "";
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
     // ==========================================
@@ -664,6 +737,7 @@
     function setupEventListeners() {
         if (elBtnPaste) elBtnPaste.addEventListener("click", handlePasteClick);
         if (elBtnInstallFfmpeg) elBtnInstallFfmpeg.addEventListener("click", installFfmpeg);
+        if (elBtnInstallEngines) elBtnInstallEngines.addEventListener("click", installEngines);
         if (elUrlInput) elUrlInput.addEventListener("input", handleUrlInput);
         if (elBtnDownload) elBtnDownload.addEventListener("click", startDownload);
         if (elBtnCancelDownload) elBtnCancelDownload.addEventListener("click", cancelDownload);
@@ -704,6 +778,7 @@
             customSelectTrigger.addEventListener("click", function (e) {
                 e.stopPropagation();
                 customSelectWrapper.classList.toggle("open");
+                customSelectTrigger.setAttribute("aria-expanded", customSelectWrapper.classList.contains("open") ? "true" : "false");
             });
 
             for (var i = 0; i < selectOptions.length; i++) {
@@ -726,12 +801,14 @@
                         }
                         opt.classList.add("active");
                         customSelectWrapper.classList.remove("open");
+                        customSelectTrigger.setAttribute("aria-expanded", "false");
                     });
                 })(selectOptions[i]);
             }
 
             document.addEventListener("click", function () {
                 customSelectWrapper.classList.remove("open");
+                customSelectTrigger.setAttribute("aria-expanded", "false");
             });
         }
 
@@ -745,11 +822,12 @@
         }
 
         window.addEventListener("focus", function () {
-            if (!elUrlInput.value.trim()) {
-                window.Bridge.readClipboard().then(function (text) {
+            if (!elUrlInput.value.trim() && !isDownloading) {
+                // Leitura barata: sem abrir PowerShell a cada vez que o painel ganha foco.
+                window.Bridge.readClipboard(true).then(function (text) {
                     if (text && (text.startsWith("http://") || text.startsWith("https://"))) {
                         var platform = window.Downloader.detectPlatform(text);
-                        if (platform.id !== "unknown") {
+                        if (platform.id !== "web" && platform.id !== "unknown") {
                             elUrlInput.value = text.trim();
                             handleUrlChange(text.trim());
                         }

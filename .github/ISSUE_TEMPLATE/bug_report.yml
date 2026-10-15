@@ -1,0 +1,56 @@
+name: Relatar um problema
+description: Erro no aplicativo, no plugin ou na instalação.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Não publique cookies.txt, credenciais, sessões, arquivos pessoais ou links privados. Vulnerabilidades: ascencioalexgabriel@gmail.com."
+  - type: input
+    id: version
+    attributes:
+      label: Versão do Media Downloader
+      placeholder: "Ex.: Desktop Windows 1.3.0"
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Sistema e host
+      description: "Sistema, arquitetura e versão do Premiere, se houver."
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Onde ocorreu
+      options:
+        - Vídeo ou áudio
+        - Playlist ou canal
+        - Vários links
+        - Plugin Premiere
+        - Instalador
+        - Site
+        - Outro
+  - type: input
+    id: preset
+    attributes:
+      label: Qualidade ou formato selecionado
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para reproduzir
+      description: "Inclua somente link público autorizado, quando necessário."
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Resultado esperado e resultado observado
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Mensagem de erro ou captura
+      description: "Revise e remova informações pessoais antes de enviar."

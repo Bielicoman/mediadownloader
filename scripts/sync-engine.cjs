@@ -1,0 +1,1 @@
+const fs=require('fs'),path=require('path');const root=path.resolve(__dirname,'..');fs.copyFileSync(path.join(root,'app/src/js/downloader.js'),path.join(root,'com.alexascencio.mediadownloader/js/downloader.js'));console.log('Motor sincronizado.');

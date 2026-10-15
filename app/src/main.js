@@ -1,6 +1,12 @@
 const { app, BrowserWindow, ipcMain, dialog, shell, clipboard } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const { pathToFileURL } = require("url");
+
+function safeExternalUrl(value) {
+  if (typeof value !== "string" || /[\x00-\x20]/.test(value)) return false;
+  try { const u = new URL(value); return u.protocol === "https:" && !u.username && !u.password; } catch (_) { return false; }
+}
 
 // Set safe userData directory in standard AppData to prevent disk cache permission errors
 try {
@@ -16,8 +22,9 @@ try {
 let mainWindow = null;
 
 function createWindow() {
+  // No Windows o .ico tem 16 a 256 px; a miniatura da barra de tarefas usa este icone.
   const iconCandidates = [
-    path.join(__dirname, "..", "icons", "iconNormal.png"),
+    ...(process.platform === "win32" ? [path.join(__dirname, "..", "icons", "icon.ico")] : []),
     path.join(__dirname, "..", "icons", "logo.png"),
     path.join(__dirname, "..", "favicon.ico")
   ];
@@ -30,10 +37,10 @@ function createWindow() {
   }
 
   mainWindow = new BrowserWindow({
-    width: 640,
-    height: 800,
-    minWidth: 480,
-    minHeight: 600,
+    width: 1040,
+    height: 820,
+    minWidth: 680,
+    minHeight: 620,
     frame: false, // Frameless custom Obsidian titlebar
     backgroundColor: "#080a0e",
     center: true,
@@ -44,9 +51,19 @@ function createWindow() {
       contextIsolation: false
     },
     icon: appIcon,
-    title: "Media Downloader Pro"
+    title: "Media Downloader"
   });
 
+  const uiUrl = pathToFileURL(path.join(__dirname, "index.html")).href;
+  const denyRemoteNavigation = (event, target) => {
+    if (target !== uiUrl) event.preventDefault();
+  };
+  mainWindow.webContents.on("will-navigate", denyRemoteNavigation);
+  mainWindow.webContents.on("will-redirect", denyRemoteNavigation);
+  mainWindow.webContents.on("will-attach-webview", event => event.preventDefault());
+  mainWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+  mainWindow.webContents.session.setPermissionRequestHandler((_wc, _permission, callback) => callback(false));
+  mainWindow.webContents.session.setPermissionCheckHandler(() => false);
   mainWindow.loadFile(path.join(__dirname, "index.html"));
 
   mainWindow.on("closed", () => {
@@ -149,7 +166,7 @@ ipcMain.handle("shell:showItemInFolder", (event, fullPath) => {
 });
 
 ipcMain.handle("shell:openExternal", async (event, url) => {
-  if (url) {
+  if (safeExternalUrl(url)) {
     await shell.openExternal(url);
     return true;
   }
@@ -169,13 +186,9 @@ ipcMain.handle("system:getPaths", () => {
     path.join(process.cwd(), "bin")
   ];
 
-  let localBin = candidateBins[0];
-  for (const c of candidateBins) {
-    if (fs.existsSync(c)) {
-      localBin = c;
-      break;
-    }
-  }
+  // Downloaded updates must not modify the signed macOS bundle.
+  const localBin = path.join(app.getPath("userData"), "bin");
+  fs.mkdirSync(localBin, { recursive: true });
 
   const defaultDownloadDir = path.join(app.getPath("videos"), "MediaDownloader");
 
@@ -188,6 +201,7 @@ ipcMain.handle("system:getPaths", () => {
   return {
     appPath,
     localBin,
+    bundledBins: candidateBins,
     defaultDownloadDir,
     userData: app.getPath("userData"),
     videos: app.getPath("videos"),

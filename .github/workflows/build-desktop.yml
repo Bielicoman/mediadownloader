@@ -1,28 +1,67 @@
 name: Build (Windows + macOS + Linux + Android)
 
+# Publica so quando uma tag de versao e enviada (git tag v1.3.0 && git push origin v1.3.0).
+# Antes, qualquer push em app/ reenviava os arquivos por cima da release v1.0.0.
 on:
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Tag da release onde publicar os artefatos"
+        description: "Tag da release (ex.: v1.3.0). Precisa bater com app/package.json."
         required: true
-        default: "v1.0.0"
-  push:
-    paths:
-      - "app/**"
-      - "android/**"
-      - ".github/workflows/build-desktop.yml"
 
 permissions:
   contents: write
 
 env:
-  ELECTRON_VERSION: "33.4.11"
+  ELECTRON_VERSION: "44.7.2"
   FFMPEG_TAG: "b6.1.1"
+  TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
 
 jobs:
+  # Cria a release como rascunho. Os jobs de build anexam os arquivos e o job
+  # "publicar" so a torna publica quando todos terminaram: o link "latest" nunca
+  # aponta para uma release sem os instaladores.
+  preparar:
+    name: Preparar release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conferir versao unica
+        run: |
+          set -euo pipefail
+          APP=$(node -p "require('./app/package.json').version")
+          EXT=$(grep -o 'ExtensionBundleVersion="[^"]*"' com.alexascencio.mediadownloader/CSXS/manifest.xml | cut -d'"' -f2)
+          SITE=$(node -p "require('./version.json').version")
+          echo "tag=$TAG app=$APP extensao=$EXT version.json=$SITE"
+          for v in "$APP" "$EXT" "$SITE"; do
+            if [ "v$v" != "$TAG" ]; then
+              echo "ERRO: versao divergente ($v) da tag $TAG"
+              exit 1
+            fi
+          done
+
+      - name: Criar rascunho
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            DRAFT=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
+            if [ "$DRAFT" != "true" ]; then echo "ERRO: release publicada; use uma nova tag."; exit 1; fi
+            echo "Rascunho $TAG existente; os builds anexam a ele."
+          else
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft \
+              --title "Media Downloader ${TAG#v}" \
+              --notes "Veja o changelog em version.json. Extensao do Premiere: MediaDownloader.zip com instaladores para Windows e macOS."
+          fi
+
   macos:
     name: macOS
+    needs: preparar
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -38,7 +77,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Baixar binarios nativos de macOS
         working-directory: app
@@ -110,7 +149,7 @@ jobs:
             --arch=${{ matrix.arch }} \
             --electron-version="$ELECTRON_VERSION" \
             --app-bundle-id=com.alexascencio.mediadownloader.desktop \
-            --app-version=1.0.0 \
+            --app-version="$(node -p "require('./app/package.json').version")" \
             --icon=app/icon.icns \
             --no-asar \
             --overwrite \
@@ -179,7 +218,6 @@ jobs:
       - name: Publicar na release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.event.inputs.release_tag || 'v1.0.0' }}
         run: |
           set -euo pipefail
           gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
@@ -188,6 +226,7 @@ jobs:
 
   windows:
     name: Windows
+    needs: preparar
     runs-on: windows-latest
     defaults:
       run:
@@ -198,7 +237,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Baixar binarios nativos de Windows
         working-directory: app
@@ -214,11 +253,8 @@ jobs:
           curl -sSL -o bin/ffmpeg.exe             "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_TAG}/ffmpeg-win32-x64"
           curl -sSL -o bin/ffprobe.exe             "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_TAG}/ffprobe-win32-x64"
 
-          curl -sSL -o aria2.zip             https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip
-          7z e -y aria2.zip -obin "*/aria2c.exe" >/dev/null
-          rm -f aria2.zip
 
-          for b in yt-dlp.exe ffmpeg.exe ffprobe.exe aria2c.exe; do
+          for b in yt-dlp.exe ffmpeg.exe ffprobe.exe; do
             size=$(stat -c%s "bin/$b")
             echo "$b: $size bytes"
             if [ "$size" -lt 1000000 ]; then
@@ -236,7 +272,7 @@ jobs:
       - name: Empacotar .exe
         run: |
           set -euo pipefail
-          npx --yes @electron/packager@20 app "Media Downloader"             --platform=win32             --arch=x64             --electron-version="$ELECTRON_VERSION"             --app-version=1.0.0             --icon=app/icons/icon.ico             --no-asar             --overwrite             --out=out
+          npx --yes @electron/packager@20 app "Media Downloader"             --platform=win32             --arch=x64             --electron-version="$ELECTRON_VERSION"             --app-version="$(node -p "require('./app/package.json').version")"             --icon=app/icons/icon.ico             --no-asar             --overwrite             --out=out
           ls -la "out/Media Downloader-win32-x64"
 
       - name: Enxugar o pacote
@@ -261,13 +297,13 @@ jobs:
 
           echo "depois: $(du -sm "$DIR" | cut -f1) MB"
 
-      - name: Incluir o instalador
+      - name: Gerar instalador EXE com escolha de usuário e pasta
         run: |
           set -euo pipefail
-          DIR="out/Media Downloader-win32-x64"
-          cp installers/windows/Instalar.bat    "$DIR/"
-          cp installers/windows/Desinstalar.bat "$DIR/"
-          ls -la "$DIR"/*.bat
+          npx --yes electron-builder@25.1.8 --win nsis --x64 --publish never \
+            --projectDir app --config ../installers/windows/electron-builder.nsis.json \
+            --prepackaged "../out/Media Downloader-win32-x64" \
+            --config.directories.output=../dist --config.electronVersion="$ELECTRON_VERSION"
 
       - name: Gerar .zip
         run: |
@@ -281,7 +317,6 @@ jobs:
       - name: Publicar na release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.event.inputs.release_tag || 'v1.0.0' }}
         run: |
           set -euo pipefail
           gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
@@ -289,6 +324,7 @@ jobs:
 
   linux:
     name: Linux
+    needs: preparar
     runs-on: ubuntu-latest
 
     steps:
@@ -296,7 +332,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Baixar binarios nativos de Linux
         working-directory: app
@@ -308,8 +344,7 @@ jobs:
           curl -sSL -o bin/ffmpeg             "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_TAG}/ffmpeg-linux-x64"
           curl -sSL -o bin/ffprobe             "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_TAG}/ffprobe-linux-x64"
 
-          # aria2 nao publica binario para Linux nas releases oficiais, so Android.
-          # O downloader trata aria2 como opcional, entao o yt-dlp usa o motor nativo.
+          # Nenhuma plataforma usa aria2c: o motor nativo do yt-dlp e o unico downloader.
 
           chmod +x bin/yt-dlp bin/ffmpeg bin/ffprobe
 
@@ -330,7 +365,7 @@ jobs:
       - name: Empacotar aplicacao
         run: |
           set -euo pipefail
-          npx --yes @electron/packager@20 app "Media Downloader"             --platform=linux             --arch=x64             --electron-version="$ELECTRON_VERSION"             --app-version=1.0.0             --executable-name=media-downloader             --no-asar             --overwrite             --out=out
+          npx --yes @electron/packager@20 app "Media Downloader"             --platform=linux             --arch=x64             --electron-version="$ELECTRON_VERSION"             --app-version="$(node -p "require('./app/package.json').version")"             --executable-name=media-downloader             --no-asar             --overwrite             --out=out
           ls -la "out/Media Downloader-linux-x64"
 
       - name: Enxugar o pacote
@@ -407,7 +442,6 @@ jobs:
       - name: Publicar na release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.event.inputs.release_tag || 'v1.0.0' }}
         run: |
           set -euo pipefail
           cp installers/linux/instalar.sh    dist/
@@ -417,6 +451,7 @@ jobs:
 
   android:
     name: Android
+    needs: preparar
     runs-on: ubuntu-latest
 
     steps:
@@ -495,7 +530,6 @@ jobs:
       - name: Publicar na release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.event.inputs.release_tag || 'v1.0.0' }}
         run: |
           set -euo pipefail
           # Os quatro jobs publicam na mesma release em paralelo, e uploads
@@ -516,3 +550,32 @@ jobs:
             done
           done
           echo "Publicado em $TAG"
+
+  plugin:
+    name: Extensao Premiere ZIP
+    needs: preparar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Empacotar extensao e instaladores
+        run: python scripts/package_plugin.py
+      - name: Anexar ZIP ao rascunho
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$TAG" dist/MediaDownloader.zip --clobber --repo "$GITHUB_REPOSITORY"
+
+  publicar:
+    name: Publicar release
+    needs: [macos, windows, linux, android, plugin]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tornar a release publica
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name'

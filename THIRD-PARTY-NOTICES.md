@@ -1,64 +1,43 @@
-# Avisos de terceiros
+# Avisos de terceiros e proveniência
 
-O código-fonte do Media Downloader é licenciado sob [MIT](LICENSE). Essa licença
-cobre **apenas o código deste projeto**.
+O código próprio e a documentação do Media Downloader são MIT, copyright 2026 Alex Ascencio. Isso não relicencia programas, fontes ou bibliotecas de terceiros. Downloads oficiais do projeto são gratuitos.
 
-Os pacotes distribuídos (`.zip`, `.dmg`, `.AppImage`) **empacotam programas de
-terceiros**, cada um sob a sua própria licença. Alguns são copyleft (GPL) e essas
-licenças **não são substituídas** pela licença MIT deste projeto.
+## Pacote Windows 1.3.0 desta entrega
 
-Os programas abaixo são executados como **processos separados**, invocados pela
-linha de comando. Não há vinculação de código: o Media Downloader não é uma obra
-derivada deles.
-
----
-
-## Componentes empacotados
-
-| Componente | Licença | Origem |
+| Componente | Versão medida | Licença efetiva / origem |
 |---|---|---|
-| **yt-dlp** | Unlicense (domínio público) | [yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp) |
-| **FFmpeg** e **ffprobe** | **GPL v3** | [ffmpeg.org](https://ffmpeg.org) |
-| **aria2c** (só no Windows) | **GPL v2 ou posterior** | [aria2/aria2](https://github.com/aria2/aria2) |
-| **Electron** | MIT | [electron/electron](https://github.com/electron/electron) |
-| **Chromium** (dentro do Electron) | BSD-3-Clause e outras | [chromium.org](https://www.chromium.org) |
-| **Node.js** (dentro do Electron) | MIT | [nodejs.org](https://nodejs.org) |
-| **CSInterface.js** (extensão CEP) | BSD-3-Clause, Adobe | [Adobe-CEP/CEP-Resources](https://github.com/Adobe-CEP/CEP-Resources) |
+| Electron | 44.7.2 | MIT; contém Chromium e Node.js com avisos próprios |
+| yt-dlp.exe | 2026.08.19 | núcleo Unlicense; executável PyInstaller combinado GPLv3 ou posterior e licenças de dependências |
+| FFmpeg / FFprobe | 6.1.1 essentials, Gyan | GPLv3 ou posterior; build estática com --enable-gpl --enable-version3 |
+| Manrope | fonte variável do projeto Manrope | SIL OFL 1.1; copyright 2018 The Manrope Project Authors |
+| CSInterface.js (CEP) | arquivo distribuído no painel | BSD-3-Clause, Adobe; aviso mantido no próprio arquivo |
 
-O FFmpeg é distribuído sob **GPL v3**, e não sob a LGPL, porque as builds usadas
-incluem o **libx264**, que é GPL. Essa é a licença que vale para os binários que
-acompanham os pacotes.
+aria2c não é incluído nem utilizado nos pacotes novos. Pacotes anteriores podem conter esse componente, sujeito à licença GPLv2 ou posterior.
 
----
+## Textos de licença
 
-## Como obter o código-fonte (obrigação da GPL)
+- MIT do projeto: [LICENSE](LICENSE)
+- Electron: [licenses/Electron-MIT.txt](licenses/Electron-MIT.txt)
+- Chromium e dependências: `LICENSES.chromium.html` acompanha o runtime Electron
+- GPLv3: [licenses/GPL-3.0.txt](licenses/GPL-3.0.txt)
+- yt-dlp: [Unlicense](licenses/yt-dlp-Unlicense.txt) e [avisos completos](licenses/yt-dlp-THIRD-PARTY-LICENSES.txt)
+- Manrope: [OFL](licenses/Manrope-OFL.txt) e [FONTLOG](licenses/Manrope-FONTLOG.txt)
 
-A GPL exige que quem distribui os binários ofereça o código-fonte correspondente.
-Os binários empacotados **não são compilados por este projeto**: são baixados,
-sem modificação, durante o build. As fontes exatas estão publicadas:
+## Fontes identificadas
 
-| Binário | Build usada | Código-fonte |
-|---|---|---|
-| `ffmpeg`, `ffprobe` (Windows, macOS) | [eugeneware/ffmpeg-static](https://github.com/eugeneware/ffmpeg-static/releases) | [git.ffmpeg.org/ffmpeg.git](https://git.ffmpeg.org/ffmpeg.git) |
-| `ffmpeg`, `ffprobe` (Linux) | [johnvansickle.com/ffmpeg](https://johnvansickle.com/ffmpeg/) | [git.ffmpeg.org/ffmpeg.git](https://git.ffmpeg.org/ffmpeg.git) |
-| `aria2c` | [aria2 release 1.37.0](https://github.com/aria2/aria2/releases/tag/release-1.37.0) | mesmo repositório, aba de tags |
-| `yt-dlp` | [release mais recente](https://github.com/yt-dlp/yt-dlp/releases/latest) | mesmo repositório |
-| `electron` | versão fixada no workflow | [electron/electron](https://github.com/electron/electron) |
+- Media Downloader: https://github.com/Bielicoman/mediadownloader — a release inclui snapshot do código desta entrega.
+- yt-dlp 2026.08.19: https://github.com/yt-dlp/yt-dlp/tree/2026.08.19 — inclui receitas e referências de dependências. Os avisos completos identificam os componentes combinados.
+- Electron 44.7.2: https://github.com/electron/electron/tree/v44.7.2
+- Build Gyan 6.1.1: https://github.com/GyanD/codexffmpeg/releases/tag/6.1.1
+- Núcleo FFmpeg identificado pelo fornecedor: commit e38092ef93, https://github.com/FFmpeg/FFmpeg/commit/e38092ef93
+- Manrope: https://github.com/google/fonts/tree/main/ofl/manrope
 
-As versões exatas de cada build estão declaradas em
-[`.github/workflows/build-desktop.yml`](.github/workflows/build-desktop.yml),
-nas variáveis `ELECTRON_VERSION` e `FFMPEG_TAG` e nas URLs de download.
+## Limite de verificação da fonte correspondente GPL
 
-Se precisar do código-fonte de alguma versão específica e os links acima não
-resolverem, abra uma
-[issue](https://github.com/Bielicoman/mediadownloader/issues).
+O núcleo FFmpeg foi identificado, mas o conjunto completo de fontes das bibliotecas vinculadas estaticamente e dos scripts correspondentes ao build Gyan ainda não foi verificado. Um link genérico para FFmpeg não equivale a esse conjunto. A inclusão dos avisos não encerra essa obrigação de distribuição. Esta entrega não é uma certificação de conformidade GPL; a coleta e oferta da fonte correspondente completa permanecem registradas como pendência de distribuição.
 
----
+Para solicitar fontes, comunicar lacunas ou exercer direitos relativos às licenças: ascencioalexgabriel@gmail.com. Não envie cookies ou credenciais. As licenças originais prevalecem.
 
-## Texto completo das licenças
+## Outras plataformas
 
-- MIT deste projeto: [LICENSE](LICENSE)
-- GPL v3 (FFmpeg): https://www.gnu.org/licenses/gpl-3.0.html
-- GPL v2 (aria2): https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-- Unlicense (yt-dlp): https://unlicense.org
-- Licenças do Chromium: acompanham cada pacote, no arquivo de licenças do Electron
+O workflow baixa motores nativos conforme arquitetura. A proveniência de um futuro pacote deverá registrar os binários realmente incorporados; não reutilizar a identificação Gyan Windows como se descrevesse todos os pacotes Mac/Linux. As versões atualmente publicadas em cada plataforma são indicadas no site.

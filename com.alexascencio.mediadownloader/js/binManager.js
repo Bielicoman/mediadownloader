@@ -1,6 +1,6 @@
 /**
  * binManager.js - Manages detection, validation, and auto-download of yt-dlp & ffmpeg binaries
- * Includes SSL proxy bypass (rejectUnauthorized: false) and multi-tier path resolution
+ * Uses verified HTTPS downloads and multi-tier path resolution
  */
 
 (function (window) {
@@ -11,7 +11,7 @@
     var fs = isNode ? require("fs") : null;
     var child_process = isNode ? require("child_process") : null;
     var https = isNode ? require("https") : null;
-    var http = isNode ? require("http") : null;
+      var os = isNode ? require("os") : null;
 
     var BinManager = {
         cachedYtDlpPath: null,
@@ -55,17 +55,48 @@
             ];
         },
 
-        /** bin/ da extensao primeiro, depois os caminhos conhecidos de macOS. */
+        /** No Windows, o app Desktop instalado pelo Instalar.bat tambem traz os motores. */
+        winCandidates: function (name) {
+            if (!isNode || process.platform !== "win32") return [];
+            var local = process.env.LOCALAPPDATA || "";
+            return [
+                path.join(local, "Programs", "Media Downloader", "resources", "app", "bin", name + ".exe"),
+                path.join(process.env.ProgramFiles || "C:\\Program Files", "Media Downloader", "resources", "app", "bin", name + ".exe")
+            ];
+        },
+
+        /** bin/ da extensao primeiro, depois o app Desktop e os caminhos conhecidos do sistema. */
         candidatosLocais: function (name) {
             if (!isNode) return [];
-            var lista = [path.join(this.getLocalBinDir(), process.platform === "win32" ? name + ".exe" : name)];
-            return lista.concat(this.macCandidates(name));
+            var exe = process.platform === "win32" ? name + ".exe" : name;
+            var lista = [path.join(this.getLocalBinDir(), exe), path.join(this.getExtensionDir(), "bin", exe)];
+            return lista.concat(this.winCandidates(name), this.macCandidates(name));
+        },
+
+        /** ffprobe fica ao lado do ffmpeg em todas as instalacoes suportadas. */
+        findFfprobe: function (ffmpegPath) {
+            if (!isNode || !ffmpegPath) return null;
+            var p = path.join(path.dirname(ffmpegPath), process.platform === "win32" ? "ffprobe.exe" : "ffprobe");
+            return fs.existsSync(p) ? p : null;
+        },
+
+        /** Esquece os caminhos achados; usado ao abrir o diagnostico e apos instalar motores. */
+        resetCache: function () {
+            this.cachedYtDlpPath = null;
+            this.cachedFfmpegPath = null;
+      this.cachedAria2Path = null;
+      this.ytDlpVersion = null;
+      this.ffmpegVersion = null;
+      this.aria2Version = null;
         },
 
         getLocalBinDir: function () {
             if (!isNode) return "";
-            var extDir = this.getExtensionDir();
-            var localBin = path.join(extDir, "bin");
+            // Keep updates writable even when CEP was installed system-wide.
+            var home = os.homedir();
+            var base = process.platform === "win32" ? (process.env.APPDATA || path.join(home, "AppData", "Roaming"))
+                : (process.platform === "darwin" ? path.join(home, "Library", "Application Support") : (process.env.XDG_DATA_HOME || path.join(home, ".local", "share")));
+            var localBin = path.join(base, "MediaDownloaderPro", "bin");
             if (!fs.existsSync(localBin)) {
                 try {
                     fs.mkdirSync(localBin, { recursive: true });
@@ -74,339 +105,240 @@
             return localBin;
         },
 
-        findYtDlp: function () {
-            if (!isNode) {
-                return Promise.resolve({ found: true, path: "yt-dlp (browser mock)", version: "2026.07.04" });
-            }
 
-            var self = this;
-            return new Promise(function (resolve) {
-                // 1. Verifica configuração customizada salva
-                var customPath = localStorage.getItem("mediadownloader_custom_ytdlp");
-                if (customPath && fs.existsSync(customPath)) {
-                    self.cachedYtDlpPath = customPath;
-                    return self.checkBinaryVersion(customPath).then(function (ver) {
-                        resolve({ found: true, path: customPath, version: ver, source: "custom" });
-                    });
-                }
-
-                // 2. Verifica pasta bin/ local da extensão
-                var locais = self.candidatosLocais("yt-dlp");
-                for (var L = 0; L < locais.length; L++) {
-                    if (fs.existsSync(locais[L])) {
-                        var achado = locais[L];
-                        self.cachedYtDlpPath = achado;
-                        return self.checkBinaryVersion(achado).then(function (ver) {
-                            resolve({ found: true, path: achado, version: ver, source: "local" });
-                        });
-                    }
-                }
-
-                // 3. Procura no PATH do sistema
-                var cmd = process.platform === "win32" ? "where yt-dlp" : "which yt-dlp";
-                child_process.exec(cmd, function (err, stdout) {
-                    if (!err && stdout && stdout.trim()) {
-                        var detectedPath = stdout.trim().split(/\r?\n/)[0];
-                        self.cachedYtDlpPath = detectedPath;
-                        self.checkBinaryVersion(detectedPath).then(function (ver) {
-                            resolve({ found: true, path: detectedPath, version: ver, source: "system" });
-                        });
-                        return;
-                    }
-
-                    // 4. Procura em caminhos padrão no Windows
-                    if (process.platform === "win32") {
-                        var appData = process.env.APPDATA || "";
-                        var localAppData = process.env.LOCALAPPDATA || "";
-                        var userProfile = process.env.USERPROFILE || "";
-
-                        var candidatePaths = [
-                            path.join(appData, "Python", "Python314", "Scripts", "yt-dlp.exe"),
-                            path.join(appData, "Python", "Python313", "Scripts", "yt-dlp.exe"),
-                            path.join(appData, "Python", "Python312", "Scripts", "yt-dlp.exe"),
-                            path.join(appData, "Python", "Python311", "Scripts", "yt-dlp.exe"),
-                            path.join(userProfile, "AppData", "Roaming", "Python", "Python314", "Scripts", "yt-dlp.exe"),
-                            path.join(userProfile, "AppData", "Local", "Programs", "Python", "Python314", "Scripts", "yt-dlp.exe"),
-                            path.join(localAppData, "Microsoft", "WinGet", "Links", "yt-dlp.exe"),
-                            "C:\\Program Files\\yt-dlp\\yt-dlp.exe",
-                            "C:\\Program Files (x86)\\yt-dlp\\yt-dlp.exe"
-                        ];
-
-                        for (var i = 0; i < candidatePaths.length; i++) {
-                            if (fs.existsSync(candidatePaths[i])) {
-                                self.cachedYtDlpPath = candidatePaths[i];
-                                return self.checkBinaryVersion(candidatePaths[i]).then(function (ver) {
-                                    resolve({ found: true, path: candidatePaths[i], version: ver, source: "common_path" });
-                                });
-                            }
-                        }
-                    }
-
-                    resolve({ found: false, path: null, version: null });
-                });
+    // A file is usable only after its version command succeeds.
+    findValidatedBinary: async function (name, customKey, cacheKey, versionKey) {
+      if (!isNode) return { found: false, path: null, version: null };
+      var self = this;
+      if (self[cacheKey] && self[versionKey] && fs.existsSync(self[cacheKey])) {
+        return { found: true, path: self[cacheKey], version: self[versionKey], source: "cache" };
+      }
+      self[cacheKey] = null;
+      self[versionKey] = null;
+      var candidates = [];
+      var custom = customKey && localStorage.getItem(customKey);
+      if (custom) candidates.push({ path: custom, source: "custom" });
+      var locals = self.getBinaryCandidates ? await self.getBinaryCandidates(name) : self.candidatosLocais(name);
+      locals.forEach(function (p) { candidates.push({ path: p, source: "local" }); });
+      var systemPaths = await new Promise(function (resolve) {
+        child_process.exec((process.platform === "win32" ? "where " : "which -a ") + name,
+          { timeout: 4000, windowsHide: true }, function (err, stdout) {
+            resolve(!err && stdout ? stdout.trim().split(/\r?\n/).filter(Boolean) : []);
+          });
+      });
+      systemPaths.forEach(function (p) { candidates.push({ path: p, source: "system" }); });
+      if (process.platform === "win32") {
+        var env = process.env || {}, home = env.USERPROFILE || os.homedir();
+        var local = env.LOCALAPPDATA || path.join(home, "AppData", "Local");
+        var roaming = env.APPDATA || path.join(home, "AppData", "Roaming");
+        var known = [path.join(local, "Microsoft", "WinGet", "Links", name + ".exe")];
+        if (name === "yt-dlp") {
+          ["314", "313", "312", "311"].forEach(function (v) {
+            known.push(path.join(roaming, "Python", "Python" + v, "Scripts", "yt-dlp.exe"));
+            known.push(path.join(local, "Programs", "Python", "Python" + v, "Scripts", "yt-dlp.exe"));
+          });
+          known.push("C:\\Program Files\\yt-dlp\\yt-dlp.exe", "C:\\Program Files (x86)\\yt-dlp\\yt-dlp.exe");
+        }
+        if (name === "ffmpeg") {
+          known.push("C:\\ffmpeg\\bin\\ffmpeg.exe", "C:\\Program Files\\ffmpeg\\bin\\ffmpeg.exe");
+          try {
+            var packages = path.join(local, "Microsoft", "WinGet", "Packages");
+            fs.readdirSync(packages).filter(function (d) { return /ffmpeg/i.test(d); }).forEach(function (d) {
+              var pkg = path.join(packages, d);
+              fs.readdirSync(pkg).forEach(function (sub) { known.push(path.join(pkg, sub, "bin", "ffmpeg.exe")); });
             });
-        },
+          } catch (e) {}
+        }
+        known.forEach(function (p) { candidates.push({ path: p, source: "common_path" }); });
+      }
+      var seen = {};
+      for (var i = 0; i < candidates.length; i++) {
+        var candidate = candidates[i];
+        if (seen[candidate.path] || !fs.existsSync(candidate.path)) continue;
+        seen[candidate.path] = true;
+        var version = await self.checkBinaryVersion(candidate.path, name === "ffmpeg" ? true : name);
+        if (!version) continue;
+        self[cacheKey] = candidate.path;
+        self[versionKey] = version;
+        return { found: true, path: candidate.path, version: version, source: candidate.source };
+      }
+      return { found: false, path: null, version: null };
+    },
 
-        findFfmpeg: function () {
-            if (!isNode) {
-                return Promise.resolve({ found: true, path: "ffmpeg (browser mock)", version: "9.0" });
-            }
+    findYtDlp: function () {
+      return this.findValidatedBinary("yt-dlp", "mediadownloader_custom_ytdlp", "cachedYtDlpPath", "ytDlpVersion");
+    },
 
-            var self = this;
-            return new Promise(function (resolve) {
-                var customPath = localStorage.getItem("mediadownloader_custom_ffmpeg");
-                if (customPath && fs.existsSync(customPath)) {
-                    self.cachedFfmpegPath = customPath;
-                    return self.checkBinaryVersion(customPath, true).then(function (ver) {
-                        resolve({ found: true, path: customPath, version: ver, source: "custom" });
-                    });
-                }
+    findFfmpeg: function () {
+      return this.findValidatedBinary("ffmpeg", "mediadownloader_custom_ffmpeg", "cachedFfmpegPath", "ffmpegVersion");
+    },
 
-                var locaisF = self.candidatosLocais("ffmpeg");
-                for (var F = 0; F < locaisF.length; F++) {
-                    if (fs.existsSync(locaisF[F])) {
-                        var achadoF = locaisF[F];
-                        self.cachedFfmpegPath = achadoF;
-                        return self.checkBinaryVersion(achadoF, true).then(function (ver) {
-                            resolve({ found: true, path: achadoF, version: ver, source: "local" });
-                        });
+    findAria2: function () {
+      return this.findValidatedBinary("aria2c", null, "cachedAria2Path", "aria2Version");
+    },
+
+    checkBinaryVersion: function (binaryPath, kind) {
+      if (!isNode) return Promise.resolve(null);
+      return new Promise(function (resolve) {
+        var ff = kind === true || kind === "ffmpeg" || kind === "ffprobe";
+        try {
+          child_process.execFile(binaryPath, [ff ? "-version" : "--version"], { timeout: 10000, windowsHide: true }, function (err, stdout) {
+            if (err || !stdout) return resolve(null);
+            var line = stdout.trim().split(/\r?\n/)[0];
+            var match = ff ? line.match(kind === "ffprobe" ? /^ffprobe version\s+(\S+)/i : /^ffmpeg version\s+(\S+)/i)
+              : (kind === "aria2c" ? line.match(/^aria2 version\s+(\S+)/i) : line.match(/^(\d{4}\.\d{2}\.\d{2}(?:[.\w+-]*)?)$/));
+            resolve(match ? match[1] : null);
+          });
+        } catch (e) { resolve(null); }
+      });
+    },
+
+
+    // Trust the bundled public roots plus the Windows roots trusted by this user/OS.
+    // Never disable certificate verification or persist certificate material.
+    getTrustedCertificateAuthorities: function () {
+      if (!isNode) return Promise.resolve(null);
+      if (this._trustedCertificateAuthorities) return this._trustedCertificateAuthorities;
+      this._trustedCertificateAuthorities = new Promise(function (resolve, reject) {
+        var tls = require("tls");
+        var bundled = tls.rootCertificates ? Array.prototype.slice.call(tls.rootCertificates) : [];
+        if (typeof tls.getCACertificates === "function") {
+          try {
+            var system = tls.getCACertificates("system");
+            if (system && system.length) return resolve(bundled.concat(system));
+          } catch (e) {}
+        }
+        if (process.platform !== "win32") return resolve(bundled.length ? bundled : undefined);
+        var powershell = path.join(process.env.SystemRoot || "C:\\Windows", "System32", "WindowsPowerShell", "v1.0", "powershell.exe");
+        // This command is fixed source code; no paths, URLs or user text are interpolated.
+        var script = "$ErrorActionPreference='Stop'; " +
+          "Import-Module (Join-Path $PSHOME 'Modules/Microsoft.PowerShell.Security/Microsoft.PowerShell.Security.psd1'); " +
+          "$certs=@(Get-ChildItem -LiteralPath 'Cert:\\CurrentUser\\Root','Cert:\\LocalMachine\\Root'); " +
+          "foreach($cert in $certs) { " +
+          "Write-Output '-----BEGIN CERTIFICATE-----'; " +
+          "Write-Output ([Convert]::ToBase64String($cert.RawData,[Base64FormattingOptions]::InsertLineBreaks)); " +
+          "Write-Output '-----END CERTIFICATE-----' }";
+        child_process.execFile(powershell, ["-NoProfile", "-NonInteractive", "-Command", script],
+          { timeout: 15000, windowsHide: true, maxBuffer: 2097152 }, function (err, stdout) {
+            if (err) return reject(new Error("Não foi possível consultar os certificados confiáveis do Windows para atualizar os motores."));
+            var certificates = (stdout || "").match(/-----BEGIN CERTIFICATE-----[\s\S]*?-----END CERTIFICATE-----/g) || [];
+            if (!certificates.length) return reject(new Error("O Windows não retornou certificados confiáveis para atualizar os motores."));
+            resolve(bundled.concat(certificates));
+          });
+      });
+      var self = this;
+      this._trustedCertificateAuthorities = this._trustedCertificateAuthorities.catch(function (error) {
+        self._trustedCertificateAuthorities = null;
+        throw error;
+      });
+      return this._trustedCertificateAuthorities;
+    },
+
+    // Download, validate and only then replace. A failed update preserves the current engine.
+    downloadValidatedBinary: async function (url, target, kind, onProgress) {
+      if (!isNode) return Promise.reject(new Error("Atualização disponível apenas no aplicativo ou painel instalado."));
+      var self = this;
+      var trustedAuthorities = await self.getTrustedCertificateAuthorities();
+      self._activeDownloads = self._activeDownloads || {};
+      if (self._activeDownloads[target]) return Promise.reject(new Error("Este motor já está sendo atualizado."));
+      self._activeDownloads[target] = true;
+      var unique = Date.now() + "-" + Math.random().toString(16).slice(2);
+      var temp = target + ".download-" + unique + (process.platform === "win32" ? ".exe" : ".tmp");
+      var backup = target + ".backup-" + unique;
+      var operation = new Promise(function (resolve, reject) {
+        var settled = false, stream = null, response = null;
+        function cleanup() { try { if (fs.existsSync(temp)) fs.unlinkSync(temp); } catch (e) {} }
+        function fail(error) {
+          if (settled) return;
+          settled = true;
+          if (stream) { stream.on("close", cleanup); stream.destroy(); }
+          if (response) response.destroy();
+          cleanup();
+          reject(error);
+        }
+        function follow(u, redirects) {
+          if (!/^https:\/\//i.test(u)) return fail(new Error("Apenas HTTPS é permitido para baixar motores."));
+          if (redirects > 8) return fail(new Error("Muitos redirecionamentos ao baixar motor."));
+          var req;
+          try {
+            req = https.get(u, { headers: { "User-Agent": "MediaDownloader" }, rejectUnauthorized: true, ca: trustedAuthorities }, function (res) {
+              if (settled) { res.destroy(); return; }
+              if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+                res.resume();
+                try { follow(new URL(res.headers.location, u).href, redirects + 1); } catch (e) { fail(e); }
+                return;
+              }
+              response = res;
+              if (res.statusCode !== 200) return fail(new Error("HTTP " + res.statusCode + " ao baixar motor."));
+              var total = Number(res.headers["content-length"]) || 0, received = 0;
+              try { stream = fs.createWriteStream(temp, { flags: "wx" }); } catch (e) { return fail(e); }
+              stream.on("error", fail);
+              res.on("error", fail);
+              res.on("aborted", function () { fail(new Error("Download interrompido; tente novamente.")); });
+              res.on("data", function (chunk) {
+                received += chunk.length;
+                if (onProgress) { try { onProgress(received, total); } catch (e) {} }
+              });
+              res.on("end", function () {
+                if (res.complete === false || received === 0 || (total && received !== total)) fail(new Error("Download incompleto; motor anterior preservado."));
+              });
+              stream.on("close", function () {
+                if (settled) return;
+                if (!stream.writableFinished) return fail(new Error("Gravação do motor interrompida."));
+                Promise.resolve().then(function () {
+                  if (process.platform !== "win32") fs.chmodSync(temp, "755");
+                  return self.checkBinaryVersion(temp, kind);
+                }).then(function (version) {
+                  if (settled) return;
+                  if (!version) throw new Error("Motor baixado inválido; motor anterior preservado.");
+                  var moved = false;
+                  try {
+                    if (fs.existsSync(target)) { fs.renameSync(target, backup); moved = true; }
+                    fs.renameSync(temp, target);
+                  } catch (e) {
+                    if (moved) {
+                      try { fs.renameSync(backup, target); } catch (rollback) {
+                        throw new Error("Falha ao atualizar. Motor anterior preservado em " + backup + ": " + rollback.message);
+                      }
                     }
-                }
-
-                var cmd = process.platform === "win32" ? "where ffmpeg" : "which ffmpeg";
-                child_process.exec(cmd, function (err, stdout) {
-                    if (!err && stdout && stdout.trim()) {
-                        var detectedPath = stdout.trim().split(/\r?\n/)[0];
-                        self.cachedFfmpegPath = detectedPath;
-                        self.checkBinaryVersion(detectedPath, true).then(function (ver) {
-                            resolve({ found: true, path: detectedPath, version: ver, source: "system" });
-                        });
-                        return;
-                    }
-
-                    if (process.platform === "win32") {
-                        var localAppData = process.env.LOCALAPPDATA || "";
-                        var userProfile = process.env.USERPROFILE || "";
-                        var candidatePaths = [
-                            path.join(localAppData, "Microsoft", "WinGet", "Links", "ffmpeg.exe"),
-                            path.join(userProfile, "AppData", "Local", "Microsoft", "WinGet", "Links", "ffmpeg.exe"),
-                            "C:\\ffmpeg\\bin\\ffmpeg.exe",
-                            "C:\\Program Files\\ffmpeg\\bin\\ffmpeg.exe"
-                        ];
-
-                        // Busca automática em pastas de pacotes WinGet
-                        try {
-                            var wingetPackages = path.join(localAppData || path.join(userProfile, "AppData", "Local"), "Microsoft", "WinGet", "Packages");
-                            if (fs.existsSync(wingetPackages)) {
-                                var dirs = fs.readdirSync(wingetPackages);
-                                for (var d = 0; d < dirs.length; d++) {
-                                    if (dirs[d].toLowerCase().indexOf("ffmpeg") !== -1) {
-                                        var pkgDir = path.join(wingetPackages, dirs[d]);
-                                        var subDirs = fs.readdirSync(pkgDir);
-                                        for (var s = 0; s < subDirs.length; s++) {
-                                            var candidate = path.join(pkgDir, subDirs[s], "bin", "ffmpeg.exe");
-                                            if (fs.existsSync(candidate)) {
-                                                candidatePaths.unshift(candidate);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (we) {}
-
-                        for (var i = 0; i < candidatePaths.length; i++) {
-                            if (fs.existsSync(candidatePaths[i])) {
-                                self.cachedFfmpegPath = candidatePaths[i];
-                                return self.checkBinaryVersion(candidatePaths[i], true).then(function (ver) {
-                                    resolve({ found: true, path: candidatePaths[i], version: ver, source: "common_path" });
-                                });
-                            }
-                        }
-                    }
-
-                    resolve({ found: false, path: null, version: null });
-                });
+                    throw e;
+                  }
+                  // Backup cleanup failure does not turn a committed update into an error.
+                  if (moved) { try { fs.unlinkSync(backup); } catch (e) {} }
+                  settled = true;
+                  resolve({ path: target, version: version });
+                }).catch(fail);
+              });
+              res.pipe(stream);
             });
-        },
+            req.on("error", fail);
+            req.setTimeout(60000, function () { req.destroy(new Error("Tempo limite ao baixar motor.")); });
+          } catch (e) { fail(e); }
+        }
+        follow(url, 0);
+      });
+      return operation.then(function (result) { delete self._activeDownloads[target]; return result; }, function (error) { delete self._activeDownloads[target]; throw error; });
+    },
 
-        findAria2: function () {
-            if (!isNode) return Promise.resolve({ found: false, path: null });
-            var locaisA = this.candidatosLocais("aria2c");
-            for (var A = 0; A < locaisA.length; A++) {
-                if (fs.existsSync(locaisA[A])) {
-                    return Promise.resolve({ found: true, path: locaisA[A], source: "local" });
-                }
-            }
-            return new Promise(function (resolve) {
-                var cmd = process.platform === "win32" ? "where aria2c" : "which aria2c";
-                child_process.exec(cmd, function (err, stdout) {
-                    if (!err && stdout && stdout.trim()) {
-                        return resolve({ found: true, path: stdout.trim().split(/\r?\n/)[0], source: "system" });
-                    }
-                    resolve({ found: false, path: null });
-                });
-            });
-        },
-
-        checkBinaryVersion: function (binaryPath, isFfmpeg) {
-            if (!isNode) return Promise.resolve("1.0.0");
-            return new Promise(function (resolve) {
-                var flag = isFfmpeg ? "-version" : "--version";
-                child_process.exec('"' + binaryPath + '" ' + flag, { timeout: 4000 }, function (err, stdout) {
-                    if (err || !stdout) return resolve("Desconhecida");
-                    var line = stdout.trim().split(/\r?\n/)[0];
-                    if (isFfmpeg) {
-                        var m = line.match(/version\s+([^\s]+)/i);
-                        resolve(m ? m[1] : line.substring(0, 30));
-                    } else {
-                        resolve(line);
-                    }
-                });
-            });
-        },
-
-        /**
-         * Baixa o yt-dlp.exe com bypass de proxy / SSL self-signed certificates
-         */
-        downloadStandaloneYtDlp: function (onProgress) {
-            if (!isNode) return Promise.reject(new Error("Apenas suportado no ambiente Node.js / CEP."));
-
-            var self = this;
-            var localBin = self.getLocalBinDir();
-            var targetFile = path.join(localBin, process.platform === "win32" ? "yt-dlp.exe" : "yt-dlp");
-            var tempFile = targetFile + ".tmp";
-            var url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/" + (process.platform === "win32" ? "yt-dlp.exe" : "yt-dlp");
-
-            // Permite download mesmo com certificados intermediários corporativos/antivírus
-            var agent = new https.Agent({ rejectUnauthorized: false });
-
-            return new Promise(function (resolve, reject) {
-                function follow(downloadUrl, redirects) {
-                    if (redirects > 6) return reject(new Error("Muitos redirecionamentos ao baixar yt-dlp"));
-
-                    var isHttps = downloadUrl.startsWith("https");
-                    var client = isHttps ? https : http;
-                    var options = {
-                        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
-                        agent: isHttps ? agent : undefined,
-                        rejectUnauthorized: false
-                    };
-
-                    var req = client.get(downloadUrl, options, function (res) {
-                        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-                            return follow(res.headers.location, (redirects || 0) + 1);
-                        }
-
-                        if (res.statusCode !== 200) {
-                            return reject(new Error("HTTP Error " + res.statusCode + " ao baixar yt-dlp"));
-                        }
-
-                        var total = parseInt(res.headers["content-length"], 10) || 0;
-                        var received = 0;
-                        var fileStream = fs.createWriteStream(tempFile);
-
-                        res.on("data", function (chunk) {
-                            received += chunk.length;
-                            fileStream.write(chunk);
-                            if (total && onProgress) {
-                                var pct = Math.round((received / total) * 100);
-                                onProgress(pct, received, total);
-                            }
-                        });
-
-                        res.on("end", function () {
-                            fileStream.end(function () {
-                                try {
-                                    if (fs.existsSync(targetFile)) {
-                                        fs.unlinkSync(targetFile);
-                                    }
-                                    fs.renameSync(tempFile, targetFile);
-                                    if (process.platform !== "win32") {
-                                        fs.chmodSync(targetFile, "755");
-                                    }
-                                    self.cachedYtDlpPath = targetFile;
-                                    self.checkBinaryVersion(targetFile).then(function (v) {
-                                        resolve({ path: targetFile, version: v });
-                                    });
-                                } catch (err) {
-                                    reject(err);
-                                }
-                            });
-                        });
-                    });
-
-                    req.on("error", function (e) {
-                        try { if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile); } catch (ex) {}
-                        reject(e);
-                    });
-                }
-
-                follow(url, 0);
-            });
-        },
+    downloadStandaloneYtDlp: async function (onProgress) {
+      if (!isNode) throw new Error("Atualização disponível apenas no aplicativo ou painel instalado.");
+      var self = this, win = process.platform === "win32";
+      var target = path.join(await self.getLocalBinDir(), win ? "yt-dlp.exe" : "yt-dlp");
+      var asset = win ? "yt-dlp.exe" : (process.platform === "darwin" ? "yt-dlp_macos" : "yt-dlp_linux");
+      var result = await self.downloadValidatedBinary("https://github.com/yt-dlp/yt-dlp/releases/latest/download/" + asset, target, "yt-dlp", function (received, total) {
+        if (onProgress && total) onProgress(Math.round(received / total * 100), received, total);
+      });
+      self.cachedYtDlpPath = result.path;
+      self.ytDlpVersion = result.version;
+      return result;
+    },
 
         /**
          * Baixa um binario unico, seguindo redirecionamentos.
          */
         baixarBinario: function (url, destino, onProgress) {
-            var agent = new https.Agent({ rejectUnauthorized: false });
-            var temp = destino + ".tmp";
-
-            return new Promise(function (resolve, reject) {
-                function follow(u, redirects) {
-                    if (redirects > 6) {
-                        return reject(new Error("Muitos redirecionamentos ao baixar " + path.basename(destino)));
-                    }
-                    var isHttps = u.indexOf("https") === 0;
-                    var client = isHttps ? https : http;
-                    var options = {
-                        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
-                        agent: isHttps ? agent : undefined,
-                        rejectUnauthorized: false
-                    };
-
-                    var req = client.get(u, options, function (res) {
-                        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-                            return follow(res.headers.location, (redirects || 0) + 1);
-                        }
-                        if (res.statusCode !== 200) {
-                            return reject(new Error("HTTP " + res.statusCode + " ao baixar " + path.basename(destino)));
-                        }
-
-                        var total = parseInt(res.headers["content-length"], 10) || 0;
-                        var recebido = 0;
-                        var fileStream = fs.createWriteStream(temp);
-
-                        res.on("data", function (chunk) {
-                            recebido += chunk.length;
-                            fileStream.write(chunk);
-                            if (onProgress) onProgress(recebido, total);
-                        });
-
-                        res.on("end", function () {
-                            fileStream.end(function () {
-                                try {
-                                    if (fs.existsSync(destino)) fs.unlinkSync(destino);
-                                    fs.renameSync(temp, destino);
-                                    if (process.platform !== "win32") {
-                                        fs.chmodSync(destino, "755");
-                                    }
-                                    resolve(destino);
-                                } catch (err) {
-                                    reject(err);
-                                }
-                            });
-                        });
-                    });
-
-                    req.on("error", function (e) {
-                        try { if (fs.existsSync(temp)) fs.unlinkSync(temp); } catch (ex) {}
-                        reject(e);
-                    });
-                }
-
-                follow(url, 0);
-            });
+            var kind = /^ffprobe/i.test(path.basename(destino)) ? "ffprobe" : "ffmpeg";
+            return this.downloadValidatedBinary(url, destino, kind, onProgress).then(function (result) { return result.path; });
         },
 
         /**
@@ -434,8 +366,10 @@
             function passo(i) {
                 if (i >= nomes.length) {
                     var final = path.join(localBin, "ffmpeg" + ext);
-                    self.cachedFfmpegPath = final;
                     return self.checkBinaryVersion(final, true).then(function (v) {
+                        if (!v) throw new Error("FFmpeg inválido após atualização.");
+                        self.cachedFfmpegPath = final;
+                        self.ffmpegVersion = v;
                         return { path: final, version: v };
                     });
                 }
@@ -455,6 +389,7 @@
 
         getStatus: function () {
             var self = this;
+            this.resetCache();
             return Promise.all([this.findYtDlp(), this.findFfmpeg()]).then(function (results) {
                 var ytdlp = results[0];
                 var ffmpeg = results[1];
@@ -464,7 +399,8 @@
                 return {
                     ytdlp: ytdlp,
                     ffmpeg: ffmpeg,
-                    ready: ytdlp.found
+                    // Sem FFmpeg nao ha como juntar video e audio: o painel nao esta pronto.
+                    ready: ytdlp.found && ffmpeg.found
                 };
             });
         }

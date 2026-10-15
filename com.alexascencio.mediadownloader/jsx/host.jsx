@@ -167,8 +167,9 @@ function findProjectItemByMediaPath(mediaPath, currentItem) {
     }
     if (!mediaPath) return null;
     
-    var targetPath = normalizePath(mediaPath).toLowerCase();
-    var fileName = targetPath.split("/").pop();
+    var targetPath = normalizePath(new File(mediaPath).fsName);
+    var windowsPaths = /windows/i.test($.os);
+    if (windowsPaths) targetPath = targetPath.toLowerCase();
     
     if (currentItem.children && currentItem.children.numItems > 0) {
         for (var i = 0; i < currentItem.children.numItems; i++) {
@@ -177,17 +178,13 @@ function findProjectItemByMediaPath(mediaPath, currentItem) {
             
             // If item has media path
             if (child.getMediaPath) {
-                var p = normalizePath(child.getMediaPath()).toLowerCase();
+                var p = normalizePath(new File(child.getMediaPath()).fsName);
+                if (windowsPaths) p = p.toLowerCase();
                 if (p === targetPath) {
                     return child;
                 }
             }
 
-            // Fallback match por nome de arquivo se caminho for relativo
-            if (child.name && child.name.toLowerCase() === fileName) {
-                return child;
-            }
-            
             // Se for bin, busca recursiva
             if (child.children && child.children.numItems > 0) {
                 var found = findProjectItemByMediaPath(mediaPath, child);
@@ -308,10 +305,13 @@ function importMediaFile(filePath, binName) {
         var suppressUI = true;
         var importAsNumbered = false;
 
-        app.project.importFiles(fileArray, suppressUI, targetBin, importAsNumbered);
+        var importResult = app.project.importFiles(fileArray, suppressUI, targetBin, importAsNumbered);
+        if (importResult === false) return safeReturn(false, null, "O Premiere recusou a importação.");
 
         // Localiza o item recém importado
         var importedItem = findProjectItemByMediaPath(filePath, targetBin) || findProjectItemByMediaPath(filePath, app.project.rootItem);
+
+        if (!importedItem) return safeReturn(false, null, "A importação não foi confirmada no projeto.");
 
         if (importedItem && targetBin && targetBin !== app.project.rootItem && importedItem.parent !== targetBin && typeof importedItem.moveBin === "function") {
             try {
@@ -355,48 +355,16 @@ function isTrackOccupiedAtTime(track, timeSec) {
 /**
  * Encontra a primeira trilha de vídeo vazia no playhead (ou a camada mais alta livre)
  */
-function findEmptyVideoTrackIndex(seq, playheadSec) {
-    if (!seq || !seq.videoTracks || seq.videoTracks.numTracks === 0) return 0;
-    
-    // 1. Procura uma trilha existente que esteja 100% vazia no playhead
-    for (var v = 0; v < seq.videoTracks.numTracks; v++) {
-        var track = seq.videoTracks[v];
-        if (!track.isLocked() && !isTrackOccupiedAtTime(track, playheadSec)) {
-            return v; // Trilha vazia encontrada!
-        }
+function findEntirelyEmptyTrack(tracks) {
+    if (!tracks) return -1;
+    for (var i = 0; i < tracks.numTracks; i++) {
+        var track = tracks[i];
+        if (track && !track.isLocked() && track.clips && track.clips.numItems === 0) return i;
     }
-    
-    // 2. Se todas as trilhas estiverem ocupadas no playhead, usa a camada do topo (mais alta desbloqueada)
-    for (var v2 = seq.videoTracks.numTracks - 1; v2 >= 0; v2--) {
-        if (!seq.videoTracks[v2].isLocked()) {
-            return v2;
-        }
-    }
-    return 0;
+    return -1;
 }
-
-/**
- * Encontra a primeira trilha de áudio vazia no playhead
- */
-function findEmptyAudioTrackIndex(seq, playheadSec) {
-    if (!seq || !seq.audioTracks || seq.audioTracks.numTracks === 0) return 0;
-    
-    // 1. Procura uma trilha de áudio 100% vazia no playhead
-    for (var a = 0; a < seq.audioTracks.numTracks; a++) {
-        var aTrack = seq.audioTracks[a];
-        if (!aTrack.isLocked() && !isTrackOccupiedAtTime(aTrack, playheadSec)) {
-            return a;
-        }
-    }
-    
-    // 2. Se todas estiverem ocupadas, usa a última desbloqueada
-    for (var a2 = seq.audioTracks.numTracks - 1; a2 >= 0; a2--) {
-        if (!seq.audioTracks[a2].isLocked()) {
-            return a2;
-        }
-    }
-    return 0;
-}
+function findEmptyVideoTrackIndex(seq) { return findEntirelyEmptyTrack(seq && seq.videoTracks); }
+function findEmptyAudioTrackIndex(seq) { return findEntirelyEmptyTrack(seq && seq.audioTracks); }
 
 /**
  * Importa o arquivo para o Bin e insere diretamente na Sequence ativa em uma CAMADA VAZIA no Playhead
@@ -425,6 +393,8 @@ function insertMediaToTimeline(filePath, binName) {
                 projectItem.moveBin(targetBin);
             } catch (me3) {}
         }
+
+        if (!projectItem) return safeReturn(false, null, "A importação não foi confirmada no projeto.");
 
         var seq = app.project.activeSequence;
         if (!seq) {
@@ -455,69 +425,28 @@ function insertMediaToTimeline(filePath, binName) {
         // 3. Determina se é áudio puro
         var isAudioOnly = false;
         var ext = filePath.substring(filePath.lastIndexOf(".")).toLowerCase();
-        if (ext === ".wav" || ext === ".mp3" || ext === ".aac" || ext === ".m4a" || ext === ".ogg" || ext === ".flac") {
+        if (ext === ".wav" || ext === ".mp3" || ext === ".aac" || ext === ".m4a" || ext === ".ogg" || ext === ".flac" || ext === ".opus") {
             isAudioOnly = true;
         }
 
-        // 4. DETECTA CAMADAS VAZIAS PARA NUNCA SUBSCREVER/CORTAR CLIPES EXISTENTES
-        var targetVideoIdx = isAudioOnly ? -1 : findEmptyVideoTrackIndex(seq, playheadTime.seconds);
-        var targetAudioIdx = findEmptyAudioTrackIndex(seq, playheadTime.seconds);
-
+        // Empty for the entire timeline, not merely at the playhead: no downstream
+        // clip can be overwritten. Use explicit V/A targeting for linked media.
+        var targetVideoIdx = isAudioOnly ? -1 : findEmptyVideoTrackIndex(seq);
+        var targetAudioIdx = findEmptyAudioTrackIndex(seq);
         var inserted = false;
-        var insertError = "";
-
-        // TIER 1: Inserção na trilha vazia alvo via track.overwriteClip (Overlay limpo na camada livre)
-        if (!isAudioOnly && targetVideoIdx >= 0 && seq.videoTracks && targetVideoIdx < seq.videoTracks.numTracks) {
+        if (isAudioOnly && targetAudioIdx >= 0) {
             try {
-                var targetVTrack = seq.videoTracks[targetVideoIdx];
-                if (targetVTrack && typeof targetVTrack.overwriteClip === "function") {
-                    targetVTrack.overwriteClip(projectItem, playheadTime);
-                    inserted = true;
-                }
-            } catch (eTrack) {
-                insertError += " [TrackOverwrite: " + eTrack.toString() + "]";
-            }
-        }
-
-        if (isAudioOnly && targetAudioIdx >= 0 && seq.audioTracks && targetAudioIdx < seq.audioTracks.numTracks) {
+                var track = seq.audioTracks[targetAudioIdx];
+                var before = track.clips.numItems;
+                track.overwriteClip(projectItem, playheadTime.ticks);
+                inserted = track.clips.numItems > before;
+            } catch (insertError) {}
+        } else if (!isAudioOnly && targetVideoIdx >= 0 && targetAudioIdx >= 0 && typeof seq.overwriteClip === "function") {
             try {
-                var targetATrack = seq.audioTracks[targetAudioIdx];
-                if (targetATrack && typeof targetATrack.overwriteClip === "function") {
-                    targetATrack.overwriteClip(projectItem, playheadTime);
-                    inserted = true;
-                }
-            } catch (eATrack) {
-                insertError += " [AudioTrackOverwrite: " + eATrack.toString() + "]";
-            }
-        }
-
-        // TIER 2: Inserção via Premiere Pro Sequence API moderna direcionando as trilhas livres
-        if (!inserted && typeof seq.insertClip === "function") {
-            try {
-                seq.insertClip(projectItem, playheadTime, targetVideoIdx, targetAudioIdx);
-                inserted = true;
-            } catch (e1) {
-                insertError += " [T2: " + e1.toString() + "]";
-            }
-        }
-
-        // TIER 3: Tenta QE DOM (Quality Engineering API)
-        if (!inserted) {
-            try {
-                if (typeof app.enableQE === "function") {
-                    app.enableQE();
-                    if (typeof qe !== "undefined" && qe.project) {
-                        var qeSeq = qe.project.getActiveSequence();
-                        if (qeSeq && typeof qeSeq.insert === "function") {
-                            var ticksStr = playheadTime.ticks || String(Math.round(playheadTime.seconds * 254016000000));
-                            qeSeq.insert(projectItem, ticksStr);
-                            inserted = true;
-                        }
-                    }
-                }
-            } catch (e2) {
-                insertError += " [T3: " + e2.toString() + "]";
-            }
+                var videoBefore = seq.videoTracks[targetVideoIdx].clips.numItems;
+                seq.overwriteClip(projectItem, String(playheadTime.seconds), targetVideoIdx, targetAudioIdx);
+                inserted = seq.videoTracks[targetVideoIdx].clips.numItems > videoBefore;
+            } catch (videoInsertError) {}
         }
 
         if (!inserted) {
@@ -525,7 +454,7 @@ function insertMediaToTimeline(filePath, binName) {
                 imported: true,
                 inserted: false,
                 mediaName: projectItem.name,
-                warning: "Mídia importada no Bin. Arraste para a timeline (todas as faixas bloqueadas)."
+                warning: "Mídia importada no Bin. Arraste para a timeline para escolher as faixas e preservar a edição existente."
             });
         }
 

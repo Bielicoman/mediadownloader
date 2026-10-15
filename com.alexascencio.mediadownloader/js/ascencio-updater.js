@@ -78,13 +78,20 @@
     return [];
   }
 
+  function safeHttpsUrl(value) {
+    if (typeof value !== 'string' || /[\x00-\x20]/.test(value)) return false;
+    try { var u = new URL(value); return u.protocol === 'https:' && !u.username && !u.password; } catch (e) { return false; }
+  }
+
   /** Um manifesto só é utilizável se tiver versão e um destino de download. */
   function validateManifest(m) {
     if (!m || typeof m !== 'object') return 'manifesto vazio';
-    if (!m.version || !/^\d+\.\d+\.\d+/.test(String(m.version).replace(/^v/i, ''))) {
+    if (!m.version || !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(String(m.version).replace(/^v/i, ''))) {
       return 'versão ausente ou inválida';
     }
     if (!m.downloadUrl && !m.zipUrl) return 'sem downloadUrl nem zipUrl';
+    if (!safeHttpsUrl(m.downloadUrl || m.zipUrl)) return 'download exige HTTPS sem credenciais';
+    if (m.pluginId && !/^com\.[a-z0-9_.-]+$/i.test(m.pluginId)) return 'pluginId inválido';
     return null;
   }
 
@@ -139,6 +146,7 @@
   /* ═══════════════ rede ═══════════════ */
 
   function getJSON(url, cb) {
+    if (!safeHttpsUrl(url)) return cb(new Error('URL exige HTTPS'));
     var full = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_t=' + Date.now();
     if (nodeOk) {
       httpGet(full, 0, function (err, res, body) {
@@ -160,6 +168,7 @@
 
   /** GET com redirecionamento (até 5) e timeout de 20 s. Devolve o corpo como texto. */
   function httpGet(url, depth, cb) {
+    if (!safeHttpsUrl(url)) return cb(new Error('URL exige HTTPS'));
     if (depth > 5) return cb(new Error('redirecionamentos demais'));
     var mod = url.indexOf('https:') === 0 ? https : http;
     var reqO;
@@ -175,7 +184,7 @@
         }
         var data = '';
         res.setEncoding('utf8');
-        res.on('data', function (c) { data += c; });
+        res.on('data', function (c) { data += c; if (data.length > 1048576) reqO.destroy(new Error('manifesto excede 1 MB')); });
         res.on('end', function () { cb(null, res, data); });
       });
     } catch (e) { return cb(e); }
@@ -191,6 +200,7 @@
   /** Baixa para um arquivo, com progresso real em bytes. */
   function download(url, dest, onProgress, cb, depth) {
     depth = depth || 0;
+    if (!safeHttpsUrl(url)) return cb(new Error('URL exige HTTPS'));
     if (depth > 5) return cb(new Error('redirecionamentos demais'));
     var mod = url.indexOf('https:') === 0 ? https : http;
     var file = null, reqO;
@@ -245,24 +255,50 @@
     } catch (e) {}
   }
 
+  function safeArchiveEntry(name) {
+    return typeof name === 'string' && name.length > 0 && !/[\x00-\x1f]/.test(name) &&
+      !/^(?:[\\/]|[A-Za-z]:)/.test(name) && name.replace(/\\/g, '/').split('/').indexOf('..') < 0;
+  }
+
   /** Extrai um zip usando a ferramenta nativa do sistema. Sem dependências. */
-  function extract(zipPath, destDir, cb) {
+  function extractNative(zipPath, destDir, cb) {
     try { fs.mkdirSync(destDir, { recursive: true }); } catch (e) {}
-    var cmd;
+    var command, args;
     if (isWin()) {
-      // Expand-Archive exige extensão .zip
       var zipCopy = zipPath.replace(/\.zxp$/i, '') + '.zip';
       try { if (zipCopy !== zipPath) fs.copyFileSync(zipPath, zipCopy); } catch (e) { return cb(e); }
-      cmd = 'powershell -NoProfile -NonInteractive -Command "' +
-            'Expand-Archive -LiteralPath \'' + zipCopy.replace(/'/g, "''") + '\' ' +
-            '-DestinationPath \'' + destDir.replace(/'/g, "''") + '\' -Force"';
+      command = 'powershell.exe';
+      args = ['-NoProfile', '-NonInteractive', '-Command',
+        "Expand-Archive -LiteralPath '" + zipCopy.replace(/'/g, "''") + "' -DestinationPath '" + destDir.replace(/'/g, "''") + "' -Force"];
     } else {
-      cmd = 'unzip -o ' + shq(zipPath) + ' -d ' + shq(destDir);
+      command = '/usr/bin/unzip';
+      args = ['-o', zipPath, '-d', destDir];
     }
-    cp.exec(cmd, { timeout: 120000, maxBuffer: 8 * 1024 * 1024 }, function (err, so, se) {
+    cp.execFile(command, args, { timeout: 120000, maxBuffer: 8 * 1024 * 1024, windowsHide: true }, function (err, so, se) {
       if (err) return cb(new Error('falha ao extrair: ' + (se || err.message).toString().slice(0, 200)));
       cb(null, destDir);
     });
+  }
+
+  // Inspect names before any extraction so traversal entries cannot write outside staging.
+  function extract(zipPath, destDir, cb) {
+    function checked(err, stdout) {
+      if (err) return cb(new Error('não foi possível validar o arquivo de atualização'));
+      var entries = String(stdout).split(/\r?\n/).filter(Boolean);
+      if (!entries.length || entries.some(function (entry) { return !safeArchiveEntry(entry); })) {
+        return cb(new Error('pacote contém caminhos inseguros'));
+      }
+      extractNative(zipPath, destDir, cb);
+    }
+    if (isWin()) {
+      var script = "Add-Type -AssemblyName System.IO.Compression.FileSystem; $z=[IO.Compression.ZipFile]::OpenRead('" + zipPath.replace(/'/g, "''") + "'); try { foreach($e in $z.Entries){ if(($e.ExternalAttributes -shr 16 -band 61440) -eq 40960){throw 'symlink'}; $e.FullName } } finally {$z.Dispose()}";
+      cp.execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { windowsHide: true, maxBuffer: 8 * 1024 * 1024, timeout: 30000 }, checked);
+    } else {
+      cp.execFile('/usr/bin/unzip', ['-Z', '-l', zipPath], { maxBuffer: 8 * 1024 * 1024, timeout: 30000 }, function (err, listing) {
+        if (err || /^l[rwx-]{9}\s/m.test(String(listing))) return cb(new Error('pacote inválido ou contém links simbólicos'));
+        cp.execFile('/usr/bin/unzip', ['-Z1', zipPath], { maxBuffer: 8 * 1024 * 1024, timeout: 30000 }, checked);
+      });
+    }
   }
 
   function shq(s) { return "'" + String(s).replace(/'/g, "'\\''") + "'"; }
@@ -272,6 +308,7 @@
     depth = depth || 0;
     if (depth > 4) return null;
     try {
+      if (fs.lstatSync(dir).isSymbolicLink()) return null;
       if (fs.existsSync(pathM.join(dir, 'CSXS', 'manifest.xml'))) return dir;
       var kids = fs.readdirSync(dir, { withFileTypes: true });
       for (var i = 0; i < kids.length; i++) {
@@ -289,6 +326,8 @@
     var kids = fs.readdirSync(from, { withFileTypes: true });
     for (var i = 0; i < kids.length; i++) {
       var s = pathM.join(from, kids[i].name), d = pathM.join(to, kids[i].name);
+      if (fs.lstatSync(s).isSymbolicLink()) throw new Error('links simbólicos não são permitidos');
+      if (fs.existsSync(d) && fs.lstatSync(d).isSymbolicLink()) throw new Error('destino contém link simbólico');
       if (kids[i].isDirectory()) copyDir(s, d);
       else fs.copyFileSync(s, d);
     }
@@ -296,19 +335,20 @@
 
   function reveal(p) {
     try {
-      if (isWin()) cp.exec('explorer /select,"' + p + '"');
-      else cp.exec('open -R ' + shq(p));
+      if (isWin()) cp.execFile('explorer.exe', ['/select,', p], { windowsHide: true });
+      else cp.execFile('/usr/bin/open', ['-R', p]);
     } catch (e) {}
   }
 
   function openExternal(url) {
+    if (!safeHttpsUrl(url)) return false;
     try {
       if (root.cep && root.cep.util && root.cep.util.openURLInDefaultBrowser) {
         return root.cep.util.openURLInDefaultBrowser(url);
       }
     } catch (e) {}
     try {
-      if (cp) return cp.exec((isWin() ? 'start ""' : 'open') + ' "' + url + '"');
+      if (cp && !isWin()) return cp.execFile('/usr/bin/open', [url]);
     } catch (e) {}
     try { root.open(url, '_blank'); } catch (e) {}
   }
@@ -476,6 +516,7 @@
         return;
       }
       var bad = validateManifest(m);
+      if (!bad && m.pluginId && m.pluginId !== self.cfg.pluginId) bad = 'pluginId diferente do painel';
       if (bad) {
         if (!silent) self.toast('Manifesto inválido: ' + bad, 'err');
         return;
@@ -514,9 +555,10 @@
     this.status('Preparando…');
 
     var url = m.downloadUrl || m.zipUrl;
-    var tmp = pathM.join(os.tmpdir(), 'ascencio-' + this.cfg.pluginId + '-' + m.version);
-    var pkg = pathM.join(os.tmpdir(), this.cfg.pluginId + '-' + m.version + '.zxp');
-    rmrf(tmp);
+    if (!/^[a-z0-9_.-]+$/i.test(this.cfg.pluginId) || validateManifest(m)) { this.busy = false; return; }
+    var tmp = fs.mkdtempSync(pathM.join(os.tmpdir(), 'ascencio-update-'));
+    var pkg = pathM.join(tmp, 'package.zxp');
+    var extracted = pathM.join(tmp, 'extracted');
 
     function fail(e, keepFile) {
       self.busy = false;
@@ -540,14 +582,20 @@
 
       self.bar(66);
       self.status('Extraindo…');
-      extract(pkg, tmp, function (err2) {
+      extract(pkg, extracted, function (err2) {
         if (err2) return fail(err2, true);
 
-        var src = findExtensionRoot(tmp);
+        var src = findExtensionRoot(extracted);
         if (!src) return fail(new Error('o pacote não contém CSXS/manifest.xml'), true);
 
         var dest = extensionDir();
         if (!dest) return fail(new Error('não achei a pasta da extensão'), true);
+
+        try {
+          var packageVersion = JSON.parse(fs.readFileSync(pathM.join(src, 'version.json'), 'utf8'));
+          var manifest = fs.readFileSync(pathM.join(src, 'CSXS', 'manifest.xml'), 'utf8');
+          if (packageVersion.version !== m.version || manifest.indexOf('Id="' + self.cfg.pluginId + '"') < 0) throw new Error('identidade ou versão do pacote inválida');
+        } catch (identityError) { return fail(identityError, true); }
 
         self.bar(82);
         self.status('Instalando…');
@@ -609,6 +657,6 @@
 
   /* export para teste em Node */
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { cmpVersion: cmpVersion, normalizeChangelog: normalizeChangelog, validateManifest: validateManifest };
+    module.exports = { cmpVersion: cmpVersion, normalizeChangelog: normalizeChangelog, validateManifest: validateManifest, safeHttpsUrl: safeHttpsUrl, safeArchiveEntry: safeArchiveEntry };
   }
 })(typeof window !== 'undefined' ? window : globalThis);

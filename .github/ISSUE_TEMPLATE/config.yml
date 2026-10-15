@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Vulnerabilidade de segurança
+    url: mailto:ascencioalexgabriel@gmail.com
+    about: "Relate vulnerabilidades em privado. Não publique credenciais ou cookies."

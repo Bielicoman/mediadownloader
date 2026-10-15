@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Downloader Desktop</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -35,20 +32,21 @@
 
     <!-- App Container -->
     <div class="app-container">
+        <header class="workspace-heading"><div><p class="workspace-kicker">Seu espaço de mídia</p><h1>Seu próximo download.</h1><p>Cole um link, escolha o formato e deixe tudo pronto para editar.</p></div><span class="workspace-signature">Por Alex Ascencio</span></header>
         <!-- Top Navigation & Actions Bar -->
         <div class="nav-row">
             <div class="tabs-container">
                 <button class="nav-tab active" data-tab="tab-single">
                     <svg viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
-                    Vídeo Único
+                    Vídeo ou áudio
                 </button>
                 <button class="nav-tab" data-tab="tab-playlist">
                     <svg viewBox="0 0 24 24"><path d="M19 9H2v2h17V9zm0-4H2v2h17V5zM2 15h13v-2H2v2zm15 0v6l5-3-5-3z"/></svg>
-                    Playlist / Canal
+                    Playlist ou canal
                 </button>
                 <button class="nav-tab" data-tab="tab-batch">
                     <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-                    Em Lote (Multi-URL)
+                    Vários links
                 </button>
             </div>
             <div class="nav-actions">
@@ -81,7 +79,7 @@
         <div id="tab-single" class="tab-content active">
             <div class="main-card">
                 <!-- Unified URL Input Capsule -->
-                <div class="input-capsule">
+                <p class="field-caption">Link da mídia</p><div class="input-capsule">
                     <div class="input-platform-icon" id="inputPlatformIcon">
                         <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
                     </div>
@@ -108,93 +106,29 @@
                 </div>
 
                 <!-- Controls Row: Preset Selector + Action Button -->
-                <div class="controls-row">
+                <p class="format-caption">Qualidade e formato</p><div class="controls-row">
                     <div class="custom-select-wrapper" id="customSelectWrapper">
-                        <input type="hidden" id="selectPreset" value="best" />
-                        <button type="button" class="custom-select-trigger" id="customSelectTrigger">
-                            <div class="select-current-option">
-                                <svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
-                                <span class="opt-label" id="currentOptionLabel">Máxima Qualidade (4K/HD)</span>
-                            </div>
-                            <svg class="chevron-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
-                        </button>
-                        
-                        <div class="custom-select-dropdown" id="customSelectDropdown">
-                            <div class="select-option active" data-value="best" data-label="Máxima Qualidade (4K/HD)">
-                                <svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
-                                <div class="opt-text">
-                                    <span class="opt-title">Máxima Qualidade Original</span>
-                                    <span class="opt-desc">4K 2160p, 1440p ou Maior</span>
-                                </div>
-                                <span class="opt-badge">4K / MAX</span>
-                            </div>
-
-                            <div class="select-option" data-value="1440p" data-label="Quad HD 1440p (2K)">
-                                <svg class="opt-icon" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
-                                <div class="opt-text">
-                                    <span class="opt-title">Quad HD 1440p MP4</span>
-                                    <span class="opt-desc">2K / 2560x1440 H.264</span>
-                                </div>
-                                <span class="opt-badge">1440p</span>
-                            </div>
-                            
-                            <div class="select-option" data-value="1080p" data-label="Full HD 1080p MP4">
-                                <svg class="opt-icon" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
-                                <div class="opt-text">
-                                    <span class="opt-title">Full HD 1080p MP4</span>
-                                    <span class="opt-desc">H.264 / 1920x1080</span>
-                                </div>
-                                <span class="opt-badge">1080p</span>
-                            </div>
-
-                            <div class="select-option" data-value="720p" data-label="Rascunho 720p MP4">
-                                <svg class="opt-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 14H9v-6h2v6zm6 0h-2v-6h2v6z"/></svg>
-                                <div class="opt-text">
-                                    <span class="opt-title">Rascunho 720p MP4</span>
-                                    <span class="opt-desc">Otimizado para Edição Leve</span>
-                                </div>
-                                <span class="opt-badge">720p</span>
-                            </div>
-
-                            <div class="select-option" data-value="prores" data-label="Apple ProRes 422 HQ">
-                                <svg class="opt-icon" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-                                <div class="opt-text">
-                                    <span class="opt-title">Apple ProRes 422 HQ</span>
-                                    <span class="opt-desc">MOV Master de Edição</span>
-                                </div>
-                                <span class="opt-badge prores">PRORES</span>
-                            </div>
-
-                            <div class="select-divider"></div>
-
-                            <div class="select-option" data-value="audio_wav" data-label="Áudio Master WAV 24-bit">
-                                <svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>
-                                <div class="opt-text">
-                                    <span class="opt-title">Áudio Master WAV</span>
-                                    <span class="opt-desc">PCM 24-bit / 48.000 Hz</span>
-                                </div>
-                                <span class="opt-badge audio">WAV</span>
-                            </div>
-
-                            <div class="select-option" data-value="audio_mp3" data-label="Áudio MP3 320kbps">
-                                <svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                                <div class="opt-text">
-                                    <span class="opt-title">Áudio MP3</span>
-                                    <span class="opt-desc">320 kbps / 48.000 Hz Estéreo</span>
-                                </div>
-                                <span class="opt-badge audio">MP3</span>
-                            </div>
-
-                            <div class="select-option" data-value="thumbnail" data-label="Capa Thumbnail PNG">
-                                <svg class="opt-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1 2 .9 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                                <div class="opt-text">
-                                    <span class="opt-title">Capa Thumbnail PNG</span>
-                                    <span class="opt-desc">Imagem em Alta Definição</span>
-                                </div>
-                                <span class="opt-badge">PNG</span>
-                            </div>
-                        </div>
-                    </div>
+<input type="hidden" id="selectPreset" value="best" />
+<button type="button" class="custom-select-trigger" id="customSelectTrigger" title="Qualidade e formato" aria-label="Qualidade e formato" aria-expanded="false" aria-controls="customSelectDropdown">
+<div class="select-current-option"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><span class="opt-label" id="currentOptionLabel">Máxima qualidade disponível</span></div><svg class="chevron-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></button>
+<div class="custom-select-dropdown" id="customSelectDropdown">
+<div class="select-option active" data-value="best" data-label="Máxima qualidade disponível"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Máxima qualidade disponível</span><span class="opt-desc">Maior resolução da fonte · sem ampliar</span></div><span class="opt-badge">MAX</span></div>
+<div class="select-option" data-value="4320p" data-label="Até 8K (4320p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 8K (4320p)</span><span class="opt-desc">MP4 H.264 · limitado à resolução da fonte</span></div><span class="opt-badge">8K</span></div>
+<div class="select-option" data-value="2160p" data-label="Até 4K (2160p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 4K (2160p)</span><span class="opt-desc">MP4 H.264 · sem ampliar vídeos menores</span></div><span class="opt-badge">4K</span></div>
+<div class="select-option" data-value="1440p" data-label="Até 1440p (2K)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 1440p (2K)</span><span class="opt-desc">MP4 H.264 · até 2560 × 1440</span></div><span class="opt-badge">1440p</span></div>
+<div class="select-option" data-value="1080p" data-label="Até Full HD (1080p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até Full HD (1080p)</span><span class="opt-desc">MP4 H.264 · até 1920 × 1080</span></div><span class="opt-badge">1080p</span></div>
+<div class="select-option" data-value="720p" data-label="Até HD (720p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até HD (720p)</span><span class="opt-desc">MP4 H.264 · arquivo mais leve</span></div><span class="opt-badge">720p</span></div>
+<div class="select-option" data-value="480p" data-label="Até 480p"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 480p</span><span class="opt-desc">MP4 H.264 · resolução reduzida</span></div><span class="opt-badge">480p</span></div>
+<div class="select-option" data-value="360p" data-label="Até 360p"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 360p</span><span class="opt-desc">MP4 H.264 · arquivo compacto</span></div><span class="opt-badge">360p</span></div>
+<div class="select-option" data-value="prores" data-label="Apple ProRes 422 HQ"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Apple ProRes 422 HQ</span><span class="opt-desc">MOV para edição · resolução da fonte</span></div><span class="opt-badge">PRORES</span></div>
+<div class="select-option" data-value="audio_wav" data-label="Áudio WAV 24-bit"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio WAV 24-bit</span><span class="opt-desc">PCM para edição · conversão de áudio</span></div><span class="opt-badge audio">WAV</span></div>
+<div class="select-option" data-value="audio_flac" data-label="Áudio FLAC"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio FLAC</span><span class="opt-desc">Compressão sem perdas adicionais</span></div><span class="opt-badge audio">FLAC</span></div>
+<div class="select-option" data-value="audio_mp3" data-label="Áudio MP3"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio MP3</span><span class="opt-desc">Compatibilidade ampla · até 320 kbps</span></div><span class="opt-badge audio">MP3</span></div>
+<div class="select-option" data-value="audio_m4a" data-label="Áudio M4A (AAC)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio M4A (AAC)</span><span class="opt-desc">AAC em arquivo M4A</span></div><span class="opt-badge audio">M4A</span></div>
+<div class="select-option" data-value="audio_original" data-label="Áudio original (sem conversão)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio original (sem conversão)</span><span class="opt-desc">Mantém o codec e o contêiner da fonte</span></div><span class="opt-badge audio">ORIGINAL</span></div>
+<div class="select-option" data-value="thumbnail" data-label="Capa Thumbnail PNG"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Capa Thumbnail PNG</span><span class="opt-desc">Somente a imagem de capa</span></div><span class="opt-badge">PNG</span></div>
+</div>
+</div>
 
                     <button id="btnDownload" class="btn-download-primary">
                         <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -204,10 +138,10 @@
             </div>
         </div>
 
-        <!-- TAB 2: Playlist / Canal -->
+        <!-- TAB 2: Playlist ou canal -->
         <div id="tab-playlist" class="tab-content">
             <div class="main-card">
-                <div class="input-capsule">
+                <p class="field-caption">Link da playlist ou do canal</p><div class="input-capsule">
                     <div class="input-platform-icon">
                         <svg viewBox="0 0 24 24"><path d="M19 9H2v2h17V9zm0-4H2v2h17V5zM2 15h13v-2H2v2zm15 0v6l5-3-5-3z"/></svg>
                     </div>
@@ -216,6 +150,29 @@
                         Indexar Vídeos
                     </button>
                 </div>
+
+                <div class="custom-select-wrapper" id="customSelectWrapperPlaylist">
+<input type="hidden" id="selectPresetPlaylist" value="best" />
+<button type="button" class="custom-select-trigger" id="customSelectTriggerPlaylist" title="Qualidade e formato" aria-label="Qualidade e formato" aria-expanded="false" aria-controls="customSelectDropdownPlaylist">
+<div class="select-current-option"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><span class="opt-label" id="currentOptionLabelPlaylist">Máxima qualidade disponível</span></div><svg class="chevron-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></button>
+<div class="custom-select-dropdown" id="customSelectDropdownPlaylist">
+<div class="select-option active" data-value="best" data-label="Máxima qualidade disponível"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Máxima qualidade disponível</span><span class="opt-desc">Maior resolução da fonte · sem ampliar</span></div><span class="opt-badge">MAX</span></div>
+<div class="select-option" data-value="4320p" data-label="Até 8K (4320p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 8K (4320p)</span><span class="opt-desc">MP4 H.264 · limitado à resolução da fonte</span></div><span class="opt-badge">8K</span></div>
+<div class="select-option" data-value="2160p" data-label="Até 4K (2160p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 4K (2160p)</span><span class="opt-desc">MP4 H.264 · sem ampliar vídeos menores</span></div><span class="opt-badge">4K</span></div>
+<div class="select-option" data-value="1440p" data-label="Até 1440p (2K)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 1440p (2K)</span><span class="opt-desc">MP4 H.264 · até 2560 × 1440</span></div><span class="opt-badge">1440p</span></div>
+<div class="select-option" data-value="1080p" data-label="Até Full HD (1080p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até Full HD (1080p)</span><span class="opt-desc">MP4 H.264 · até 1920 × 1080</span></div><span class="opt-badge">1080p</span></div>
+<div class="select-option" data-value="720p" data-label="Até HD (720p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até HD (720p)</span><span class="opt-desc">MP4 H.264 · arquivo mais leve</span></div><span class="opt-badge">720p</span></div>
+<div class="select-option" data-value="480p" data-label="Até 480p"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 480p</span><span class="opt-desc">MP4 H.264 · resolução reduzida</span></div><span class="opt-badge">480p</span></div>
+<div class="select-option" data-value="360p" data-label="Até 360p"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 360p</span><span class="opt-desc">MP4 H.264 · arquivo compacto</span></div><span class="opt-badge">360p</span></div>
+<div class="select-option" data-value="prores" data-label="Apple ProRes 422 HQ"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Apple ProRes 422 HQ</span><span class="opt-desc">MOV para edição · resolução da fonte</span></div><span class="opt-badge">PRORES</span></div>
+<div class="select-option" data-value="audio_wav" data-label="Áudio WAV 24-bit"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio WAV 24-bit</span><span class="opt-desc">PCM para edição · conversão de áudio</span></div><span class="opt-badge audio">WAV</span></div>
+<div class="select-option" data-value="audio_flac" data-label="Áudio FLAC"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio FLAC</span><span class="opt-desc">Compressão sem perdas adicionais</span></div><span class="opt-badge audio">FLAC</span></div>
+<div class="select-option" data-value="audio_mp3" data-label="Áudio MP3"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio MP3</span><span class="opt-desc">Compatibilidade ampla · até 320 kbps</span></div><span class="opt-badge audio">MP3</span></div>
+<div class="select-option" data-value="audio_m4a" data-label="Áudio M4A (AAC)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio M4A (AAC)</span><span class="opt-desc">AAC em arquivo M4A</span></div><span class="opt-badge audio">M4A</span></div>
+<div class="select-option" data-value="audio_original" data-label="Áudio original (sem conversão)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio original (sem conversão)</span><span class="opt-desc">Mantém o codec e o contêiner da fonte</span></div><span class="opt-badge audio">ORIGINAL</span></div>
+<div class="select-option" data-value="thumbnail" data-label="Capa Thumbnail PNG"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Capa Thumbnail PNG</span><span class="opt-desc">Somente a imagem de capa</span></div><span class="opt-badge">PNG</span></div>
+</div>
+</div>
 
                 <div id="playlistContainer" style="display:none; flex-direction:column; gap:8px;">
                     <div class="playlist-header-card">
@@ -244,6 +201,28 @@
             <div class="main-card">
                 <label style="font-weight:600; color:var(--text-secondary); font-size:11px;">Cole uma lista de URLs (uma por linha):</label>
                 <textarea id="batchTextarea" class="batch-textarea" placeholder="https://www.youtube.com/watch?v=...&#10;https://www.instagram.com/reel/...&#10;https://www.tiktok.com/@..."></textarea>
+                <div class="custom-select-wrapper" id="customSelectWrapperBatch">
+<input type="hidden" id="selectPresetBatch" value="best" />
+<button type="button" class="custom-select-trigger" id="customSelectTriggerBatch" title="Qualidade e formato" aria-label="Qualidade e formato" aria-expanded="false" aria-controls="customSelectDropdownBatch">
+<div class="select-current-option"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><span class="opt-label" id="currentOptionLabelBatch">Máxima qualidade disponível</span></div><svg class="chevron-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></button>
+<div class="custom-select-dropdown" id="customSelectDropdownBatch">
+<div class="select-option active" data-value="best" data-label="Máxima qualidade disponível"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Máxima qualidade disponível</span><span class="opt-desc">Maior resolução da fonte · sem ampliar</span></div><span class="opt-badge">MAX</span></div>
+<div class="select-option" data-value="4320p" data-label="Até 8K (4320p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 8K (4320p)</span><span class="opt-desc">MP4 H.264 · limitado à resolução da fonte</span></div><span class="opt-badge">8K</span></div>
+<div class="select-option" data-value="2160p" data-label="Até 4K (2160p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 4K (2160p)</span><span class="opt-desc">MP4 H.264 · sem ampliar vídeos menores</span></div><span class="opt-badge">4K</span></div>
+<div class="select-option" data-value="1440p" data-label="Até 1440p (2K)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 1440p (2K)</span><span class="opt-desc">MP4 H.264 · até 2560 × 1440</span></div><span class="opt-badge">1440p</span></div>
+<div class="select-option" data-value="1080p" data-label="Até Full HD (1080p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até Full HD (1080p)</span><span class="opt-desc">MP4 H.264 · até 1920 × 1080</span></div><span class="opt-badge">1080p</span></div>
+<div class="select-option" data-value="720p" data-label="Até HD (720p)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até HD (720p)</span><span class="opt-desc">MP4 H.264 · arquivo mais leve</span></div><span class="opt-badge">720p</span></div>
+<div class="select-option" data-value="480p" data-label="Até 480p"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 480p</span><span class="opt-desc">MP4 H.264 · resolução reduzida</span></div><span class="opt-badge">480p</span></div>
+<div class="select-option" data-value="360p" data-label="Até 360p"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Até 360p</span><span class="opt-desc">MP4 H.264 · arquivo compacto</span></div><span class="opt-badge">360p</span></div>
+<div class="select-option" data-value="prores" data-label="Apple ProRes 422 HQ"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Apple ProRes 422 HQ</span><span class="opt-desc">MOV para edição · resolução da fonte</span></div><span class="opt-badge">PRORES</span></div>
+<div class="select-option" data-value="audio_wav" data-label="Áudio WAV 24-bit"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio WAV 24-bit</span><span class="opt-desc">PCM para edição · conversão de áudio</span></div><span class="opt-badge audio">WAV</span></div>
+<div class="select-option" data-value="audio_flac" data-label="Áudio FLAC"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio FLAC</span><span class="opt-desc">Compressão sem perdas adicionais</span></div><span class="opt-badge audio">FLAC</span></div>
+<div class="select-option" data-value="audio_mp3" data-label="Áudio MP3"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio MP3</span><span class="opt-desc">Compatibilidade ampla · até 320 kbps</span></div><span class="opt-badge audio">MP3</span></div>
+<div class="select-option" data-value="audio_m4a" data-label="Áudio M4A (AAC)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio M4A (AAC)</span><span class="opt-desc">AAC em arquivo M4A</span></div><span class="opt-badge audio">M4A</span></div>
+<div class="select-option" data-value="audio_original" data-label="Áudio original (sem conversão)"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="opt-text"><span class="opt-title">Áudio original (sem conversão)</span><span class="opt-desc">Mantém o codec e o contêiner da fonte</span></div><span class="opt-badge audio">ORIGINAL</span></div>
+<div class="select-option" data-value="thumbnail" data-label="Capa Thumbnail PNG"><svg class="opt-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg><div class="opt-text"><span class="opt-title">Capa Thumbnail PNG</span><span class="opt-desc">Somente a imagem de capa</span></div><span class="opt-badge">PNG</span></div>
+</div>
+</div>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span id="batchCountLabel" style="color:var(--text-muted); font-size:10.5px;">0 links detectados</span>
                     <button id="btnStartBatch" class="btn-download-primary">
@@ -274,7 +253,7 @@
         <!-- History & Download Queue Section -->
         <div class="history-section">
             <div class="history-header">
-                <span>HISTÓRICO & FILA DE DOWNLOADS</span>
+                <span>Seus downloads</span>
                 <div class="history-header-actions">
                     <span id="historyCount" class="history-count">0</span>
                     <button id="btnClearHistory" class="btn-clear-history" title="Limpar Histórico">Limpar</button>
@@ -286,7 +265,15 @@
         </div>
 
         <!-- Author Footer -->
-        <div class="author-footer">MEDIA DOWNLOADER DESKTOP · ALEX ASCENCIO</div>
+        <div class="author-footer">MEDIA DOWNLOADER DESKTOP · ALEX ASCENCIO <span id="appVersionTag"></span></div>
+        <script>
+          // Versao lida do package.json do proprio app: o rodape nunca diverge do build.
+          try {
+            var v = require("../package.json").version;
+            document.getElementById("appVersionTag").textContent = "· v" + v;
+            document.title = "Media Downloader " + v;
+          } catch (e) {}
+        </script>
     </div>
 
     <!-- Settings Modal -->
@@ -299,6 +286,7 @@
                 </button>
             </div>
             <div class="modal-body">
+<div class="modal-row"><label for="selectDefaultPreset">Qualidade padrão ao abrir</label><select id="selectDefaultPreset" class="modal-input" style="width:100%; background:var(--bg-input); color:var(--text-main); border:1px solid var(--border-default); padding:8px; border-radius:var(--radius-sm);"><option value="best">Máxima qualidade disponível</option><option value="4320p">Até 8K (4320p)</option><option value="2160p">Até 4K (2160p)</option><option value="1440p">Até 1440p (2K)</option><option value="1080p">Até Full HD (1080p)</option><option value="720p">Até HD (720p)</option><option value="480p">Até 480p</option><option value="360p">Até 360p</option><option value="prores">Apple ProRes 422 HQ</option><option value="audio_wav">Áudio WAV 24-bit</option><option value="audio_flac">Áudio FLAC</option><option value="audio_mp3">Áudio MP3</option><option value="audio_m4a">Áudio M4A (AAC)</option><option value="audio_original">Áudio original (sem conversão)</option><option value="thumbnail">Capa Thumbnail PNG</option></select><small style="color:var(--text-muted); font-size:10px;">Aplicada ao abrir o aplicativo. Cada aba pode usar outro formato durante a sessão.</small></div>
                 <div class="modal-row">
                     <label>Pasta Padrão de Downloads:</label>
                     <div style="display:flex; gap:6px;">
@@ -308,7 +296,7 @@
                 </div>
 
                 <div class="modal-row">
-                    <label>Arquivo de Cookies (Vídeos 18+ / Privados):</label>
+                    <label>Arquivo de cookies (opcional):</label>
                     <div style="display:flex; gap:6px;">
                         <input type="text" id="inputCookiesPath" class="url-input" placeholder="Caminho do cookies.txt (opcional)" style="flex:1; background:var(--bg-input); border:1px solid var(--border-default); padding:6px 8px; border-radius:var(--radius-sm);" />
                         <button id="btnBrowseCookies" class="btn-dir" style="height:32px;">Selecionar...</button>
@@ -349,5 +337,6 @@
     <script src="js/binManager.js"></script>
     <script src="js/downloader.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/ui-polish.js"></script>
 </body>
 </html>

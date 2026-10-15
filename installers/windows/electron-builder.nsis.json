@@ -1,0 +1,33 @@
+{
+  "appId": "com.alexascencio.mediadownloader.desktop",
+  "productName": "Media Downloader",
+  "artifactName": "MediaDownloader-Windows-x64-Setup.exe",
+  "compression": "normal",
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "signAndEditExecutable": false,
+    "icon": "icons/icon.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "selectPerMachineByDefault": false,
+    "allowElevation": true,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "runAfterFinish": false,
+    "deleteAppDataOnUninstall": false,
+    "installerLanguages": [
+      "pt_BR",
+      "en_US"
+    ]
+  }
+}

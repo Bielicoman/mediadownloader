@@ -31,6 +31,9 @@
   var elPreviewMeta = document.getElementById("previewMeta");
   var elPreviewPlatform = document.getElementById("previewPlatform");
   var elSelectPreset = document.getElementById("selectPreset");
+  var elDefaultPreset = document.getElementById("selectDefaultPreset");
+  var elPlaylistPreset = document.getElementById("selectPresetPlaylist");
+  var elBatchPreset = document.getElementById("selectPresetBatch");
   var elCustomSelectWrapper = document.getElementById("customSelectWrapper");
   var elCustomSelectTrigger = document.getElementById("customSelectTrigger");
   var elCurrentOptionLabel = document.getElementById("currentOptionLabel");
@@ -86,6 +89,7 @@
   // State
   var currentMetadata = null;
   var currentDownloadId = null;
+  var queueCancelled = false;
   var isDownloading = false;
   var playlistData = null;
   var historyItems = [];
@@ -152,34 +156,65 @@
   }
 
   function setupDropdown() {
-    if (elCustomSelectTrigger && elCustomSelectWrapper) {
-      elCustomSelectTrigger.addEventListener("click", function (e) {
+    var wrappers = document.querySelectorAll(".custom-select-wrapper");
+    function closeMenu(wrapper) {
+      wrapper.classList.remove("open");
+      wrapper.querySelector(".custom-select-trigger").setAttribute("aria-expanded", "false");
+    }
+    wrappers.forEach(function (wrapper) {
+      var trigger = wrapper.querySelector(".custom-select-trigger");
+      var input = wrapper.querySelector('input[type="hidden"]');
+      var label = wrapper.querySelector(".opt-label");
+      var options = wrapper.querySelectorAll(".select-option");
+      trigger.addEventListener("click", function (e) {
         e.stopPropagation();
-        elCustomSelectWrapper.classList.toggle("open");
+        var shouldOpen = !wrapper.classList.contains("open");
+        wrappers.forEach(closeMenu);
+        if (shouldOpen) {
+          wrapper.classList.add("open");
+          trigger.setAttribute("aria-expanded", "true");
+        }
       });
-
-      var options = elCustomSelectDropdown.querySelectorAll(".select-option");
       options.forEach(function (opt) {
         opt.addEventListener("click", function (e) {
           e.stopPropagation();
           options.forEach(function (o) { o.classList.remove("active"); });
           opt.classList.add("active");
-
-          var val = opt.getAttribute("data-value");
-          var label = opt.getAttribute("data-label");
-          elSelectPreset.value = val;
-          elCurrentOptionLabel.textContent = label;
-          elCustomSelectWrapper.classList.remove("open");
+          input.value = opt.getAttribute("data-value");
+          label.textContent = opt.getAttribute("data-label");
+          var currentIcon = trigger.querySelector(".opt-icon");
+          var selectedIcon = opt.querySelector(".opt-icon");
+          if (currentIcon && selectedIcon) currentIcon.innerHTML = selectedIcon.innerHTML;
+          closeMenu(wrapper);
         });
       });
-
-      document.addEventListener("click", function () {
-        elCustomSelectWrapper.classList.remove("open");
-      });
-    }
+    });
+    document.addEventListener("click", function () { wrappers.forEach(closeMenu); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") wrappers.forEach(closeMenu); });
   }
 
+  function validDefaultPreset(value) {
+      return elDefaultPreset && Array.prototype.some.call(elDefaultPreset.options, function (option) { return option.value === value; }) ? value : "best";
+    }
+
+    function loadDefaultPreset() {
+      var preset = validDefaultPreset(localStorage.getItem("mediadownloader_default_preset"));
+      if (elDefaultPreset) elDefaultPreset.value = preset;
+      document.querySelectorAll(".custom-select-wrapper").forEach(function (wrapper) {
+        var input = wrapper.querySelector('input[type="hidden"]');
+        var selected = wrapper.querySelector('.select-option[data-value="' + preset + '"]');
+        if (!input || !selected) return;
+        input.value = preset;
+        wrapper.querySelector(".opt-label").textContent = selected.getAttribute("data-label");
+        wrapper.querySelectorAll(".select-option").forEach(function (option) { option.classList.toggle("active", option === selected); });
+        var currentIcon = wrapper.querySelector(".custom-select-trigger .opt-icon");
+        var selectedIcon = selected.querySelector(".opt-icon");
+        if (currentIcon && selectedIcon) currentIcon.innerHTML = selectedIcon.innerHTML;
+      });
+    }
+
   async function loadSettings() {
+    loadDefaultPreset();
     var savedDir = localStorage.getItem("mediadownloader_download_dir");
     if (!savedDir) {
       savedDir = window.Downloader.getDefaultDownloadDir();
@@ -192,6 +227,7 @@
   }
 
   function saveSettings() {
+    if (elDefaultPreset) localStorage.setItem("mediadownloader_default_preset", validDefaultPreset(elDefaultPreset.value));
     if (elInputSettingDownloadDir) {
       var dir = elInputSettingDownloadDir.value.trim();
       localStorage.setItem("mediadownloader_download_dir", dir);
@@ -222,14 +258,14 @@
         elFfmpegStatus.textContent = "✅ Pronto (" + (status.ffmpeg.version || "OK") + ")";
         elFfmpegStatus.style.color = "var(--accent-emerald)";
       } else {
-        elFfmpegStatus.textContent = "⚠️ Opcional (usado para remux H.264/ProRes)";
+        elFfmpegStatus.textContent = "❌ Não encontrado: necessário para juntar vídeo e áudio";
         elFfmpegStatus.style.color = "var(--accent-amber)";
       }
     }
 
     if (elAria2Status) {
       if (status.aria2 && status.aria2.found) {
-        elAria2Status.textContent = "✅ Ativo (Aceleração Turbo)";
+        elAria2Status.textContent = "Não usado (o yt-dlp baixa direto)";
         elAria2Status.style.color = "var(--accent-emerald)";
       } else {
         elAria2Status.textContent = "ℹ️ Padrão";
@@ -260,12 +296,15 @@
   // 3. Single Video Event Handlers
   var debounceTimer = null;
   function handleUrlChange(url) {
+    var thumbnailLink = String(url || "").match(/^https?:\/\/(?:i|img)\.ytimg\.com\/(?:vi|vi_webp)\/([A-Za-z0-9_-]{11})(?:\/|$)/i);
+    if (thumbnailLink) { url = "https://www.youtube.com/watch?v=" + thumbnailLink[1]; if (elUrlInput) elUrlInput.value = url; }
     if (!url) {
       if (elPreviewBox) elPreviewBox.classList.remove("active");
       currentMetadata = null;
       return;
     }
 
+    currentMetadata = null;
     var platform = window.Downloader.detectPlatform(url);
     updatePlatformIcon(platform);
 
@@ -278,7 +317,10 @@
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(async function () {
       try {
-        var meta = await window.Downloader.fetchMetadata(url);
+        var meta = await window.Downloader.fetchMetadata(url, function (quick) {
+          if (elUrlInput.value.trim() === url && (!currentMetadata || currentMetadata.isInstant)) renderPreview(quick);
+        });
+        if (elUrlInput.value.trim() !== url) return;
         currentMetadata = meta;
         renderPreview(meta);
       } catch (err) {
@@ -333,24 +375,27 @@
       return;
     }
 
+    var meta = currentMetadata;
     var preset = elSelectPreset.value;
     var outputDir = localStorage.getItem("mediadownloader_download_dir") || window.Downloader.getDefaultDownloadDir();
 
     isDownloading = true;
-    showProgressCard(true, currentMetadata ? currentMetadata.title : "Baixando mídia...");
+    showProgressCard(true, meta ? meta.title : "Baixando mídia...");
 
     try {
-      var result = await window.Downloader.startDownload({
+      var job = window.Downloader.startDownload({
         url: url,
         preset: preset,
         outputDir: outputDir,
-        title: currentMetadata ? currentMetadata.title : null,
-        id: currentMetadata ? currentMetadata.id : null
+        title: meta ? meta.title : null,
+        id: meta ? meta.id : null
       }, function (prog) {
         updateProgress(prog);
       }, function (status) {
         if (elProgressStatus) elProgressStatus.textContent = status;
       });
+      currentDownloadId = job.downloadId;
+      var result = await job;
 
       showToast("Download concluído com sucesso!", "success");
       addToHistory({
@@ -358,7 +403,7 @@
         filePath: result.filePath,
         preset: result.preset,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        thumbnail: currentMetadata ? currentMetadata.thumbnail : ""
+        thumbnail: meta ? meta.thumbnail : ""
       });
 
       // Clear input
@@ -369,8 +414,9 @@
       showToast("Erro: " + err.message, "error");
     } finally {
       isDownloading = false;
+      currentDownloadId = null;
       setTimeout(function () {
-        showProgressCard(false);
+        if (!isDownloading) showProgressCard(false);
       }, 1500);
     }
   }
@@ -496,18 +542,21 @@
       return;
     }
 
-    var preset = elSelectPreset.value;
+    var preset = elPlaylistPreset.value;
     var outputDir = localStorage.getItem("mediadownloader_download_dir") || window.Downloader.getDefaultDownloadDir();
 
     isDownloading = true;
+    queueCancelled = false;
     showToast("Iniciando download de " + selected.length + " vídeos...", "info");
 
+    var successes = 0, failures = 0;
     for (var i = 0; i < selected.length; i++) {
       var item = selected[i];
       showProgressCard(true, "(" + (i + 1) + "/" + selected.length + ") " + item.title);
 
+      if (queueCancelled) break;
       try {
-        var res = await window.Downloader.startDownload({
+        var plJob = window.Downloader.startDownload({
           url: item.url,
           preset: preset,
           outputDir: outputDir,
@@ -516,6 +565,9 @@
         }, function (prog) {
           updateProgress(prog);
         });
+        currentDownloadId = plJob.downloadId;
+        var res = await plJob;
+        successes++;
 
         addToHistory({
           title: res.title,
@@ -525,13 +577,14 @@
           thumbnail: item.thumbnail
         });
       } catch (err) {
-        showToast("Falha em (" + item.title + "): " + err.message, "error");
+        if (!queueCancelled) { failures++; showToast("Falha em (" + item.title + "): " + err.message, "error"); }
       }
     }
 
     isDownloading = false;
     showProgressCard(false);
-    showToast("Download da playlist concluído!", "success");
+    currentDownloadId = null;
+    showQueueResult("Playlist", successes, failures, selected.length, queueCancelled);
   }
 
   // 6. Batch Downloads
@@ -563,24 +616,31 @@
       return;
     }
 
-    var preset = elSelectPreset.value;
+    var preset = elBatchPreset.value;
     var outputDir = localStorage.getItem("mediadownloader_download_dir") || window.Downloader.getDefaultDownloadDir();
 
     isDownloading = true;
+    queueCancelled = false;
     showToast("Processando lote de " + urls.length + " mídias...", "info");
 
+    var successes = 0, failures = 0, completed = {};
     for (var i = 0; i < urls.length; i++) {
       var u = urls[i];
       showProgressCard(true, "Lote (" + (i + 1) + "/" + urls.length + ")");
 
+      if (queueCancelled) break;
       try {
-        var res = await window.Downloader.startDownload({
+        var batchJob = window.Downloader.startDownload({
           url: u,
           preset: preset,
           outputDir: outputDir
         }, function (prog) {
           updateProgress(prog);
         });
+        currentDownloadId = batchJob.downloadId;
+        var res = await batchJob;
+        successes++;
+        completed[i] = true;
 
         addToHistory({
           title: res.title,
@@ -590,22 +650,31 @@
           thumbnail: ""
         });
       } catch (err) {
-        showToast("Erro no link #" + (i + 1) + ": " + err.message, "error");
+        if (!queueCancelled) { failures++; showToast("Erro no link #" + (i + 1) + ": " + err.message, "error"); }
       }
     }
 
     isDownloading = false;
     showProgressCard(false);
-    elBatchTextarea.value = "";
+    elBatchTextarea.value = urls.filter(function (url, index) { return !completed[index]; }).join("\n");
     handleBatchInput();
-    showToast("Lote finalizado com sucesso!", "success");
+    currentDownloadId = null;
+    showQueueResult("Lote", successes, failures, urls.length, queueCancelled);
+  }
+
+  function showQueueResult(label, successes, failures, total, cancelled) {
+    var pending = total - successes - failures;
+    var message = label + (cancelled ? " interrompido: " : " finalizado: ") + successes + " concluído(s), " + failures + " falha(s)";
+    if (pending > 0) message += ", " + pending + " pendente(s)";
+    showToast(message + ".", cancelled || (successes > 0 && failures > 0) ? "info" : (failures > 0 ? "error" : "success"));
   }
 
   // 7. History Management
   function loadHistory() {
     try {
       var raw = localStorage.getItem("mediadownloader_desktop_history");
-      historyItems = raw ? JSON.parse(raw) : [];
+      var parsed = raw ? JSON.parse(raw) : [];
+      historyItems = Array.isArray(parsed) ? parsed.filter(function (item) { return item && typeof item === "object" && typeof item.filePath === "string"; }).slice(0, 50) : [];
     } catch (e) {
       historyItems = [];
     }
@@ -613,11 +682,12 @@
   }
 
   function saveHistory() {
-    localStorage.setItem("mediadownloader_desktop_history", JSON.stringify(historyItems.slice(0, 50)));
+    try { localStorage.setItem("mediadownloader_desktop_history", JSON.stringify(historyItems.slice(0, 50))); } catch (err) { console.warn("Não foi possível salvar o histórico:", err.message); }
   }
 
   function addToHistory(item) {
     historyItems.unshift(item);
+    if (historyItems.length > 50) historyItems.length = 50;
     saveHistory();
     renderHistory();
   }
@@ -661,7 +731,7 @@
 
       var meta = document.createElement("div");
       meta.className = "history-item-meta";
-      meta.innerHTML = "<span>" + (item.preset ? item.preset.toUpperCase() : "MP4") + "</span> · <span>" + item.time + "</span>";
+      meta.textContent = (item.preset ? String(item.preset).toUpperCase() : "MP4") + " · " + (item.time || "");
 
       info.appendChild(title);
       info.appendChild(meta);
@@ -790,10 +860,9 @@
     if (elBtnCancelDownload) {
       elBtnCancelDownload.addEventListener("click", function () {
         if (currentDownloadId) {
+          queueCancelled = true;
           window.Downloader.cancelDownload(currentDownloadId);
-          showToast("Download cancelado.", "info");
-          showProgressCard(false);
-          isDownloading = false;
+          showToast("Cancelando download...", "info");
         }
       });
     }

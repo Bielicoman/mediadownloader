@@ -1,52 +1,20 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-
-const PORT = process.env.PORT || 3000;
-const PUBLIC_DIR = __dirname;
-
-const MIME_TYPES = {
-    '.html': 'text/html; charset=UTF-8',
-    '.css': 'text/css; charset=UTF-8',
-    '.js': 'application/javascript; charset=UTF-8',
-    '.json': 'application/json; charset=UTF-8',
-    '.png': 'image/png',
-    '.jpg': 'image/jpeg',
-    '.svg': 'image/svg+xml',
-    '.zxp': 'application/octet-stream',
-    '.zip': 'application/zip',
-    '.bat': 'application/x-bat'
-};
-
-const server = http.createServer((req, res) => {
-    let reqPath = req.url.split('?')[0];
-    if (reqPath === '/') reqPath = '/index.html';
-
-    const filePath = path.join(PUBLIC_DIR, decodeURIComponent(reqPath));
-
-    fs.stat(filePath, (err, stats) => {
-        if (err || !stats.isFile()) {
-            res.writeHead(404, { 'Content-Type': 'text/plain; charset=UTF-8' });
-            res.end('404 - Arquivo não encontrado');
-            return;
-        }
-
-        const ext = path.extname(filePath).toLowerCase();
-        const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-
-        res.writeHead(200, {
-            'Content-Type': contentType,
-            'Content-Length': stats.size,
-            'Cache-Control': 'no-cache'
-        });
-
-        fs.createReadStream(filePath).pipe(res);
-    });
-});
-
-server.listen(PORT, () => {
-    console.log(`\n======================================================`);
-    console.log(`🌐 MediaDownloader Pro — Website Oficial Ativo!`);
-    console.log(`👉 Acesse no navegador: http://localhost:${PORT}`);
-    console.log(`======================================================\n`);
-});
+const root = fs.existsSync(path.join(__dirname, 'dist/site/index.html')) ? path.join(__dirname, 'dist/site') : __dirname;
+const port = Number(process.env.PORT || 3000);
+const allowed = new Set(['index.html','site.css','site.js','version.json','logo.png','favicon.ico','favicon.svg','favicon.png','apple-touch-icon.png','LICENSE','LICENSE.txt','THIRD-PARTY-NOTICES.md','privacidade.html','termos.html','cookies.html','licencas.html','suporte.html','acessibilidade.html']);
+const types = {'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.txt':'text/plain; charset=utf-8','.md':'text/plain; charset=utf-8','.ttf':'font/ttf'};
+http.createServer((req,res)=>{
+  if (!['GET','HEAD'].includes(req.method)) {res.writeHead(405);res.end();return;}
+  let rel;
+  try { rel=decodeURIComponent(new URL(req.url,'http://localhost').pathname).replace(/^\/+/, '') || 'index.html'; } catch {res.writeHead(400);res.end();return;}
+  const file=path.resolve(root,rel);
+  const inRoot=file.startsWith(path.resolve(root)+path.sep);
+  const publicFile=allowed.has(rel)||(/^(assets|licenses)\//.test(rel)&&!rel.split('/').some(p=>p.startsWith('.')));
+  if(!inRoot||!publicFile){res.writeHead(404);res.end('Não encontrado');return;}
+  fs.stat(file,(err,st)=>{if(err||!st.isFile()){res.writeHead(404);res.end('Não encontrado');return;}
+    res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Content-Length':st.size,'X-Content-Type-Options':'nosniff','Cache-Control':'no-cache'});
+    if(req.method==='HEAD')res.end();else fs.createReadStream(file).pipe(res);
+  });
+}).listen(port,'127.0.0.1',()=>console.log('Media Downloader: http://127.0.0.1:'+port));

@@ -21,3 +21,13 @@ android/app/build/
 android/local.properties
 android/keystore.jks
 android/keystore.properties
+
+# Build outputs and private/local state
+work/
+*.zip
+*.zxp
+*.exe
+.env*
+.vercel/
+.venv/
+__pycache__/
