@@ -10,7 +10,7 @@ Evite publicar detalhes exploráveis em issues antes de uma análise e correçã
 
 ## Escopo e versões
 
-Versões atuais por componente estão em version.json. Desktop Windows 1.4.2, painel Adobe 1.4.2 Beta e Editores 1.1.3 Beta usam atualização verificada. Android é distribuído por release própria; Mac/Linux Desktop anteriores são Beta. Não há garantia de correções retroativas para pacotes antigos.
+Versões atuais por componente estão em version.json. Desktop Windows 1.4.3, painel Adobe 1.4.3 Beta e Editores 1.1.4 Beta usam atualização verificada. Android é distribuído por release própria; Mac/Linux Desktop anteriores são Beta. Não há garantia de correções retroativas para pacotes antigos.
 
 O programa usa yt-dlp, FFmpeg/FFprobe, Electron e integração CEP. Problemas de uma dependência podem exigir atualização upstream; informe o componente e a versão detectados no diagnóstico.
 

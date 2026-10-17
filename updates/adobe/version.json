@@ -1,8 +1,8 @@
 {
   "pluginId": "com.alexascencio.mediadownloader",
   "name": "Media Downloader",
-  "version": "1.4.2",
-  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Adobe-1.4.2.zip",
-  "sha256": "3ef6df94a81e74a5205d3b2279a09ff196710d4342096088bb9e43ba2cecb4ab",
+  "version": "1.4.3",
+  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.3/MediaDownloader-Adobe-1.4.3.zip",
+  "sha256": "e34bd641aefb8c5bf94d258a0d66d13861922ec1d6b1cd08a682afe769531c89",
   "mandatory": false
 }

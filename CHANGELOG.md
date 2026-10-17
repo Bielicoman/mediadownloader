@@ -1,5 +1,14 @@
 # Histórico de mudanças
 
+## 1.4.3 — 17/10/2026
+
+Cartão de vídeo único com seis dados principais em grade, miniatura ampla, ícones dos editores e ficha completa. Desktop/Adobe 1.4.3; Editores 1.1.4.
+
+## Android 1.3.6 — 17/10/2026
+
+Preparação de motores em etapas visíveis, bloqueio de download até concluir, prévia ampla, logo oficial e ícone adaptativo escuro.
+
+
 ## 1.4.2 — 17/10/2026
 
 - Atualizador Electron 6.8.9, com correção da dependência builder-util-runtime.

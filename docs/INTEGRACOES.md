@@ -2,9 +2,9 @@
 
 | Editor | Entrega | Canal |
 |---|---|---|
-| Premiere Pro | Painel CEP Adobe 1.4.2 | Beta |
+| Premiere Pro | Painel CEP Adobe 1.4.3 | Beta |
 | After Effects | Mesmo painel, adaptador de projeto/composição | Beta |
-| DaVinci Resolve | Atalhos Scripts + Editores 1.1.3; Workflow Integration Studio opcional | Beta |
+| DaVinci Resolve | Atalhos Scripts + Editores 1.1.4; Workflow Integration Studio opcional | Beta |
 | CapCut | Aplicativo externo, arquivo/pasta/arrastar | Beta |
 | Avid Media Composer | Aplicativo externo, arquivo para Source Browser | Beta |
 | Final Cut Pro | Aplicativo externo, FCPXML | Beta |

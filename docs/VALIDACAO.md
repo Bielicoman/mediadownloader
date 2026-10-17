@@ -8,7 +8,7 @@
 - Usuário confirmou abertura do aplicativo pelo menu Scripts do Resolve. Importação no Pool de Mídia, reprodução CapCut e integrações Mac/Avid/Final Cut continuam como validação nativa pendente; na apresentação pública são Beta.
 - Auditoria de dependências identificou GHSA-p2f4-r6v6-j797 em electron-updater 6.6.2 / builder-util-runtime. Atualização para 6.8.9 eliminou os avisos da auditoria de produção.
 - Desktop 1.4.2 e Editores 1.1.3 instalados via NSIS com saída 0; versões, i18n e electron-updater 6.8.9 conferidos nos ASAR instalados. Novo download real MP4 passou em FFprobe e decodificação FFmpeg. Adobe 1.4.2 copiado com backup; reabertura do painel é necessária.
-- Sete testes dedicados de atualização, coleções, idioma e demonstração passaram. Sintaxe: 54 arquivos válidos. Demonstração no navegador completou com metadados e 100%; não usa download de mídia real. Android 1.3.5 aguarda o CI da nova interface de idioma.
+- Sete testes dedicados de atualização, coleções, idioma e demonstração passaram. Sintaxe: 54 arquivos válidos. Demonstração no navegador completou com metadados e 100%; não usa download de mídia real. Android 1.3.5: GitHub Actions 39040134673 concluído com sucesso; build, testes e emulador. Release android-v1.3.5 publicada com os quatro APKs e SHA256SUMS. Validação do código/site em main: 39040134620, sucesso.
 - Traduções são um catálogo incremental: interface principal em seis idiomas; textos fora do catálogo permanecem na origem. Francês, alemão e italiano são apresentados como Beta.
 
 Não substituir validação de host por mocks, build ou abertura da interface no navegador. O selo Beta comunica maturidade ao usuário e não substitui os registros técnicos.
@@ -109,3 +109,7 @@ Em 15/10/2026, sete novos testes de bridge/adaptador passaram junto à suíte an
 Execução nativa no After Effects 26.3x87: importação WAV sem duplicação (duas chamadas, um footage), camada em t=2 com outPoint=10, preservação de camada anterior bloqueada e erro real para arquivo inexistente. Removidos somente os itens de teste; contagem do projeto: 92 antes e 92 depois. Não foi salvo o projeto. Relatório local smoke.json; não publicado por conter caminhos locais.
 
 Pendente: abertura e download/importação através do painel CEP instalado, além de macOS. O teste do adaptador via linha de comando não equivale a validar o painel completo.
+
+## Cartão de mídia e nova instalação
+
+Desktop 1.4.3 e Editores 1.1.4 instalados por NSIS, ambos com saída 0; painel Adobe 1.4.3 copiado com backup. Motor do ASAR instalado baixou novamente jNQXAC9IVRw em H.264/AAC, conferido e decodificado. Teste do renderizador verificou seis campos com valores reais e seis ícones, preservando a ficha completa. Site publicado conferido em 390 px, sem transbordamento horizontal. Android 1.3.6 está em validação no emulador na execução 39056700647.
