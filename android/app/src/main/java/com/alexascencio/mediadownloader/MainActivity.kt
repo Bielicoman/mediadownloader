@@ -14,6 +14,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import coil.ImageLoader
+import coil.decode.SvgDecoder
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -94,7 +96,7 @@ class MainActivity:ComponentActivity() {
                 }
                 if(previa.url.isNotBlank())CartaoPrevia(previa)
                 Seletor("Como quer salvar?",perfil.rotulo,!ocupado,Perfil.entries.map{it.rotulo}){i->perfil=Perfil.entries[i]}
-                Seletor("Qualidade do vídeo",qualidade.rotulo,!ocupado && !perfil.ehAudio,Qualidade.entries.map{it.rotulo}){i->qualidade=Qualidade.entries[i]}
+                Seletor("Qualidade do vídeo",qualidade.rotulo,!ocupado && !perfil.ehAudio && perfil!=Perfil.CAPA,Qualidade.entries.map{it.rotulo}){i->qualidade=Qualidade.entries[i]}
                 Text(perfil.detalhe,color=Apagado,fontSize=12.sp)
                 Button(onClick={aviso="";if(Build.VERSION.SDK_INT<29 && ContextCompat.checkSelfPermission(context,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED)permissao.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)else vm.baixar(url,perfil,qualidade)},enabled=!ocupado && url.isNotBlank(),shape=RoundedCornerShape(8.dp),modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)) {Text(if(ocupado)"Preparando…" else "Baixar mídia",fontWeight=FontWeight.Bold)}
                 if(estado is Estado.Sondando || estado is Estado.Baixando)OutlinedButton(onClick=vm::cancelar,modifier=Modifier.fillMaxWidth()){Text("Cancelar")}
@@ -119,22 +121,52 @@ class MainActivity:ComponentActivity() {
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable private fun Seletor(rotulo:String,selecionado:String,enabled:Boolean,itens:List<String>,escolher:(Int)->Unit){
     var expanded by remember{mutableStateOf(false)}
     Column(verticalArrangement=Arrangement.spacedBy(6.dp)){
         Text(rotulo,fontSize=12.sp,color=Apagado)
-        Box{OutlinedButton(onClick={expanded=true},enabled=enabled,shape=RoundedCornerShape(8.dp),modifier=Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=14.dp,vertical=12.dp)){Text(selecionado,modifier=Modifier.weight(1f),color=if(enabled)Texto else Apagado);Text("⌄",color=Ambar)}
-            DropdownMenu(expanded=expanded,onDismissRequest={expanded=false}){itens.forEachIndexed{i,item->DropdownMenuItem(text={Text(item)},onClick={escolher(i);expanded=false})}}
+        OutlinedButton(onClick={expanded=true},enabled=enabled,shape=RoundedCornerShape(9.dp),modifier=Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=14.dp,vertical=12.dp)){Text(selecionado,modifier=Modifier.weight(1f),color=if(enabled)Texto else Apagado);Text("⌄",color=Ambar)}
+    }
+    if(expanded)ModalBottomSheet(onDismissRequest={expanded=false},containerColor=Fundo){
+        Column(Modifier.fillMaxWidth().heightIn(max=650.dp).verticalScroll(rememberScrollState()).padding(horizontal=20.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
+            Text(rotulo,fontSize=23.sp,fontWeight=FontWeight.Bold)
+            Text("Escolha a opção que combina com seu uso. A qualidade depende da fonte.",fontSize=12.sp,color=Apagado)
+            itens.forEachIndexed{i,item->Surface(onClick={escolher(i);expanded=false},color=if(item==selecionado)Color(0xFF282214)else Superficie,shape=RoundedCornerShape(12.dp),border=androidx.compose.foundation.BorderStroke(1.dp,if(item==selecionado)Ambar else Borda)){
+                Row(Modifier.fillMaxWidth().padding(12.dp),verticalAlignment=Alignment.CenterVertically){RadioButton(selected=item==selecionado,onClick={escolher(i);expanded=false});Text(item,modifier=Modifier.padding(start=8.dp),fontWeight=FontWeight.SemiBold,fontSize=14.sp)}
+            }}
+            Spacer(Modifier.height(18.dp))
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable private fun CartaoPrevia(previa:Previa){
+    var detailsOpen by remember{mutableStateOf(false)}
+    val context=LocalContext.current
+    val imageLoader=remember(context){ImageLoader.Builder(context).components{add(SvgDecoder.Factory())}.build()}
     Row(horizontalArrangement=Arrangement.spacedBy(12.dp),verticalAlignment=Alignment.CenterVertically){
         if(previa.thumbnail!=null)AsyncImage(model=previa.thumbnail,contentDescription="Miniatura do vídeo",contentScale=ContentScale.Crop,modifier=Modifier.width(112.dp).aspectRatio(16f/9).clip(RoundedCornerShape(8.dp)))
         Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)){
             Text(previa.titulo.ifBlank{if(previa.lendo)"Lendo informações…" else "Prévia do vídeo"},fontWeight=FontWeight.SemiBold,fontSize=13.sp,maxLines=3,overflow=TextOverflow.Ellipsis)
             if(previa.autor.isNotBlank())Text(previa.autor,fontSize=11.sp,color=Apagado,maxLines=1,overflow=TextOverflow.Ellipsis)
             if(previa.duracao>0)Text("${previa.duracao/60}:${(previa.duracao%60).toString().padStart(2,'0')}",fontSize=11.sp,color=Apagado)
+        }
+    }
+    if(previa.detalhes.isNotEmpty())OutlinedButton(onClick={detailsOpen=true},modifier=Modifier.fillMaxWidth()){Text(if(previa.arquivoFinal)"Ver dados do arquivo final" else "Ver todos os dados da mídia")}
+    if(detailsOpen)ModalBottomSheet(onDismissRequest={detailsOpen=false},containerColor=Fundo){
+        Column(Modifier.fillMaxWidth().heightIn(max=700.dp).verticalScroll(rememberScrollState()).padding(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
+            Text(if(previa.arquivoFinal)"Arquivo final" else "Dados da fonte",fontSize=23.sp,fontWeight=FontWeight.Bold)
+            Text("Original preserva a codificação da fonte e pode ter compressão. A ficha final pode ter outros codecs.",fontSize=12.sp,color=Apagado)
+            Text("Leitura nos editores",fontWeight=FontWeight.SemiBold)
+            val editors=listOf("Premiere" to "premiere.png","After Effects" to "after-effects.png","Resolve" to "resolve.png","Avid" to "avid.svg","Final Cut" to "final-cut.png","CapCut" to "capcut.png")
+            editors.chunked(3).forEach{row->Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)){row.forEach{editor->Surface(modifier=Modifier.weight(1f),shape=RoundedCornerShape(10.dp),color=Superficie){Column(Modifier.padding(10.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
+                AsyncImage(model="file:///android_asset/brands/${editor.second}",imageLoader=imageLoader,contentDescription=editor.first,modifier=Modifier.size(24.dp),contentScale=ContentScale.Fit)
+                Text(editor.first,fontSize=10.sp,fontWeight=FontWeight.Bold)
+                Text(if(!previa.arquivoFinal)"Conferir após salvar" else if(editor.first=="Avid")"Conferir Link/Import" else if(editor.first=="Resolve")"Depende do sistema" else if(editor.first=="Final Cut")"Requer Mac" else "Verificar codecs",fontSize=9.sp,color=Apagado)
+            }}}}}
+            Text("Indicação pelo formato, sem teste de importação neste arquivo. Versão, sistema e licença do editor podem alterar o suporte.",fontSize=11.sp,color=Apagado)
+            SelectionContainer{Column(verticalArrangement=Arrangement.spacedBy(12.dp)){previa.detalhes.forEach{(label,value)->Column{Text(label,fontSize=11.sp,color=Apagado);Text(value,fontSize=13.sp)}}}}
+            Spacer(Modifier.height(20.dp))
         }
     }
     previa.aviso?.let{Text(it,fontSize=11.sp,color=Apagado)}

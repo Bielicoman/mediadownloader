@@ -23,8 +23,8 @@ android {
         applicationId = "com.alexascencio.mediadownloader"
         minSdk = 24
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.3.2"
+        versionCode = 5
+        versionName = "1.3.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // A biblioteca do yt-dlp so publica binarios para estas ABIs.
@@ -96,6 +96,7 @@ dependencies {
     implementation("io.github.junkfood02.youtubedl-android:library:$youtubedl")
     implementation("io.github.junkfood02.youtubedl-android:ffmpeg:$youtubedl")
     implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("io.coil-kt:coil-svg:2.7.0")
 
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")

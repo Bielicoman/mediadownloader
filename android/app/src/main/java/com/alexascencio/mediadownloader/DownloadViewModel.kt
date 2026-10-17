@@ -24,7 +24,7 @@ sealed interface Estado {
     data class Concluido(val nomeArquivo:String,val uri:String,val mime:String):Estado
     data class Falhou(val mensagem:String):Estado
 }
-data class Previa(val url:String="",val titulo:String="",val autor:String="",val thumbnail:String?=null,val duracao:Int=0,val lendo:Boolean=false,val aviso:String?=null)
+data class Previa(val url:String="",val titulo:String="",val autor:String="",val thumbnail:String?=null,val duracao:Int=0,val lendo:Boolean=false,val aviso:String?=null,val detalhes:List<Pair<String,String>> = emptyList(),val arquivoFinal:Boolean=false)
 
 class DownloadViewModel(app:Application):AndroidViewModel(app) {
     private val _estado=MutableStateFlow<Estado>(Estado.Preparando)
@@ -86,7 +86,7 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
             try {
                 val response=YoutubeDL.execute(pedidoBase(link).apply{addOption("--dump-single-json");addOption("--skip-download")},id)
                 ensureActive();val info=JSONObject(response.out)
-                if(_previa.value.url==link)_previa.value=Previa(link,info.optString("title"),info.optString("uploader"),info.optString("thumbnail").takeIf{it.startsWith("https://")} ?: _previa.value.thumbnail,info.optInt("duration"),false)
+                if(_previa.value.url==link)_previa.value=Previa(link,info.optString("title"),info.optString("uploader"),info.optString("thumbnail").takeIf{it.startsWith("https://")} ?: _previa.value.thumbnail,info.optInt("duration"),false,detalhes=detalhesFonte(info))
             }catch(e:Exception){if(isActive && _previa.value.url==link)_previa.value=_previa.value.copy(lendo=false,aviso="A prévia não carregou. Você ainda pode tentar baixar.")}
             finally{if(previewId==id)previewId=null}
         }
@@ -103,24 +103,32 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
                 val resultFile=File(dir,"result.txt")
                 val pedido=pedidoBase(link).apply {
                     addOption("--no-mtime");addOption("--newline");addOption("--no-simulate");addOption("--match-filter","!is_live")
-                    addOption("-f",seletorFormato(perfil,qualidade));addOption("--merge-output-format","mkv")
+                    if(perfil==Perfil.CAPA){addOption("--skip-download");addOption("--write-thumbnail")}else{addOption("-f",seletorFormato(perfil,qualidade));addOption("--merge-output-format","mkv")}
                     addOption("-o",File(dir,"%(title).80s.%(ext)s").absolutePath)
                     addCommands(listOf("--print-to-file","after_move:%(filepath)s",resultFile.absolutePath))
                 }
                 val id="download-${UUID.randomUUID()}";activeId=id
                 YoutubeDL.execute(pedido,id){progresso,_,linha->if(!cancelled){anotar(linha);_estado.value=Estado.Baixando(if(progresso>=0)(progresso/100).coerceIn(0f,1f)else null,if(linha.contains("[Merger]"))"Unindo vídeo e áudio…" else "Baixando da plataforma…")}}
                 conferirCancelamento()
-                val source=File(resultFile.readLines().lastOrNull{it.isNotBlank()} ?: error("O download não gerou um arquivo final."))
+                val source=if(perfil==Perfil.CAPA)dir.listFiles()?.firstOrNull{it.extension.lowercase() in listOf("jpg","jpeg","webp","png")} ?: error("A fonte não disponibilizou capa.")else File(resultFile.readLines().lastOrNull{it.isNotBlank()} ?: error("O download não gerou um arquivo final."))
                 check(source.canonicalFile.parentFile==dir.canonicalFile && source.isFile && source.length()>0){"Arquivo final inválido."}
-                val final=if(perfil==Perfil.VIDEO_ORIGINAL)source else converter(source,perfil,dir)
+                val final=if(perfil==Perfil.VIDEO_ORIGINAL||perfil==Perfil.AUDIO_ORIGINAL)source else converter(source,perfil,dir)
+                try{_previa.value=_previa.value.copy(detalhes=detalhesArquivo(final.name,final.length(),sondarArquivo(final)),arquivoFinal=true)}catch(e:Exception){anotar("Dados finais indisponíveis: ${e.message}")}
                 conferirCancelamento();_estado.value=Estado.Baixando(null,"Salvando no celular…");_estado.value=publicar(final,perfil)
             }catch(e:Exception){anotar(e.message.orEmpty());_estado.value=if(cancelled)Estado.Pronto else Estado.Falhou(erroAmigavel(e.message.orEmpty()))}
             finally{activeId=null;conversion=null;dir.deleteRecursively();_motor.value="yt-dlp ${YoutubeDL.versionName(getApplication()) ?: "incluído"} · pronto"}
         }
     }
     private fun conferirCancelamento(){if(cancelled)throw CancellationException("Cancelado")}
+    private fun sondarArquivo(file:File):String {
+        val app=getApplication<Application>();val base=File(app.noBackupFilesDir,"youtubedl-android/packages")
+        val builder=ProcessBuilder(File(app.applicationInfo.nativeLibraryDir,"libffmpeg.so").absolutePath,"-nostdin","-hide_banner","-i",file.absolutePath).redirectErrorStream(true)
+        builder.environment()["LD_LIBRARY_PATH"]=listOf("python","ffmpeg","aria2c").joinToString(":"){File(base,"$it/usr/lib").absolutePath}
+        val process=builder.start();conversion=process
+        return try{val output=process.inputStream.bufferedReader().readText();process.waitFor();conferirCancelamento();output}finally{process.destroy();conversion=null}
+    }
     internal fun converter(source:File,perfil:Perfil,dir:File):File {
-        val app=getApplication<Application>();val ext=when(perfil){Perfil.AUDIO_MP3->"mp3";Perfil.AUDIO_WAV->"wav";else->"mp4"}
+        val app=getApplication<Application>();val ext=when(perfil){Perfil.AUDIO_MP3->"mp3";Perfil.AUDIO_WAV->"wav";Perfil.AUDIO_FLAC->"flac";Perfil.AUDIO_M4A->"m4a";Perfil.VIDEO_PRORES->"mov";Perfil.CAPA->"png";else->"mp4"}
         val output=File(dir,"${source.nameWithoutExtension}.edit.$ext")
         val base=File(app.noBackupFilesDir,"youtubedl-android/packages")
         val libraryPath=listOf("python","ffmpeg","aria2c").joinToString(":"){File(base,"$it/usr/lib").absolutePath}
@@ -136,6 +144,10 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
         val copyAudio=Regex("Audio: aac[^\n]*48000 Hz").containsMatchIn(description)
         val codec=when(perfil){
             Perfil.AUDIO_MP3->listOf("-vn","-c:a","libmp3lame","-b:a","320k")
+            Perfil.AUDIO_FLAC->listOf("-vn","-c:a","flac")
+            Perfil.AUDIO_M4A->listOf("-vn","-c:a","aac","-b:a","320k")
+            Perfil.VIDEO_PRORES->listOf("-map","0:v:0","-map","0:a:0?","-c:v","prores_ks","-profile:v","3","-pix_fmt","yuv422p10le","-threads","2","-c:a","pcm_s24le","-ar","48000")
+            Perfil.CAPA->listOf("-frames:v","1","-update","1")
             Perfil.AUDIO_WAV->listOf("-vn","-c:a","pcm_s24le","-ar","48000")
             else->listOf("-map","0:v:0","-map","0:a:0?")+
                 (if(copyVideo)listOf("-c:v","copy")else listOf("-c:v","libx264","-crf","16","-preset","veryfast","-pix_fmt","yuv420p","-threads","2"))+
@@ -160,15 +172,15 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
     }
     private fun publicar(arquivo:File,perfil:Perfil):Estado.Concluido {
         val app=getApplication<Application>();val resolver=app.contentResolver
-        val mime=when(arquivo.extension.lowercase()){"mp4"->"video/mp4";"mkv"->"video/x-matroska";"webm"->"video/webm";"mp3"->"audio/mpeg";"wav"->"audio/wav";else->"application/octet-stream"}
+        val mime=when(arquivo.extension.lowercase()){"mp4"->if(perfil.ehAudio)"audio/mp4"else"video/mp4";"mkv"->"video/x-matroska";"webm"->if(perfil.ehAudio)"audio/webm"else"video/webm";"mp3"->"audio/mpeg";"wav"->"audio/wav";"flac"->"audio/flac";"m4a"->"audio/mp4";"mov"->"video/quicktime";"png"->"image/png";"opus"->"audio/ogg";else->"application/octet-stream"}
         if(Build.VERSION.SDK_INT<29){
-            val dir=File(Environment.getExternalStoragePublicDirectory(if(perfil.ehAudio)Environment.DIRECTORY_MUSIC else Environment.DIRECTORY_MOVIES),"MediaDownloader");check(dir.isDirectory || dir.mkdirs())
+            val dir=File(Environment.getExternalStoragePublicDirectory(if(perfil==Perfil.CAPA)Environment.DIRECTORY_PICTURES else if(perfil.ehAudio)Environment.DIRECTORY_MUSIC else Environment.DIRECTORY_MOVIES),"MediaDownloader");check(dir.isDirectory || dir.mkdirs())
             var out=File(dir,arquivo.name);if(out.exists())out=File(dir,"${arquivo.nameWithoutExtension}-${System.currentTimeMillis()}.${arquivo.extension}")
             arquivo.copyTo(out);android.media.MediaScannerConnection.scanFile(app,arrayOf(out.absolutePath),arrayOf(mime),null)
             return Estado.Concluido(out.name,"",mime)
         }
-        val collection=if(perfil.ehAudio)MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)else MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        val values=ContentValues().apply{put(MediaStore.MediaColumns.DISPLAY_NAME,arquivo.name);put(MediaStore.MediaColumns.MIME_TYPE,mime);put(MediaStore.MediaColumns.RELATIVE_PATH,(if(perfil.ehAudio)Environment.DIRECTORY_MUSIC else Environment.DIRECTORY_MOVIES)+"/MediaDownloader");put(MediaStore.MediaColumns.IS_PENDING,1)}
+        val collection=if(perfil==Perfil.CAPA)MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)else if(perfil.ehAudio)MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)else MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val values=ContentValues().apply{put(MediaStore.MediaColumns.DISPLAY_NAME,arquivo.name);put(MediaStore.MediaColumns.MIME_TYPE,mime);put(MediaStore.MediaColumns.RELATIVE_PATH,(if(perfil==Perfil.CAPA)Environment.DIRECTORY_PICTURES else if(perfil.ehAudio)Environment.DIRECTORY_MUSIC else Environment.DIRECTORY_MOVIES)+"/MediaDownloader");put(MediaStore.MediaColumns.IS_PENDING,1)}
         val uri=resolver.insert(collection,values) ?: error("Não foi possível criar o arquivo na galeria.")
         try {
             resolver.openOutputStream(uri)?.use{out->arquivo.inputStream().use{it.copyTo(out)}} ?: error("Não foi possível gravar o arquivo.")

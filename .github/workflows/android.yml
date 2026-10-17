@@ -82,7 +82,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: android-1.3.2-validation
+          name: android-1.3.3-validation
           path: |
             dist/android-apk
             dist/android-device
@@ -92,5 +92,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view android-v1.3.2 >/dev/null 2>&1 || gh release create android-v1.3.2 --target "$GITHUB_SHA" --title 'Android 1.3.2' --notes 'Motor atualizado com QuickJS, miniatura e seletores compactos. Conversão MP4/MP3/WAV testada em emulador Android. Uma instalação antiga com outra assinatura pode exigir remover o APK antigo antes de instalar; mídias já salvas nas pastas públicas são independentes do aplicativo. Plataformas podem exigir autenticação ou bloquear a rede. O download do vídeo específico no aparelho físico ainda precisa de confirmação.'
-          gh release upload android-v1.3.2 dist/android-apk/* --clobber
+          gh release view android-v1.3.3 >/dev/null 2>&1 || gh release create android-v1.3.3 --target "$GITHUB_SHA" --title 'Android 1.3.3' --notes 'Motor atualizado com QuickJS, miniatura e seletores compactos. Conversão MP4/MP3/WAV testada em emulador Android. Uma instalação antiga com outra assinatura pode exigir remover o APK antigo antes de instalar; mídias já salvas nas pastas públicas são independentes do aplicativo. Plataformas podem exigir autenticação ou bloquear a rede. O download do vídeo específico no aparelho físico ainda precisa de confirmação.'
+          gh release upload android-v1.3.3 dist/android-apk/* --clobber

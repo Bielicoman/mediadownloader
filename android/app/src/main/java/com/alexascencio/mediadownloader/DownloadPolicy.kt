@@ -6,7 +6,12 @@ enum class Perfil(val rotulo:String,val detalhe:String,val ehAudio:Boolean) {
     VIDEO_MAX("Vídeo MP4","H.264 + AAC 48 kHz. Conversão apenas quando necessária.",false),
     VIDEO_ORIGINAL("Vídeo original","Preserva os codecs da fonte, sem reconversão.",false),
     AUDIO_MP3("Áudio MP3","320 kbps. Fácil de ouvir e compartilhar.",true),
-    AUDIO_WAV("Áudio WAV","PCM 24-bit / 48 kHz, pronto para edição.",true)
+    AUDIO_WAV("Áudio WAV","PCM 24-bit / 48 kHz.",true),
+    VIDEO_PRORES("Apple ProRes 422 HQ","MOV intraframe. Arquivos grandes; processamento pode demorar.",false),
+    AUDIO_FLAC("Áudio FLAC","Compressão sem perda adicional.",true),
+    AUDIO_M4A("Áudio M4A","AAC até 320 kbps.",true),
+    AUDIO_ORIGINAL("Áudio original","Preserva o codec da fonte, sem recodificar.",true),
+    CAPA("Capa PNG","Imagem disponibilizada pela plataforma.",false)
 }
 enum class Qualidade(val rotulo:String,val limite:Int?) {
     MAXIMA("Máxima disponível",null),OITO_K("Até 8K · 4320p",4320),UHD("Até 4K · 2160p",2160),QHD("Até 2K · 1440p",1440),FULLHD("Até Full HD · 1080p",1080),HD("Até HD · 720p",720),SD("Até 480p",480),BAIXA("Até 360p",360),MINIMA("Até 240p",240),ECONOMICA("Até 144p",144)

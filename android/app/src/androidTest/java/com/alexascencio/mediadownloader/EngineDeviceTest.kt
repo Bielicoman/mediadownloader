@@ -18,7 +18,7 @@ class EngineDeviceTest {
         assertEquals(Estado.Pronto,vm.estado.value)
         assertTrue(File(app.applicationInfo.nativeLibraryDir,"libqjs.so").length()>100000)
         val results=File(app.filesDir,"device-test").apply{mkdirs()}
-        for(perfil in listOf(Perfil.VIDEO_MAX,Perfil.AUDIO_MP3,Perfil.AUDIO_WAV)) {
+        for(perfil in listOf(Perfil.VIDEO_MAX,Perfil.AUDIO_MP3,Perfil.AUDIO_WAV,Perfil.AUDIO_FLAC,Perfil.AUDIO_M4A,Perfil.VIDEO_PRORES,Perfil.CAPA)) {
             val dir=File(app.cacheDir,"test-${perfil.name}").apply{mkdirs()}
             val source=File(dir,"source.mp4")
             InstrumentationRegistry.getInstrumentation().context.assets.open("clip.mp4").use{input->source.outputStream().use{input.copyTo(it)}}
@@ -30,7 +30,7 @@ class EngineDeviceTest {
             builder.environment()["LD_LIBRARY_PATH"]=listOf("python","ffmpeg","aria2c").joinToString(":"){File(base,"$it/usr/lib").absolutePath}
             val process=builder.start();val diagnostic=process.inputStream.bufferedReader().readText()
             assertEquals(diagnostic,0,process.waitFor())
-            assertTrue(diagnostic,when(perfil){Perfil.AUDIO_MP3->diagnostic.contains("Audio: mp3");Perfil.AUDIO_WAV->diagnostic.contains("Audio: pcm_s24le");else->diagnostic.contains("Video: h264") && diagnostic.contains("Audio: aac")})
+            assertTrue(diagnostic,when(perfil){Perfil.CAPA->diagnostic.contains("Video: png");Perfil.VIDEO_PRORES->diagnostic.contains("Video: prores");Perfil.AUDIO_FLAC->diagnostic.contains("Audio: flac");Perfil.AUDIO_M4A->diagnostic.contains("Audio: aac");Perfil.AUDIO_MP3->diagnostic.contains("Audio: mp3");Perfil.AUDIO_WAV->diagnostic.contains("Audio: pcm_s24le");else->diagnostic.contains("Video: h264") && diagnostic.contains("Audio: aac")})
             output.copyTo(File(results,output.name),overwrite=true)
             File(results,"${perfil.name}.txt").writeText(diagnostic)
             dir.deleteRecursively()
