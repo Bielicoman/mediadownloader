@@ -24,3 +24,14 @@ fun detalhesArquivo(name:String,bytes:Long,diagnostic:String):List<Pair<String,S
     val audio=campo("Audio: ([^,\\s]+)")
     return listOf("Arquivo final" to name,"Tamanho (bytes)" to bytes.toString(),"Codec de vídeo" to video,"Codec de áudio" to audio,"Compressão de vídeo" to compressao(video),"Compressão de áudio" to compressao(audio),"Resolução" to campo("(\\d{2,5}x\\d{2,5})(?:[ ,])"),"FPS" to campo("([0-9.]+) fps"),"Amostragem" to campo("(\\d+ Hz)"),"Duração" to campo("Duration: ([0-9:.]+)"),"Bitrate" to campo("bitrate: ([^\\r\\n]+)"),"Leitura nos editores" to "Verifique o contêiner, os codecs e a versão do editor. MP4 H.264/AAC costuma ser aceito; Resolve depende também do sistema/edição, Avid de Link/Import e Final Cut exige Mac.")
 }
+
+fun resumoMidia(previa:Previa):List<Pair<String,String>> {
+    val fields=previa.detalhes.toMap()
+    val missing="Não informado"
+    val duration=if(previa.duracao>0)"${previa.duracao/60}:${(previa.duracao%60).toString().padStart(2,'0')}"else fields["Duração"]?:missing
+    val resolution=fields["Resolução"]?:if(fields["Largura"]?.toDoubleOrNull()!=null&&fields["Altura"]?.toDoubleOrNull()!=null)"${fields["Largura"]} × ${fields["Altura"]}"else missing
+    val codecs=listOfNotNull(fields["Codec de vídeo"],fields["Codec de áudio"]).filter{it!=missing&&it!="none"}.joinToString(" / ").ifBlank{missing}
+    val sample=fields["Amostragem (Hz)"]?.toDoubleOrNull()?.let{"${it/1000} kHz"}?:fields["Amostragem"]?:missing
+    val bytes=(fields["Tamanho (bytes)"]?:fields["Tamanho estimado (bytes)"])?.toDoubleOrNull()
+    return listOf("Duração" to duration,"Resolução" to resolution,"Quadros" to (fields["FPS"]?.takeIf{it!=missing}?.plus(" fps")?:missing),"Codec" to codecs,"Áudio" to sample,(if(previa.arquivoFinal)"Tamanho"else"Tamanho estimado") to (bytes?.takeIf{it>0}?.let{String.format(java.util.Locale.ROOT,"%.1f MB",it/1048576)}?:missing))
+}

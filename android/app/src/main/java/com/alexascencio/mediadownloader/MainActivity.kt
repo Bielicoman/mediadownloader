@@ -168,6 +168,16 @@ class MainActivity:ComponentActivity() {
             if(previa.duracao>0)Text("${previa.duracao/60}:${(previa.duracao%60).toString().padStart(2,'0')}",fontSize=11.sp,color=Apagado)
         }
     }
+    if(previa.detalhes.isNotEmpty())Surface(color=Superficie,shape=RoundedCornerShape(10.dp),border=androidx.compose.foundation.BorderStroke(1.dp,Borda)){
+        Column(Modifier.padding(12.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
+            resumoMidia(previa).chunked(3).forEach{row->Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(10.dp)){row.forEach{(label,value)->Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)){Text(L10n.t(label),fontSize=10.sp,color=Apagado);Text(value,fontSize=12.sp,color=Texto)}}}}
+            HorizontalDivider(color=Borda)
+            Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)){
+                listOf("premiere.png","resolve.png","capcut.png").forEach{icon->AsyncImage(model="file:///android_asset/brands/$icon",imageLoader=imageLoader,contentDescription=icon.substringBefore('.'),modifier=Modifier.size(23.dp),contentScale=ContentScale.Fit)}
+                Text(L10n.t("Compatibilidade indicada pelo formato"),fontSize=10.sp,color=Apagado,modifier=Modifier.weight(1f))
+            }
+        }
+    }
     if(previa.detalhes.isNotEmpty())OutlinedButton(onClick={detailsOpen=true},modifier=Modifier.fillMaxWidth()){Text(if(previa.arquivoFinal)"Ver dados do arquivo final" else "Ver todos os dados da mídia")}
     if(detailsOpen)ModalBottomSheet(onDismissRequest={detailsOpen=false},containerColor=Fundo){
         Column(Modifier.fillMaxWidth().heightIn(max=700.dp).verticalScroll(rememberScrollState()).padding(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
