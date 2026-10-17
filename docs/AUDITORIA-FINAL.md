@@ -30,3 +30,11 @@ Desktop/Adobe 1.4.6, Editores 1.1.7 Beta e Android 1.3.7 Beta.
 ## Parecer
 
 Correções encontradas aplicadas e regressões automatizadas aprovadas. O escopo verificado está documentado; não há base para certificar 100% de todas as plataformas, integrações e situações reais.
+
+## Conferência da entrega
+
+Desktop 1.4.6 e Editores 1.1.7 instalados no Windows com saída 0; painel Adobe atualizado com backup. Download real de jNQXAC9IVRw em H.264/AAC confirmado e completamente decodificado no motor extraído do ASAR instalado. Houve bloqueio de robô e falha de rede antes da repetição bem-sucedida; isso demonstra uma dependência externa, não funcionamento garantido de toda plataforma a qualquer momento.
+
+Foi corrigida uma divergência no lock de desenvolvimento: end-of-stream permanece em 1.4.5 com URL e integridade originais, separado da versão 1.4.6 do aplicativo. O npm ci da validação no GitHub voltou a passar.
+
+Site: botão de estrela aponta para o repositório oficial; Pix apenas copia a chave pública autorizada e não inicia pagamento. Sucesso da cópia confirmado no navegador publicado; alternativa de seleção manual coberta por teste quando o acesso ao clipboard falha. Não há contagem fictícia de estrelas, doações ou valores.
