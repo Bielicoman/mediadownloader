@@ -86,3 +86,9 @@ Release anterior com instaladores distribuídos para Windows, macOS, Linux e And
 - Link de vídeo com list aponta para a coleção; coleções vazias falham com mensagem clara.
 - Limpa resultado anterior ao indexar; desabilita download sem seleção.
 - Menu do site renomeado para Plugins.
+
+## Android 1.3.7 — 2026-10-17
+
+- Ícone adaptativo redesenhado com seta preenchida, amarelo e verde originais, fundo preto sem moldura e profundidade discreta.
+- Arte essencial dentro da área segura das máscaras Android, sem borda branca externa nem seta cortada.
+- Desenho vetorial para telas de alta densidade e ícone de compatibilidade anterior ao Android 8.
