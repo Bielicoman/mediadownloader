@@ -10,7 +10,7 @@ Evite publicar detalhes exploráveis em issues antes de uma análise e correçã
 
 ## Escopo e versões
 
-A linha em desenvolvimento é a v1.3.0 de Windows/CEP. Os instaladores Mac, Linux e Android atualmente vinculados são da v1.0.0 e não receberam validação nativa da nova entrega. Não há garantia de correções retroativas para todos os pacotes anteriores.
+Versões atuais por componente estão em version.json. Desktop Windows 1.4.2, painel Adobe 1.4.2 Beta e Editores 1.1.3 Beta usam atualização verificada. Android é distribuído por release própria; Mac/Linux Desktop anteriores são Beta. Não há garantia de correções retroativas para pacotes antigos.
 
 O programa usa yt-dlp, FFmpeg/FFprobe, Electron e integração CEP. Problemas de uma dependência podem exigir atualização upstream; informe o componente e a versão detectados no diagnóstico.
 
@@ -20,7 +20,7 @@ O programa usa yt-dlp, FFmpeg/FFprobe, Electron e integração CEP. Problemas de
 
 Use downloads de origem conhecida e mantenha suas mídias e projetos protegidos. A política de privacidade publicada no site descreve o tratamento de dados e os serviços externos envolvidos; este arquivo trata do canal para vulnerabilidades.
 
-## Proteções e limites da versão 1.3.0
+## Proteções e limites atuais
 
 - Electron 44.7.2, verificado contra a release oficial; checksum do runtime validado no build local desta entrega.
 - Navegação remota, popups, webviews e permissões de captura/geolocalização bloqueadas.
@@ -34,3 +34,7 @@ Use downloads de origem conhecida e mantenha suas mídias e projetos protegidos.
 O renderer Desktop ainda depende de `nodeIntegration` habilitado e `contextIsolation` desabilitado. A migração completa para uma ponte preload isolada é uma melhoria de arquitetura pendente; os bloqueios de navegação não equivalem a essa migração. Os pacotes Windows não possuem assinatura Authenticode e as atualizações não usam uma assinatura criptográfica própria do projeto. As licenças e a verificação pendente da fonte correspondente FFmpeg são descritas nos avisos de terceiros.
 
 A auditoria npm de dependências de produção retornou zero vulnerabilidades na execução registrada. Esse comando não cobre os executáveis embutidos, dependências de desenvolvimento ou todos os tipos de falha. Nenhuma garantia de ausência absoluta de vulnerabilidades é dada.
+
+## Distribuição e avisos
+
+Consulte docs/AVISOS-DE-INSTALACAO.md. Editor desconhecido, falta de notarização e detecção de malware são situações distintas. Não recomendamos desativar antivírus, Gatekeeper ou Play Protect. SHA-256/SHA-512 verificam integridade, não certificam ausência de malware. Atualizador Electron 6.8.9 corrige GHSA-p2f4-r6v6-j797; não usamos tokens privados nos feeds públicos.

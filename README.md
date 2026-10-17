@@ -1,71 +1,57 @@
-# Media Downloader
+<p align="center"><img src="logo.png" width="76" alt="Media Downloader"></p>
+<h1 align="center">Media Downloader</h1>
+<p align="center">Vídeo, áudio e capas. Um link, sua qualidade, sua pasta.</p>
+<p align="center"><a href="https://mediadownloader-blush.vercel.app">Site e downloads</a> · <a href="docs/INSTALACAO.md">Instalação</a> · <a href="docs/AVISOS-DE-INSTALACAO.md">Avisos de instalação</a> · <a href="docs/README.en.md">English</a></p>
 
-Aplicativo gratuito para baixar vídeos, áudios e capas, com seleção de qualidade, playlists e fila de links. Também oferece um painel CEP para o Adobe Premiere Pro.
+Aplicativo gratuito de Alex Ascencio para mídia autorizada, playlists e arquivos para editores. Código próprio sob MIT; projeto independente dos fabricantes.
 
-Criado por **Alex Ascencio**. [Site e instalação](https://mediadownloader-blush.vercel.app) · [Releases](https://github.com/Bielicoman/mediadownloader/releases) · [Documentação de instalação](docs/INSTALACAO.md)
+## Downloads
 
-## Prévia After Effects
+| Produto | Versão | Canal | Pacote |
+|---|---|---|---|
+| Desktop Windows 10/11 x64 | 1.4.2 | Estável | [EXE](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Windows-x64-Setup.exe) |
+| Painel Premiere e After Effects | 1.4.2 | Beta | [ZIP Adobe](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Adobe-1.4.2.zip) |
+| Editores Windows: Resolve, CapCut e Avid | 1.1.3 | Beta | [Instalador](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Editores-Windows-Setup.exe) |
+| Editores macOS: Final Cut, Resolve e Avid | 1.1.3 | Beta | [ZIP Mac](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Editores-macOS-1.1.3.zip) |
+| Android | 1.3.4 | Beta | [ARM64](https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.4/MediaDownloader-Android-arm64.apk) · [Universal](https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.4/MediaDownloader-Android-universal.apk) |
+| Desktop macOS / Linux | 1.0.0 | Beta, pacote anterior | [Escolher arquitetura](https://mediadownloader-blush.vercel.app/#baixar) |
 
-A branch `feat/after-effects-adapter` contém o painel Adobe 1.4.0 em prévia. O adaptador de importação e camada foi testado no After Effects 26.3x87/Windows; o fluxo completo pelo painel e macOS ainda precisam de validação. O Desktop e os downloads estáveis continuam na 1.3.0. [Instalação e evidências](docs/AFTER-EFFECTS.md).
+Beta identifica uma entrega em avaliação, com compatibilidade variável conforme sistema e editor. Componentes têm versões independentes. O site distribui aplicativos e apresenta uma demonstração interativa; o processamento público de mídia no navegador está desativado.
 
-## Baixar e instalar
+## Recursos
 
-| Plataforma | Pacote | Situação desta entrega |
-|---|---|---|
-| Windows 10/11 x64 | [Instalador EXE v1.3.0](https://github.com/Bielicoman/mediadownloader/releases/download/v1.3.0/MediaDownloader-Windows-x64-Setup.exe) | Aplicativo atualizado; instalador por usuário ou para todos os usuários |
-| Premiere Pro | [Plugin ZIP v1.3.0](https://github.com/Bielicoman/mediadownloader/releases/download/v1.3.0/MediaDownloader.zip) | Painel CEP, com scripts de instalação por usuário para Windows e Mac |
-| macOS Apple Silicon | [DMG v1.0.0](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-AppleSilicon.dmg) | Pacote publicado anterior; execução da nova versão em Mac real não validada |
-| macOS Intel | [DMG v1.0.0](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-macOS-Intel.dmg) | Pacote publicado anterior |
-| Linux x86_64 | [AppImage v1.0.0](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Linux-x86_64.AppImage) | Pacote publicado anterior |
-| Android ARM64 | [APK v1.0.0](https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-arm64.apk) | Pacote publicado anterior |
+- Vídeo/áudio, playlists e vários links no Desktop e no painel Adobe.
+- Escolha entre vídeo e playlist ao colar links combinados; passagem automática ao modo Playlist.
+- Coleções em Lista ou Grade, seleção individual, miniaturas alternativas e controle de tamanho.
+- Limite de resolução, ProRes, WAV, FLAC, MP3, M4A, áudio original e capa PNG.
+- Dados da fonte e do arquivo, codec e orientação de compatibilidade.
+- Seletor de idioma com preferência local. Traduções complementares são Beta; informações técnicas externas mantêm a língua de origem.
+- Atualizações verificadas por hash no Windows/Adobe e APK com confirmação do Android.
 
-A [release v1.3.0](https://github.com/Bielicoman/mediadownloader/releases/tag/v1.3.0) está publicada. O instalador foi baixado pelo endereço público e seu SHA256 corresponde ao pacote instalado e verificado no Windows.
+Escolher 8K não amplia um vídeo menor. Converter para WAV/FLAC não recupera qualidade perdida. O formato original pode exigir conversão no editor.
 
-No Windows, abra o EXE e mantenha **Somente para mim** para instalar no seu usuário. O Desktop inclui yt-dlp, FFmpeg e FFprobe; o usuário final não precisa instalar Python ou Node.js. Para o Premiere, extraia o ZIP inteiro e use o instalador do seu sistema. [Passo a passo](docs/INSTALACAO.md).
+## Começar
 
-## O que mudou na v1.3.0
+Instale o Desktop, cole um link autorizado, confira o destino e baixe. Para editores, instale o painel Adobe ou o aplicativo Editores. No Resolve em português: **Área de Trabalho → Scripts → Media Downloader**. O companion usa mecanismos distintos por editor; não é um plugin interno CapCut, Avid ou Final Cut.
 
-- Download direto pelo yt-dlp, sem depender do aria2c que causava a falha de áudio.
-- Interface Desktop com superfícies de vidro, cores e identidade visual do projeto.
-- Seletores independentes de qualidade em **Vídeo ou áudio**, **Playlist ou canal** e **Vários links**.
-- Quinze opções: máxima; até 8K, 4K, 1440p, 1080p, 720p, 480p e 360p; ProRes; WAV, FLAC, MP3, M4A e áudio original; thumbnail PNG.
-- Qualidade padrão persistente nas Configurações, aplicada ao abrir. Escolher outro formato em uma aba não muda o padrão salvo.
-- Atualizações de motores na pasta do usuário, sem modificar o bundle assinado do Mac.
+## Documentação
 
-A resolução depende da fonte: escolher 8K não amplia um vídeo menor. Converter áudio para WAV ou FLAC não recupera informação perdida na origem. **Áudio original** mantém a codificação da fonte sem conversão.
-
-## O que foi verificado
-
-Em Windows, foram realizados downloads reais de WAV, FLAC, MP3, M4A, áudio original e vídeo 360p, com inspeção dos arquivos e decodificação. Os testes DOM verificaram os quinze presets, independência das três abas, formato recebido pelos trabalhos da fila e persistência do padrão após recarga.
-
-No macOS, cinco cenários de descoberta de motores foram verificados em VM JavaScript com plataforma e filesystem simulados. Isso **não equivale a executar no Mac**. Instalação, abertura e download da nova versão no macOS permanecem sem validação em equipamento real. Os pacotes publicados Mac, Linux e Android continuam na v1.0.0, sem os novos recursos. [Evidências e limites](docs/VALIDACAO.md).
+[Instalação](docs/INSTALACAO.md) · [Integrações](docs/INTEGRACOES.md) · [Atualizações](docs/ATUALIZACOES.md) · [Idiomas](docs/IDIOMAS.md) · [Desenvolvimento](docs/DESENVOLVIMENTO.md) · [Validação técnica](docs/VALIDACAO.md) · [Changelog](CHANGELOG.md) · [Segurança](SECURITY.md)
 
 ## Desenvolvimento
 
-Requisitos: Node.js com npm; Python 3 para gerar o pacote do plugin. A execução Desktop em desenvolvimento exige Electron e os motores locais, conforme [guia de desenvolvimento](docs/DESENVOLVIMENTO.md).
-
 ```sh
+npm ci
+npm ci --prefix app --omit=dev --ignore-scripts
 npm test
-npm run serve
+npm run check
 npm run build:site
-npm run package:plugin
-npm run sync:engine
 ```
 
-[Contribuir](CONTRIBUTING.md) · [Relatar vulnerabilidade](SECURITY.md) · [Histórico de mudanças](CHANGELOG.md)
+Node.js 24 e Python 3 para empacotar. A interface no navegador não executa recursos nativos. Preserve os motores fora do ASAR e use binários da plataforma correta.
 
-## Próximas integrações
+## Licenças e contato
 
-A expansão será feita uma etapa por vez, começando pela conclusão Windows/site/GitHub/Premiere. After Effects, DaVinci Resolve, Final Cut Pro, CapCut e iOS são planos sujeitos a validação; não são plugins compatíveis já entregues. Android tem uma base publicada v1.0.0, ainda sem teste da nova entrega. Veja o [roadmap e os critérios de validação](docs/ROADMAP.md).
+[MIT](LICENSE) para o código próprio; [licenças de terceiros](THIRD-PARTY-NOTICES.md) para os componentes. A fonte correspondente completa do build FFmpeg distribuído continua sendo uma pendência de conformidade; Beta não substitui obrigações de licença.
 
-## Licença e terceiros
-
-O **código próprio** do Media Downloader está sob a [licença MIT](LICENSE). O aplicativo é gratuito; a MIT permite usar, modificar e redistribuir o código com os respectivos avisos.
-
-Os programas embarcados têm licenças próprias. FFmpeg/FFprobe e o executável Windows do yt-dlp incluem componentes GPL; a MIT do projeto não substitui essas condições. Consulte [avisos de terceiros](THIRD-PARTY-NOTICES.md).
-
-A verificação do **código-fonte correspondente completo do build FFmpeg Gyan 6.1.1**, incluindo bibliotecas e scripts da compilação, permanece pendente. Não declaramos conformidade integral resolvida apenas com um link para o repositório genérico do FFmpeg.
-
-## Contato
-
-Dúvidas: **ascencioalexgabriel@gmail.com**. Para bugs, use as [issues](https://github.com/Bielicoman/mediadownloader/issues). Nunca publique cookies, credenciais ou links privados.
+[Relatar problema](https://github.com/Bielicoman/mediadownloader/issues/new/choose) · [Contribuir](CONTRIBUTING.md). Contato: **ascencioalexgabriel@gmail.com**. Não publique cookies, credenciais ou links privados.

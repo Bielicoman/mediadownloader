@@ -1,3 +1,7 @@
+# Serviço web retirado
+
+O processamento público no navegador foi desativado em 17/10/2026. O site oficial é estático e oferece instaladores e uma demonstração identificada. O Render permanece suspenso. O material abaixo é histórico de desenvolvimento local e não anuncia disponibilidade pública.
+
 # Media Downloader no navegador
 
 Interface em `online.html`, API Node em `web/server.cjs`, processamento em `web/jobs.cjs`. Funciona sem instalar componentes no celular/computador visitante. O servidor precisa de Node 24, yt-dlp, FFmpeg e FFprobe. Não inclui envio de cookies pessoais, playlists ou acesso a arquivos locais.

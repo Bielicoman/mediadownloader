@@ -1,7 +1,7 @@
 name: Android - build and device validation
 on:
   push:
-    branches: [feat/after-effects-adapter]
+    branches: [main]
     paths: ["android/**", ".github/workflows/android.yml"]
   workflow_dispatch:
 permissions:
@@ -82,7 +82,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: android-1.3.4-validation
+          name: android-1.3.5-validation
           path: |
             dist/android-apk
             dist/android-device
@@ -92,6 +92,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view android-v1.3.4 >/dev/null 2>&1 || gh release create android-v1.3.4 --target "$GITHUB_SHA" --title 'Android 1.3.4' --notes 'Motor atualizado com QuickJS, miniatura e seletores compactos. Conversão MP4/MP3/WAV testada em emulador Android. Uma instalação antiga com outra assinatura pode exigir remover o APK antigo antes de instalar; mídias já salvas nas pastas públicas são independentes do aplicativo. Plataformas podem exigir autenticação ou bloquear a rede. O download do vídeo específico no aparelho físico ainda precisa de confirmação.'
-          gh release upload android-v1.3.4 dist/android-apk/* --clobber
+          gh release view android-v1.3.5 >/dev/null 2>&1 || gh release create android-v1.3.5 --target "$GITHUB_SHA" --title 'Android 1.3.5 · Beta' --notes 'Android Beta com idiomas e preferência local, atualizações verificadas e formatos de mídia. Consulte README e documentação para instalação, licenças e avisos do sistema. Preserve seus dados antes de substituir uma instalação com assinatura diferente.'
+          gh release upload android-v1.3.5 dist/android-apk/* --clobber
 

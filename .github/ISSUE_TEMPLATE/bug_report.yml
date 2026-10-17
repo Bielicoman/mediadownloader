@@ -10,14 +10,14 @@ body:
     id: version
     attributes:
       label: Versão do Media Downloader
-      placeholder: "Ex.: Desktop Windows 1.3.0"
+      placeholder: "Ex.: Desktop Windows 1.4.2"
     validations:
       required: true
   - type: input
     id: platform
     attributes:
       label: Sistema e host
-      description: "Sistema, arquitetura e versão do Premiere, se houver."
+      description: "Sistema, arquitetura, idioma e versão do editor, se houver."
     validations:
       required: true
   - type: dropdown
@@ -28,7 +28,10 @@ body:
         - Vídeo ou áudio
         - Playlist ou canal
         - Vários links
-        - Plugin Premiere
+        - Painel Adobe (Premiere / After Effects)
+        - Editores (Resolve / CapCut / Avid / Final Cut)
+        - Android
+        - Idioma / tradução
         - Instalador
         - Site
         - Outro

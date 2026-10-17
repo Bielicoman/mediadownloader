@@ -1,7 +1,7 @@
 {
   "pluginId": "com.alexascencio.mediadownloader",
   "name": "Media Downloader",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "channel": "stable",
   "author": "Alex Ascencio",
   "type": "CEP",
@@ -13,18 +13,18 @@
     "macOS"
   ],
   "releaseDate": "2026-10-17",
-  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Adobe-1.4.1.zip",
-  "zipUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Adobe-1.4.1.zip",
+  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Adobe-1.4.2.zip",
+  "zipUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Adobe-1.4.2.zip",
   "mandatory": false,
   "desktop": {
-    "version": "1.4.1",
+    "version": "1.4.2",
     "releaseDate": "2026-10-15",
-    "releasePage": "https://github.com/Bielicoman/mediadownloader/releases/tag/v1.4.1",
+    "releasePage": "https://github.com/Bielicoman/mediadownloader/releases/tag/v1.4.2",
     "builds": {
       "win32-x64": {
         "format": "exe",
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Windows-x64-Setup.exe",
-        "version": "1.4.1"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Windows-x64-Setup.exe",
+        "version": "1.4.2"
       },
       "darwin-arm64": {
         "format": "dmg",
@@ -68,24 +68,25 @@
     "1.2.1": "Novo site com simulador de download e timeline",
     "1.2.0": "Downloads ZXP e ZIP sincronizados",
     "1.1.0": "AtualizaÃ§Ã£o da logo oficial",
-    "1.4.1": "Playlists com escolha, lista e grade ajustáveis, miniaturas alternativas, ações de download acessíveis e atualização verificada no Windows e Adobe."
+    "1.4.1": "Playlists com escolha, lista e grade ajustáveis, miniaturas alternativas, ações de download acessíveis e atualização verificada no Windows e Adobe.",
+    "1.4.2": "Atualizador corrigido, idiomas, demonstração interativa, documentação e avisos de instalação revisados."
   },
   "integrations": {
-    "version": "1.1.2",
-    "channel": "preview",
+    "version": "1.1.3",
+    "channel": "beta",
     "resolve": {
-      "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Resolve-1.1.2.zip",
-      "sha256": "fe139a710bbc9d5e32ef3309940a5aec42bb734a0c7f84128ae4d438c75fcf36",
+      "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Resolve-1.1.3.zip",
+      "sha256": "ea7d9997c99f597629dbe8bce56f0e803e3c4914ebc4a24735bcd53c169675b7",
       "nativeValidation": "pending"
     },
     "editors": {
       "windows": {
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Editores-Windows-Setup.exe",
-        "sha256": "44950b120a066d1d7176090e79c8ae142dae4d06c66c50766093d1c8f04e8020"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Editores-Windows-Setup.exe",
+        "sha256": "2c41d07e4f70cbdeee885e806fff16a2b1811d11806656d6e60e215e715ac0f3"
       },
       "macOS": {
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Editores-macOS-1.1.2.zip",
-        "sha256": "77b7bcc52786e6ef69fd80d7b9a5b6987d9b6fb8c901b1572feacfcc032f6d1d"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Editores-macOS-1.1.3.zip",
+        "sha256": "7808799d31983761334fd5b212c64c07d0bae34142908895656833948985a0aa"
       },
       "targets": [
         "avid",
@@ -97,8 +98,9 @@
     }
   },
   "adobePreview": {
-    "version": "1.4.1",
-    "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Adobe-1.4.1.zip"
+    "version": "1.4.2",
+    "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.2/MediaDownloader-Adobe-1.4.2.zip",
+    "channel": "beta"
   },
-  "sha256": "28ed305d0747da8e6cd7dd557b31e550de7bd942aeb87a2173fbb479d3ed8338"
+  "sha256": "3ef6df94a81e74a5205d3b2279a09ff196710d4342096088bb9e43ba2cecb4ab"
 }

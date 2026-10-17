@@ -385,7 +385,8 @@
         if(window.MediaInfo)window.MediaInfo.render(document.getElementById("mediaDetails"),meta.technical||window.MediaInfo.source({title:meta.title,uploader:meta.uploader}),"icons/editors/");
         elPreviewBox.className = "preview-box active";
         if (meta.thumbnail) {
-            elPreviewThumb.src = meta.thumbnail;
+            if (window.MediaThumbnails) window.MediaThumbnails.set(elPreviewThumb, { url: meta.url || elUrlInput.value, thumbnail: meta.thumbnail });
+            else elPreviewThumb.src = meta.thumbnail;
             elPreviewThumb.style.display = "block";
         } else {
             elPreviewThumb.style.display = "none";
@@ -770,8 +771,8 @@
         if (elBtnRefresh) elBtnRefresh.addEventListener("click", function () {
             checkEnvironment();
             showToast("Verificando ambiente e atualizações...", "info");
-            if (window.MediaDownloaderUpdater) {
-                window.MediaDownloaderUpdater.check(false);
+            if (window.AscencioUpdater) {
+                window.AscencioUpdater.checkNow();
             }
         });
 

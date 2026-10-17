@@ -1,3 +1,20 @@
+# Registro técnico de validação
+
+## Auditoria de 17/10/2026
+
+- Windows 1.4.1 instalado via NSIS: versão extraída do ASAR; executáveis físicos em resources/bin. Download real jNQXAC9IVRw resultou em MP4 H.264/yuv420p e AAC; FFprobe e decodificação FFmpeg passaram.
+- Suíte de regressão e sintaxe passou antes da atualização de segurança. SHA-256 do ZIP Adobe público corresponde ao manifesto; feeds Desktop, Editores e Adobe retornaram HTTP 200 com no-store.
+- Android 1.3.4: GitHub Actions 39037396892 concluiu com sucesso build e validação no emulador. O aparelho físico é um estágio separado.
+- Usuário confirmou abertura do aplicativo pelo menu Scripts do Resolve. Importação no Pool de Mídia, reprodução CapCut e integrações Mac/Avid/Final Cut continuam como validação nativa pendente; na apresentação pública são Beta.
+- Auditoria de dependências identificou GHSA-p2f4-r6v6-j797 em electron-updater 6.6.2 / builder-util-runtime. Atualização para 6.8.9 eliminou os avisos da auditoria de produção.
+- Desktop 1.4.2 e Editores 1.1.3 instalados via NSIS com saída 0; versões, i18n e electron-updater 6.8.9 conferidos nos ASAR instalados. Novo download real MP4 passou em FFprobe e decodificação FFmpeg. Adobe 1.4.2 copiado com backup; reabertura do painel é necessária.
+- Sete testes dedicados de atualização, coleções, idioma e demonstração passaram. Sintaxe: 54 arquivos válidos. Demonstração no navegador completou com metadados e 100%; não usa download de mídia real. Android 1.3.5 aguarda o CI da nova interface de idioma.
+- Traduções são um catálogo incremental: interface principal em seis idiomas; textos fora do catálogo permanecem na origem. Francês, alemão e italiano são apresentados como Beta.
+
+Não substituir validação de host por mocks, build ou abertura da interface no navegador. O selo Beta comunica maturidade ao usuário e não substitui os registros técnicos.
+
+## Registros anteriores
+
 # Validação da entrega v1.3.0
 
 Registro da revisão de 15 de outubro de 2026. Separe sempre teste de código, teste de pacote e execução em equipamento real. Este documento não certifica plataformas que não foram executadas.

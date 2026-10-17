@@ -26,6 +26,8 @@ jobs:
   # aponta para uma release sem os instaladores.
   preparar:
     name: Preparar release
+    outputs:
+      build: ${{ steps.release.outputs.build }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,13 +47,15 @@ jobs:
           done
 
       - name: Criar rascunho
+        id: release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          echo "build=true" >> "$GITHUB_OUTPUT"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             DRAFT=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
-            if [ "$DRAFT" != "true" ]; then echo "ERRO: release publicada; use uma nova tag."; exit 1; fi
+            if [ "$DRAFT" != "true" ]; then echo "Release já publicada; preservando os artefatos."; echo "build=false" >> "$GITHUB_OUTPUT"; exit 0; fi
             echo "Rascunho $TAG existente; os builds anexam a ele."
           else
             gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft \
@@ -62,6 +66,7 @@ jobs:
   macos:
     name: macOS
     needs: preparar
+    if: needs.preparar.outputs.build == 'true'
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -230,6 +235,7 @@ jobs:
   windows:
     name: Windows
     needs: preparar
+    if: needs.preparar.outputs.build == 'true'
     runs-on: windows-latest
     defaults:
       run:
@@ -331,6 +337,7 @@ jobs:
   linux:
     name: Linux
     needs: preparar
+    if: needs.preparar.outputs.build == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -461,6 +468,7 @@ jobs:
   android:
     name: Android
     needs: preparar
+    if: needs.preparar.outputs.build == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -563,6 +571,7 @@ jobs:
   plugin:
     name: Extensao Premiere ZIP
     needs: preparar
+    if: needs.preparar.outputs.build == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

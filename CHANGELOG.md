@@ -1,5 +1,24 @@
 # Histórico de mudanças
 
+## 1.4.2 — 17/10/2026
+
+- Atualizador Electron 6.8.9, com correção da dependência builder-util-runtime.
+- Painel Adobe: verificação manual chama o atualizador correto e prévia usa alternativas de miniatura.
+- Idiomas com preferência local, catálogo compartilhado e traduções complementares Beta.
+- Site com demonstração interativa 3D, mouse, metadados e download simulado explicitamente identificado; navegação suave e movimento reduzido.
+- Documentação, privacidade, cookies, termos, versões e instruções de instalação revisados.
+- Editores 1.1.3 Beta; versões e hashes de publicação independentes.
+
+## 1.4.1 — 17/10/2026
+
+Coleções em lista/grade, controle de tamanho, botões Colar, escolha de vídeo/playlist, passagem entre modos, miniaturas alternativas e atualizações verificadas. Windows instalado e motor real MP4 H.264/AAC validado. Editores 1.1.2.
+
+## Android 1.3.4 — 17/10/2026
+
+Preparação de APK atualizado com hash, identidade e assinatura verificados, instalação confirmada pelo sistema. Build e validação no emulador concluídos.
+
+
+
 ## Adobe 1.4.0 — prévia em desenvolvimento
 
 - Adaptador separado para After Effects 2026: importação no projeto e nova camada na composição ativa.

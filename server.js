@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const root = fs.existsSync(path.join(__dirname, 'dist/site/index.html')) ? path.join(__dirname, 'dist/site') : __dirname;
 const port = Number(process.env.PORT || 3000);
-const allowed = new Set(['index.html','site.css','site.js','online.html','online.css','online.js','version.json','logo.png','favicon.ico','favicon.svg','favicon.png','apple-touch-icon.png','LICENSE','LICENSE.txt','THIRD-PARTY-NOTICES.md','privacidade.html','termos.html','cookies.html','licencas.html','suporte.html','acessibilidade.html']);
+const allowed = new Set(['demo.js','demo.css','i18n.js','i18n.css','seguranca.html','index.html','site.css','site.js','online.html','online.css','online.js','version.json','logo.png','favicon.ico','favicon.svg','favicon.png','apple-touch-icon.png','LICENSE','LICENSE.txt','THIRD-PARTY-NOTICES.md','privacidade.html','termos.html','cookies.html','licencas.html','suporte.html','acessibilidade.html']);
 const types = {'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.txt':'text/plain; charset=utf-8','.md':'text/plain; charset=utf-8','.ttf':'font/ttf'};
 http.createServer((req,res)=>{
   if (!['GET','HEAD'].includes(req.method)) {res.writeHead(405);res.end();return;}

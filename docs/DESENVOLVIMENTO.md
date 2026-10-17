@@ -12,7 +12,7 @@
 | `docs/` | Instalação, desenvolvimento e validação |
 | `.github/workflows/build-desktop.yml` | Build de distribuições por plataforma |
 
-Desktop e CEP têm cópias do motor; mantenha comportamento compatível entre elas. O Desktop possui três abas; o painel CEP atual é de vídeo único.
+Desktop e CEP têm cópias do motor; mantenha comportamento compatível entre elas. Desktop e painel Adobe possuem os três modos. O catálogo de idiomas é compartilhado em i18n.js.
 
 ## Preparar
 
@@ -68,7 +68,7 @@ Antes de publicar, confira:
 5. Links do site correspondentes a arquivos realmente publicados.
 6. Instalação, abertura, download e decodificação no sistema de destino, registrando o que ficou sem teste.
 
-A v1.3.0 atualiza Windows e CEP. O site mantém links explícitos para instaladores Mac/Linux/Android v1.0.0 enquanto novos artefatos não forem produzidos e verificados.
+Windows e Adobe estão na 1.4.2; Editores na 1.1.3. Consulte version.json para a versão realmente publicada de cada arquitetura. Mac/Linux Desktop anteriores são Beta. Veja ATUALIZACOES.md para publicação dos manifestos.
 
 ## Distribuição de terceiros
 

@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="icons/iconNormal.png">
     <!-- Fonte carregada sem bloquear: offline ou atras de proxy o painel abre na hora com a fonte do sistema -->
     <link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/media-info.css"><link rel="stylesheet" href="css/collections.css"></head>
+<link rel="stylesheet" href="css/media-info.css"><link rel="stylesheet" href="css/collections.css"><link rel="stylesheet" href="css/i18n.css"></head>
 <body>
     <div class="app-container">
         <header class="app-header">
@@ -16,7 +16,7 @@
                     <svg viewBox="0 0 20 20" fill="none"><rect x="1" y="1" width="18" height="18" stroke="#e8eaee" stroke-width="1.3"/><path d="M10 4.5v8m0 0L6.5 9M10 12.5L13.5 9" stroke="#ffb020" stroke-width="1.6"/><path d="M4.5 15.5h11" stroke="#3ddc84" stroke-width="1.6"/></svg>
                 </div>
                 <span id="pluginBrandTitle">MEDIA DOWNLOADER</span>
-                <span class="panel-version brand-version-badge" id="pluginVersionTag">v1.4.1</span>
+                <span class="panel-version brand-version-badge" id="pluginVersionTag">v1.4.2</span>
                 <span class="brand-status-dot" id="systemStatusDot" title="Verificando motores..."></span>
             </div>
             <div class="header-actions">
@@ -200,12 +200,12 @@
       pluginId: 'com.alexascencio.mediadownloader',
       pluginName: 'Media Downloader',
       accent: '#ffb020',
-      currentVersion: '1.4.1',
+      currentVersion: '1.4.2',
       manifestUrl: 'https://mediadownloader-blush.vercel.app/updates/adobe/version.json',
       packagePrefix: 'https://github.com/Bielicoman/mediadownloader/releases/download/',
       isBusy: function(){return !!(window.CepCollectionHost&&window.CepCollectionHost.busy());},
       fallbackUrl: 'https://github.com/Bielicoman/mediadownloader/releases/latest'
     });
     </script>
-<script src="js/cep-collections.js"></script></body>
+<script src="js/cep-collections.js"></script><script src="js/i18n.js"></script></body>
 </html>

@@ -1,0 +1,23 @@
+name: Validate source and site
+on:
+  push:
+    branches: [main, feat/after-effects-adapter]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm ci --prefix app --omit=dev --ignore-scripts
+      - run: npm run check
+      - run: npm test
+      - run: node --test tests/i18n-demo.test.cjs
+      - run: npm audit --prefix app --omit=dev --audit-level=high
+      - run: npm run build:site
