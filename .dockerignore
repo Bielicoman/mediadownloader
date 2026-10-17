@@ -1,0 +1,16 @@
+.git
+node_modules
+app
+android
+com.alexascencio.mediadownloader
+.signing
+.vercel
+.env*
+dist
+out
+work
+downloads
+MediaDownloaderPro
+*.zip
+*.zxp
+*.exe

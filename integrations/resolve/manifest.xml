@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BlackmagicDesign><Plugin><Id>com.alexascencio.mediadownloader.resolve</Id><Name>Media Downloader</Name><Version>1.1.0</Version><Description>Baixar mídia e importar no Media Pool</Description><FilePath>companion/main.cjs</FilePath></Plugin></BlackmagicDesign>

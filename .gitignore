@@ -31,3 +31,8 @@ work/
 .vercel/
 .venv/
 __pycache__/
+
+# Generated assets for local companion preview (packaging copies canonical assets)
+integrations/companion/brands/
+integrations/companion/Manrope.ttf
+integrations/companion/logo.png

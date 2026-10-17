@@ -68,5 +68,40 @@
     "1.2.1": "Novo site com simulador de download e timeline",
     "1.2.0": "Downloads ZXP e ZIP sincronizados",
     "1.1.0": "Atualização da logo oficial"
+  },
+  "integrations": {
+    "version": "1.1.0",
+    "channel": "preview",
+    "resolve": {
+      "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.0/MediaDownloader-Resolve-1.1.0.zip",
+      "sha256": "85efdd90fbaa9343fcec4bc871312a7afcd2e5684df188c938340acf05e2c8f9",
+      "nativeValidation": "pending"
+    },
+    "editors": {
+      "windows": {
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.0/MediaDownloader-Editores-Windows-1.1.0.zip",
+        "sha256": "621295763034f80dbe509eb89bf5cffe00ae96840619163cd8f8c18dba0f0484"
+      },
+      "macOS": {
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.0/MediaDownloader-Editores-macOS-1.1.0.zip",
+        "sha256": "ed2a3de7a61ea0bc1208b08a2472abdc4e002ea5ef066faa732b7ddf8d619066"
+      },
+      "targets": [
+        "avid",
+        "final-cut",
+        "capcut",
+        "resolve-external"
+      ],
+      "validated": "Windows companion: real MP4 download and FCPXML export; editor imports pending"
+    }
+  },
+  "adobePreview": {
+    "version": "1.4.0",
+    "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.0-preview/MediaDownloader-Adobe-1.4.0-preview.zip"
+  },
+  "web": {
+    "path": "/#usar-online",
+    "state": "pending-host",
+    "requiresInstall": false
   }
 }
