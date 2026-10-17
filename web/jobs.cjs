@@ -78,7 +78,7 @@ class Jobs {
     });
     if (!source || path.dirname(path.resolve(source))!==j.dir || !fs.existsSync(source)) throw new Error('Vídeo indisponível ou duração acima do limite de uma hora.');
     if(format==='original'){j.file=source;} else {
-      j.stage='Preparando '+(format==='premiere'?'MP4 para edição':format.toUpperCase());j.percent=null;
+      j.stage='Preparando '+(format==='premiere'?'Vídeo MP4':format.toUpperCase());j.percent=null;
       const probe=JSON.parse((await run(this.ffprobe,['-v','error','-show_streams','-show_format','-of','json',source],{windowsHide:true,timeout:30000,maxBuffer:1024*1024})).stdout);
       const video=probe.streams.find(s=>s.codec_type==='video'),sound=probe.streams.find(s=>s.codec_type==='audio'),duration=Number(probe.format.duration);
       const ext=format==='premiere'?'mp4':format;j.file=path.join(j.dir,'final.'+ext);

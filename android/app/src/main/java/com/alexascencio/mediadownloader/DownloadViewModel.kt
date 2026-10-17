@@ -144,7 +144,7 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
         }
         val builder=ProcessBuilder(listOf(File(app.applicationInfo.nativeLibraryDir,"libffmpeg.so").absolutePath,"-nostdin","-hide_banner","-loglevel","error","-y","-i",source.absolutePath)+codec+listOf("-progress","pipe:1",output.absolutePath)).redirectErrorStream(true)
         builder.environment()["LD_LIBRARY_PATH"]=libraryPath
-        fun status(p:Float?)=Estado.Baixando(p,if(perfil.ehAudio)"Convertendo o áudio…" else "Preparando MP4 para edição…")
+        fun status(p:Float?)=Estado.Baixando(p,if(perfil.ehAudio)"Convertendo o áudio…" else "Preparando MP4…")
         _estado.value=status(null);val proc=builder.start();conversion=proc;val errors=StringBuilder()
         try {
             proc.inputStream.bufferedReader().useLines{lines->lines.forEach{linha->

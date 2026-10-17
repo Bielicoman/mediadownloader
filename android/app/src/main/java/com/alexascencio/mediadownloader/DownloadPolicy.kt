@@ -3,7 +3,7 @@ import java.net.URI
 import java.net.URLDecoder
 
 enum class Perfil(val rotulo:String,val detalhe:String,val ehAudio:Boolean) {
-    VIDEO_MAX("MP4 para edição","H.264 + AAC 48 kHz. Converte para edição.",false),
+    VIDEO_MAX("Vídeo MP4","H.264 + AAC 48 kHz. Conversão apenas quando necessária.",false),
     VIDEO_ORIGINAL("Vídeo original","Preserva os codecs da fonte, sem reconversão.",false),
     AUDIO_MP3("Áudio MP3","320 kbps. Fácil de ouvir e compartilhar.",true),
     AUDIO_WAV("Áudio WAV","PCM 24-bit / 48 kHz, pronto para edição.",true)
