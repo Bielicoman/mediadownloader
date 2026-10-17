@@ -79,6 +79,9 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Instalar dependências do aplicativo
+        run: npm ci --prefix app --omit=dev --ignore-scripts
+
       - name: Baixar binarios nativos de macOS
         working-directory: app
         run: |
@@ -239,6 +242,9 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Instalar dependências do aplicativo
+        run: npm ci --prefix app --omit=dev --ignore-scripts
+
       - name: Baixar binarios nativos de Windows
         working-directory: app
         run: |
@@ -333,6 +339,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
+
+      - name: Instalar dependências do aplicativo
+        run: npm ci --prefix app --omit=dev --ignore-scripts
 
       - name: Baixar binarios nativos de Linux
         working-directory: app

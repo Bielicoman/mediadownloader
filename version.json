@@ -1,7 +1,7 @@
 {
   "pluginId": "com.alexascencio.mediadownloader",
   "name": "Media Downloader",
-  "version": "1.3.0",
+  "version": "1.4.1",
   "channel": "stable",
   "author": "Alex Ascencio",
   "type": "CEP",
@@ -12,19 +12,19 @@
     "Windows",
     "macOS"
   ],
-  "releaseDate": "2026-10-15",
-  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.3.0/MediaDownloader.zip",
-  "zipUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.3.0/MediaDownloader.zip",
+  "releaseDate": "2026-10-17",
+  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Adobe-1.4.1.zip",
+  "zipUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Adobe-1.4.1.zip",
   "mandatory": false,
   "desktop": {
-    "version": "1.3.0",
+    "version": "1.4.1",
     "releaseDate": "2026-10-15",
-    "releasePage": "https://github.com/Bielicoman/mediadownloader/releases/tag/v1.3.0",
+    "releasePage": "https://github.com/Bielicoman/mediadownloader/releases/tag/v1.4.1",
     "builds": {
       "win32-x64": {
         "format": "exe",
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.3.0/MediaDownloader-Windows-x64-Setup.exe",
-        "version": "1.3.0"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Windows-x64-Setup.exe",
+        "version": "1.4.1"
       },
       "darwin-arm64": {
         "format": "dmg",
@@ -48,43 +48,44 @@
       },
       "android-arm64": {
         "format": "apk",
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.2/MediaDownloader-Android-arm64.apk",
-        "version": "1.3.2"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.4/MediaDownloader-Android-arm64.apk",
+        "version": "1.3.4"
       },
       "android-arm32": {
         "format": "apk",
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.2/MediaDownloader-Android-arm32.apk",
-        "version": "1.3.2"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.4/MediaDownloader-Android-arm32.apk",
+        "version": "1.3.4"
       },
       "android-universal": {
         "format": "apk",
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.2/MediaDownloader-Android-universal.apk",
-        "version": "1.3.2"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.4/MediaDownloader-Android-universal.apk",
+        "version": "1.3.4"
       }
     }
   },
   "changelog": {
-    "1.3.0": "Interface glass e fonte local; 15 formatos; qualidade padrão salva; Download direto sem aria2; atualização na pasta do usuário; ZIP com instaladores por usuário Windows e Mac",
+    "1.3.0": "Interface glass e fonte local; 15 formatos; qualidade padrÃ£o salva; Download direto sem aria2; atualizaÃ§Ã£o na pasta do usuÃ¡rio; ZIP com instaladores por usuÃ¡rio Windows e Mac",
     "1.2.1": "Novo site com simulador de download e timeline",
     "1.2.0": "Downloads ZXP e ZIP sincronizados",
-    "1.1.0": "Atualização da logo oficial"
+    "1.1.0": "AtualizaÃ§Ã£o da logo oficial",
+    "1.4.1": "Playlists com escolha, lista e grade ajustáveis, miniaturas alternativas, ações de download acessíveis e atualização verificada no Windows e Adobe."
   },
   "integrations": {
-    "version": "1.1.1",
+    "version": "1.1.2",
     "channel": "preview",
     "resolve": {
-      "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.1/MediaDownloader-Resolve-1.1.1.zip",
-      "sha256": "2ebb53b4e433cdf20644ce5cc94bbc88bed84cccb51755356e5ecd4ca4702bd3",
+      "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Resolve-1.1.2.zip",
+      "sha256": "fe139a710bbc9d5e32ef3309940a5aec42bb734a0c7f84128ae4d438c75fcf36",
       "nativeValidation": "pending"
     },
     "editors": {
       "windows": {
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.1/MediaDownloader-Editores-Windows-1.1.1.zip",
-        "sha256": "a2f8e4a53d7277b6736cde67d3422815e0bf7cc56af384be77c00500a4f9d3f6"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Editores-Windows-Setup.exe",
+        "sha256": "44950b120a066d1d7176090e79c8ae142dae4d06c66c50766093d1c8f04e8020"
       },
       "macOS": {
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.1/MediaDownloader-Editores-macOS-1.1.1.zip",
-        "sha256": "c096a8acca70177b3c28b339ab0ceaa2560622ac78cf07fdd3a5413db96c3c13"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Editores-macOS-1.1.2.zip",
+        "sha256": "77b7bcc52786e6ef69fd80d7b9a5b6987d9b6fb8c901b1572feacfcc032f6d1d"
       },
       "targets": [
         "avid",
@@ -96,12 +97,8 @@
     }
   },
   "adobePreview": {
-    "version": "1.4.0",
-    "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.0-preview/MediaDownloader-Adobe-1.4.0-preview.zip"
+    "version": "1.4.1",
+    "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Adobe-1.4.1.zip"
   },
-  "web": {
-    "path": "/#usar-online",
-    "state": "pending-host",
-    "requiresInstall": false
-  }
+  "sha256": "28ed305d0747da8e6cd7dd557b31e550de7bd942aeb87a2173fbb479d3ed8338"
 }

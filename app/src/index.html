@@ -146,7 +146,7 @@
                         <svg viewBox="0 0 24 24"><path d="M19 9H2v2h17V9zm0-4H2v2h17V5zM2 15h13v-2H2v2zm15 0v6l5-3-5-3z"/></svg>
                     </div>
                     <input type="text" id="playlistUrlInput" class="url-input" placeholder="Cole o link da Playlist ou Canal do YouTube..." />
-                    <button id="btnIndexPlaylist" class="btn-paste">
+                    <button type="button" id="btnPastePlaylist" class="btn-paste">Colar</button><button id="btnIndexPlaylist" class="btn-paste">
                         Indexar Vídeos
                     </button>
                 </div>
@@ -200,7 +200,7 @@
         <div id="tab-batch" class="tab-content">
             <div class="main-card">
                 <label style="font-weight:600; color:var(--text-secondary); font-size:11px;">Cole uma lista de URLs (uma por linha):</label>
-                <div id="batchItemsList" aria-label="Mídias da lista"></div><textarea id="batchTextarea" class="batch-textarea" placeholder="Cole um link por vez ou vários de uma vez. Cada mídia aparece na lista acima."></textarea>
+                <button type="button" id="btnPasteBatch" class="btn-paste" aria-label="Colar links na lista">Colar links</button><div id="batchItemsList" aria-label="Mídias da lista"></div><textarea id="batchTextarea" class="batch-textarea" placeholder="Cole um link por vez ou vários de uma vez. Cada mídia aparece na lista acima."></textarea>
                 <div class="custom-select-wrapper" id="customSelectWrapperBatch">
 <input type="hidden" id="selectPresetBatch" value="best" />
 <button type="button" class="custom-select-trigger" id="customSelectTriggerBatch" title="Qualidade e formato" aria-label="Qualidade e formato" aria-expanded="false" aria-controls="customSelectDropdownBatch">
@@ -336,7 +336,7 @@
     <script src="js/bridge.js"></script>
     <script src="js/binManager.js"></script>
     <script src="js/downloader.js"></script>
-    <script src="js/media-info.js"></script><script src="js/collections.js"></script><script src="js/app.js"></script>
+    <script src="js/media-info.js"></script><script src="js/media-thumbnails.js"></script><script src="js/collections.js"></script><script src="js/app.js"></script>
     <script src="js/ui-polish.js"></script>
 </body>
 </html>

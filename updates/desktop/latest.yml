@@ -1,0 +1,8 @@
+version: 1.4.1
+files:
+  - url: https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Windows-x64-Setup.exe
+    sha512: 3XW1OogmxL0XZYfPN1NTvHncCIov1WB5/HQhf9fwSWknEU4dsdw6WO3g5AiFXs1ToWmR561DGtNiKyht7vsFKw==
+    size: 179682868
+path: https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Windows-x64-Setup.exe
+sha512: 3XW1OogmxL0XZYfPN1NTvHncCIov1WB5/HQhf9fwSWknEU4dsdw6WO3g5AiFXs1ToWmR561DGtNiKyht7vsFKw==
+releaseDate: '2026-10-17T13:39:46.674Z'

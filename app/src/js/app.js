@@ -91,10 +91,16 @@
   var currentDownloadId = null;
   var queueCancelled = false;
   var isDownloading = false;
+  function reportBusy(){if(window.desktopAPI&&window.desktopAPI.setDownloadBusy)window.desktopAPI.setDownloadBusy(isDownloading);}
+  if(window.desktopAPI&&window.desktopAPI.onUpdateStatus)window.desktopAPI.onUpdateStatus(function(message){showToast(message,"success");});
   var playlistData = null;
   var playlistView=null,batchView=null,batchItems=[],playlistTimer=null,playlistGeneration=0;
   var historyItems = [];
 
+
+  [['btnPastePlaylist','playlistUrlInput'],['btnPasteBatch','batchTextarea']].forEach(function(pair){var button=document.getElementById(pair[0]);if(!button)return;button.addEventListener('click',async function(){try{var text=await window.Bridge.readClipboard();var input=document.getElementById(pair[1]);if(!text){showToast('A área de transferência está vazia.','error');return;}if(pair[1]==='batchTextarea'&&window.MediaCollections){await appendBatchText(text);return;}input.value=text.trim();input.dispatchEvent(new Event('input',{bubbles:true}));input.focus();}catch(e){showToast('Não foi possível colar. Use Ctrl+V no campo.','error');}});});
+  var batchPasteQueue=Promise.resolve();
+  function appendBatchText(text){batchPasteQueue=batchPasteQueue.then(async function(){try{var links=await window.MediaCollections.expandLinks(text,{container:elBatchTextarea,status:function(message){elBatchCountLabel.textContent=message;}});if(!links.length)return;elBatchTextarea.value=window.MediaCollections.urls(elBatchTextarea.value+'\n'+links.join('\n')).join('\n');handleBatchInput();}catch(e){showToast('Não foi possível adicionar a playlist: '+e.message,'error');}});return batchPasteQueue;}
   // 1. Toast Notification
   function showToast(message, type) {
     if (!elToastContainer) return;
@@ -296,7 +302,10 @@
 
   // 3. Single Video Event Handlers
   var debounceTimer = null;
+  var singlePlaylistPending='';
   function handleUrlChange(url) {
+    if(window.MediaCollections&&window.MediaCollections.playlistUrl(url)){clearTimeout(debounceTimer);if(singlePlaylistPending===url)return;singlePlaylistPending=url;window.MediaCollections.askPlaylist(elUrlInput.closest('.input-capsule')||elUrlInput,url).then(async function(choice){if(elUrlInput.value.trim()!==url)return;if(choice==='playlist'){document.querySelector('[data-tab="tab-playlist"]').click();elPlaylistUrlInput.value=url;handleIndexPlaylist();}else if(choice==='video'){var links=await window.MediaCollections.expandLinks(url,{choose:async function(){return 'video';}});if(links[0]){elUrlInput.value=links[0];handleUrlChange(links[0]);}}}).catch(function(e){showToast(e.message,'error');}).finally(function(){singlePlaylistPending='';});return;}
+
     var thumbnailLink = String(url || "").match(/^https?:\/\/(?:i|img)\.ytimg\.com\/(?:vi|vi_webp)\/([A-Za-z0-9_-]{11})(?:\/|$)/i);
     if (thumbnailLink) { url = "https://www.youtube.com/watch?v=" + thumbnailLink[1]; if (elUrlInput) elUrlInput.value = url; }
     if (!url) {
@@ -339,7 +348,7 @@
     if (!elPreviewBox) return;
     if(window.MediaInfo)window.MediaInfo.render(document.getElementById("mediaDetails"),meta.technical||window.MediaInfo.source({title:meta.title,uploader:meta.uploader}),"icons/editors/");
     elPreviewBox.classList.add("active");
-    if (elPreviewThumb) elPreviewThumb.src = meta.thumbnail || "";
+    if (elPreviewThumb) if(window.MediaThumbnails)window.MediaThumbnails.set(elPreviewThumb,meta);else elPreviewThumb.src = meta.thumbnail || "";
     if (elPreviewDuration) elPreviewDuration.textContent = meta.durationFormatted || "--:--";
     if (elPreviewTitle) elPreviewTitle.textContent = meta.title || "Vídeo Online";
     if (elPreviewMeta) elPreviewMeta.textContent = meta.uploader || "Mídia Web";
@@ -366,6 +375,7 @@
 
   // 4. Download Handlers
   async function startSingleDownload() {
+        if(singlePlaylistPending){showToast("Escolha este vídeo ou a playlist antes de baixar.","info");return;}
     var url = elUrlInput.value.trim();
     if (!url) {
       showToast("Insira um link válido para baixar.", "error");
@@ -381,7 +391,7 @@
     var preset = elSelectPreset.value;
     var outputDir = localStorage.getItem("mediadownloader_download_dir") || window.Downloader.getDefaultDownloadDir();
 
-    isDownloading = true;
+    isDownloading = true; reportBusy();
     showProgressCard(true, meta ? meta.title : "Baixando mídia...");
 
     try {
@@ -416,7 +426,7 @@
     } catch (err) {
       showToast("Erro: " + err.message, "error");
     } finally {
-      isDownloading = false;
+      isDownloading = false; reportBusy();
       currentDownloadId = null;
       setTimeout(function () {
         if (!isDownloading) showProgressCard(false);
@@ -554,7 +564,7 @@
     var preset = elPlaylistPreset.value;
     var outputDir = localStorage.getItem("mediadownloader_download_dir") || window.Downloader.getDefaultDownloadDir();
 
-    isDownloading = true;
+    isDownloading = true; reportBusy();
     queueCancelled = false;
     showToast("Iniciando download de " + selected.length + " vídeos...", "info");
 
@@ -590,7 +600,7 @@
       }
     }
 
-    isDownloading = false;
+    isDownloading = false; reportBusy();
     showProgressCard(false);
     currentDownloadId = null;
     showQueueResult("Playlist", successes, failures, selected.length, queueCancelled);
@@ -601,7 +611,7 @@
     if(!elBatchTextarea)return;
     var urls=window.MediaCollections?window.MediaCollections.urls(elBatchTextarea.value):elBatchTextarea.value.split(/\r?\n/).filter(function(u){return /^https?:\/\//.test(u);});
     var existing={};batchItems.forEach(function(i){existing[i.url]=i;});
-    batchItems=urls.map(function(url){return existing[url]||{url:url,title:url,selected:true};});
+    batchItems=urls.map(function(url){return existing[url]||(window.MediaCollections&&window.MediaCollections.seed(url))||{url:url,title:url,selected:true};});
     if(elBatchCountLabel)elBatchCountLabel.textContent=batchItems.filter(function(i){return i.selected;}).length+" de "+batchItems.length+" links selecionados";
     if(window.MediaCollections){
       if(!batchView)batchView=window.MediaCollections.create({container:document.getElementById("batchItemsList"),key:"batch",paused:function(){return isDownloading;},onSelection:function(){if(elBatchCountLabel)elBatchCountLabel.textContent=batchItems.filter(function(i){return i.selected;}).length+" de "+batchItems.length+" links selecionados";},onRemove:function(item){elBatchTextarea.value=batchItems.filter(function(i){return i.url!==item.url;}).map(function(i){return i.url;}).join("\n");handleBatchInput();}});
@@ -626,7 +636,7 @@
     var preset = elBatchPreset.value;
     var outputDir = localStorage.getItem("mediadownloader_download_dir") || window.Downloader.getDefaultDownloadDir();
 
-    isDownloading = true;
+    isDownloading = true; reportBusy();
     queueCancelled = false;
     showToast("Processando lote de " + urls.length + " mídias...", "info");
 
@@ -661,7 +671,7 @@
       }
     }
 
-    isDownloading = false;
+    isDownloading = false; reportBusy();
     showProgressCard(false);
     var finished={};urls.forEach(function(url,index){if(completed[index])finished[url]=true;});
     elBatchTextarea.value = batchItems.filter(function(item){return !finished[item.url];}).map(function(item){return item.url;}).join("\n");
@@ -793,7 +803,7 @@
 
     // Playlist
     if(elPlaylistUrlInput){elPlaylistUrlInput.addEventListener("input",function(){clearTimeout(playlistTimer);++playlistGeneration;playlistTimer=setTimeout(function(){if(elPlaylistUrlInput.value.trim())handleIndexPlaylist();},650);});}
-    if(elBatchTextarea){elBatchTextarea.addEventListener("paste",function(event){if(!window.MediaCollections||!event.clipboardData)return;var pasted=window.MediaCollections.urls(event.clipboardData.getData("text"));if(!pasted.length)return;event.preventDefault();var all=window.MediaCollections.urls(elBatchTextarea.value+"\n"+pasted.join("\n"));elBatchTextarea.value=all.join("\n");handleBatchInput();});}
+    if(elBatchTextarea){elBatchTextarea.addEventListener("paste",function(event){if(!window.MediaCollections||!event.clipboardData)return;var text=event.clipboardData.getData("text");if(!window.MediaCollections.urls(text).length)return;event.preventDefault();appendBatchText(text);});}
     if (elBtnIndexPlaylist) elBtnIndexPlaylist.addEventListener("click", handleIndexPlaylist);
     if (elBtnToggleSelectAll) elBtnToggleSelectAll.addEventListener("click", toggleSelectAllPlaylist);
     if (elBtnDownloadPlaylist) elBtnDownloadPlaylist.addEventListener("click", startPlaylistDownload);

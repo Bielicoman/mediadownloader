@@ -60,6 +60,8 @@
             if (!isNode || process.platform !== "win32") return [];
             var local = process.env.LOCALAPPDATA || "";
             return [
+                path.join(local, "Programs", "Media Downloader", "resources", "bin", name + ".exe"),
+                path.join(process.env.ProgramFiles || "C:\\Program Files", "Media Downloader", "resources", "bin", name + ".exe"),
                 path.join(local, "Programs", "Media Downloader", "resources", "app", "bin", name + ".exe"),
                 path.join(process.env.ProgramFiles || "C:\\Program Files", "Media Downloader", "resources", "app", "bin", name + ".exe")
             ];

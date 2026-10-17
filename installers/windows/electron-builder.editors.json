@@ -1,0 +1,10 @@
+{
+  "appId": "com.alexascencio.mediadownloader.editors",
+  "productName": "Media Downloader Editores",
+  "artifactName": "MediaDownloader-Editores-Windows-Setup.exe",
+  "compression": "normal",
+  "win": {"target": [{"target": "nsis", "arch": ["x64"]}], "signAndEditExecutable": false, "icon": "../../../../app/icons/icon.ico"},
+  "extraResources": [{"from": "../../../../integrations/resolve/scripts", "to": "resolve-scripts"}],
+  "nsis": {"oneClick": false, "perMachine": false, "selectPerMachineByDefault": false, "allowElevation": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true, "createStartMenuShortcut": true, "runAfterFinish": false, "deleteAppDataOnUninstall": false, "installerLanguages": ["pt_BR", "en_US"], "include": "../../../../installers/windows/editors.nsh"},
+  "publish": {"provider": "generic", "url": "https://mediadownloader-blush.vercel.app/updates/editors"}
+}

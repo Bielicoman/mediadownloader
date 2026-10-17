@@ -1,6 +1,8 @@
 const { ipcRenderer, clipboard, shell } = require("electron");
 
 window.desktopAPI = {
+  setDownloadBusy: value=>ipcRenderer.invoke("updates:busy",value),
+  onUpdateStatus: callback=>ipcRenderer.on("updates:status",(_,message)=>callback(message)),
   // Window controls
   minimize: () => ipcRenderer.invoke("window:minimize"),
   maximize: () => ipcRenderer.invoke("window:maximize"),

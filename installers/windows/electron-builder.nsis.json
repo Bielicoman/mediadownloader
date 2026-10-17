@@ -29,5 +29,19 @@
       "pt_BR",
       "en_US"
     ]
-  }
+  },
+  "publish": {
+    "provider": "generic",
+    "url": "https://mediadownloader-blush.vercel.app/updates/desktop"
+  },
+  "files": [
+    "**/*",
+    "!bin/**/*"
+  ],
+  "extraResources": [
+    {
+      "from": "bin",
+      "to": "bin"
+    }
+  ]
 }

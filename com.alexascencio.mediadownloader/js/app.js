@@ -305,7 +305,10 @@
         }, 400);
     }
 
+    var singlePlaylistPending='';
     function handleUrlChange(url) {
+      if(window.MediaCollections&&window.MediaCollections.playlistUrl(url)){clearTimeout(debounceTimer);if(singlePlaylistPending===url)return;singlePlaylistPending=url;window.MediaCollections.askPlaylist(elUrlInput.closest('.input-capsule')||elUrlInput,url).then(async function(choice){if(elUrlInput.value.trim()!==url)return;if(choice==='playlist'){if(window.CepCollectionUI)window.CepCollectionUI.openPlaylist(url);}else if(choice==='video'){var links=await window.MediaCollections.expandLinks(url,{choose:async function(){return 'video';}});if(links[0]){elUrlInput.value=links[0];handleUrlChange(links[0]);}}}).catch(function(e){showToast(e.message,'error');}).finally(function(){singlePlaylistPending='';});return;}
+
     var thumbnailLink = String(url || "").match(/^https?:\/\/(?:i|img)\.ytimg\.com\/(?:vi|vi_webp)\/([A-Za-z0-9_-]{11})(?:\/|$)/i);
     if (thumbnailLink) { url = "https://www.youtube.com/watch?v=" + thumbnailLink[1]; if (elUrlInput) elUrlInput.value = url; }
         if (!url || (!url.startsWith("http://") && !url.startsWith("https://"))) return;
@@ -408,6 +411,7 @@
     // 4. DOWNLOAD ORCHESTRATION
     // ==========================================
     function startDownload() {
+        if(singlePlaylistPending){showToast("Escolha este vídeo ou a playlist antes de baixar.","info");return;}
         var url = elUrlInput.value.trim();
         if (!url || (!url.startsWith("http://") && !url.startsWith("https://"))) {
             showToast("Cole um link válido para iniciar o download.", "error");
@@ -468,9 +472,7 @@
             return job;
         }).then(function (result) {
             if (generation !== downloadGeneration) return;
-            finishDownloadState();
-            handlePostDownload(result, meta);
-            return result;
+            return Promise.resolve(handlePostDownload(result, meta)).then(function(){finishDownloadState();return result;});
         }).catch(function (err) {
             if (generation !== downloadGeneration) return;
             var cancelled = /cancelado/i.test(err.message);
@@ -498,6 +500,7 @@
         var filePath = result.filePath;
         if(window.Downloader.inspectFile)window.Downloader.inspectFile(filePath).then(function(info){if(window.MediaInfo)window.MediaInfo.render(document.getElementById("mediaDetails"),window.MediaInfo.probe(info,filePath.split(/[\\/]/).pop()),"icons/editors/");}).catch(function(){});
         if (!filePath) return;
+        var delivery=Promise.resolve();
 
         var binName = localStorage.getItem("mediadownloader_bin_name") || "_Downloads";
         var shouldInsert = elToggleInsertTimeline ? elToggleInsertTimeline.checked : true;
@@ -506,14 +509,14 @@
 
         // Inserir na timeline exige importar; "Importar no bin" sozinho so importa.
         if (shouldInsert) {
-            window.Bridge.insertMediaToTimeline(filePath, binName).then(function (res) {
+            delivery=window.Bridge.insertMediaToTimeline(filePath, binName).then(function (res) {
                 showToast(res && res.inserted ? "Inserido " + (isAfterEffects ? "na composição e na pasta " : "na timeline e no bin ") + binName + "." :
                     "Importado " + folderTerm + " " + binName + ". " + ((res && (res.note || res.warning)) || ""), "success");
             }).catch(function (err) {
                 showToast("Baixado, mas o " + hostName + " recusou a importação: " + err.message, "error");
             });
         } else if (shouldImport) {
-            window.Bridge.importMediaFile(filePath, binName).then(function () {
+            delivery=window.Bridge.importMediaFile(filePath, binName).then(function () {
                 showToast("Importado " + folderTerm + " " + binName + ".", "success");
             }).catch(function (err) {
                 showToast("Baixado, mas o " + hostName + " recusou a importação: " + err.message, "error");
@@ -541,6 +544,7 @@
                 elProgressBarFill.style.width = "0%";
             }
         }, 4000);
+        return delivery;
     }
 
     function cancelDownload() {

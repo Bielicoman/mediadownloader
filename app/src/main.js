@@ -20,6 +20,8 @@ try {
 }
 
 let mainWindow = null;
+let downloadBusy=false;
+ipcMain.handle("updates:busy",(event,value)=>{if(mainWindow&&event.sender===mainWindow.webContents)downloadBusy=value===true;});
 
 function createWindow() {
   // No Windows o .ico tem 16 a 256 px; a miniatura da barra de tarefas usa este icone.
@@ -66,6 +68,7 @@ function createWindow() {
   mainWindow.webContents.session.setPermissionCheckHandler(() => false);
   mainWindow.loadFile(path.join(__dirname, "index.html"));
 
+  mainWindow.on("close", event=>{if(downloadBusy)event.preventDefault();});
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
@@ -74,6 +77,7 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 
+  if(app.isPackaged&&process.platform==='win32'){try{require('./auto-update.cjs').start({app,updater:require('electron-updater').autoUpdater,isBusy:()=>downloadBusy,log:console.warn,notify:message=>{if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('updates:status',message);}});}catch(e){console.warn('Atualizações:',e.message);}}
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });

@@ -1,0 +1,8 @@
+version: 1.1.2
+files:
+  - url: https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Editores-Windows-Setup.exe
+    sha512: CN+rlV35szGAKfi/h+U+BuMvX8nPnNRJDSqMLe7OlNA1PGurHbtcMV/eluP2AKfkLm2CzSbnHOmqnscFubItYg==
+    size: 192119295
+path: https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.1/MediaDownloader-Editores-Windows-Setup.exe
+sha512: CN+rlV35szGAKfi/h+U+BuMvX8nPnNRJDSqMLe7OlNA1PGurHbtcMV/eluP2AKfkLm2CzSbnHOmqnscFubItYg==
+releaseDate: '2026-10-17T13:37:34.287Z'

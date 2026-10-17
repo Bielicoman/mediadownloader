@@ -23,5 +23,5 @@
     if(m.description){var desc=add('details','');add('summary','Descrição da mídia',desc);add('p',m.description,desc);}
     if(m.formats&&m.formats.length){var detail=add('details','');add('summary','Formatos da fonte ('+m.formats.length+')',detail);var list=add('ul','',detail);m.formats.forEach(function(f){add('li',[text(f.id),text(f.ext),f.height?f.height+'p':'áudio/sem imagem',f.fps?f.fps+' FPS':'',text(f.vcodec),text(f.acodec),size(f.bytes),rate(f.tbr),text(f.hdr)].filter(Boolean).join(' · '),list);});}
   }
-  var api={source:source,probe:probe,rows:rows,compatibility:compatibility,render:render,compression:compression};if(typeof module==='object'&&module.exports)module.exports=api;else root.MediaInfo=api;
+  var api={source:source,probe:probe,rows:rows,compatibility:compatibility,render:render,compression:compression};if(typeof module==='object'&&module.exports)module.exports=api;if(root)root.MediaInfo=api;
 })(typeof window==='object'?window:this);

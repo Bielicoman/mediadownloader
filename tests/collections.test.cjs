@@ -1,0 +1,14 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path'),{JSDOM}=require('jsdom');
+function setup(){const dom=new JSDOM('<textarea id="input"></textarea>',{runScripts:'outside-only',url:'https://example.test',pretendToBeVisual:true}),w=dom.window;let calls=0;
+ w.Downloader={getInstantPreview(url){const u=new URL(url),id=u.searchParams.get('v');return id?{id,thumbnail:'https://i.ytimg.com/vi/'+id+'/hqdefault.jpg'}:{};},async fetchPlaylistOrChannel(){calls++;return{items:[{url:'https://www.youtube.com/watch?v=jNQXAC9IVRw',title:'Primeiro'},{url:'https://www.youtube.com/watch?v=9sUFp9LfQIo',title:'Segundo'}]};},async fetchMetadata(url){return{url,title:'Dados reais quando disponíveis'};}};
+ for(const name of ['media-thumbnails.js','collections.js'])w.eval(fs.readFileSync(path.join(__dirname,'../app/src/js',name),'utf8'));return {dom,w,calls:()=>calls};}
+test('batch playlist asks before fetching and supports one video, whole playlist and cancellation',async(t)=>{const {dom,w,calls}=setup();t.after(()=>dom.window.close());const api=w.MediaCollections,url='https://www.youtube.com/watch?v=jNQXAC9IVRw&list=PLtest';
+ assert.equal(api.playlistUrl('https://youtube.com.evil.test/?list=PLtest'),null);
+ const single=await api.expandLinks(url,{choose:async()=> 'video'});assert.equal(single.length,1);assert.equal(calls(),0);
+ const full=await api.expandLinks(url,{choose:async()=> 'playlist'});assert.equal(full.length,2);assert.equal(calls(),1);assert.equal(api.seed(full[1]).title,'Segundo');
+ const cancelled=await api.expandLinks(url,{choose:async()=> 'cancel'});assert.equal(cancelled.length,0);assert.equal(calls(),1);
+ const promise=api.expandLinks(url,{container:w.document.querySelector('textarea')});assert.equal(w.document.querySelectorAll('.playlist-choice button').length,3);assert.equal(calls(),1);w.document.querySelector('.playlist-choice button').click();await promise;assert.equal(w.document.querySelectorAll('.playlist-choice').length,0);
+});
+test('collection size slider persists and missing thumbnail exhausts fallbacks without broken image',async(t)=>{const {dom,w}=setup();t.after(()=>dom.window.close());const doc=w.document,container=doc.createElement('div');doc.body.append(container);w.MediaCollections.create({container,key:'test'}).load([{url:'https://www.youtube.com/watch?v=jNQXAC9IVRw',selected:true}]);const slider=doc.querySelector('input[type=range]');slider.value='60';slider.dispatchEvent(new w.Event('input'));assert.equal(container.style.getPropertyValue('--collection-card-width'),'132px');assert.equal(w.localStorage.getItem('media-zoom-test'),'60');
+ const image=container.querySelector('img');for(let i=0;i<6;i++)image.dispatchEvent(new w.Event('error'));assert.match(image.src,/^data:image\/svg/);assert(image.classList.contains('no-thumbnail'));
+});

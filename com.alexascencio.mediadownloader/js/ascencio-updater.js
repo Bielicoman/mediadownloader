@@ -374,6 +374,7 @@
     this.announceIfUpdated();
     var self = this;
     setTimeout(function () { self.check(true); }, cfg.checkDelayMs || 3000);
+    setInterval(function(){if(!self.busy)self.check(true);}, 3600000);
   }
 
   Updater.prototype.auto = function () {
@@ -538,6 +539,7 @@
   /** O caminho de verdade: baixa, extrai, copia e confere. */
   Updater.prototype.run = function (background) {
     if (this.busy || !this.remote) return;
+    if(this.cfg.isBusy&&this.cfg.isBusy()){var paused=this;setTimeout(function(){paused.run(background);},5000);return;}
     var self = this, m = this.remote;
 
     if (!nodeOk) {
@@ -555,6 +557,7 @@
     this.status('Preparando…');
 
     var url = m.downloadUrl || m.zipUrl;
+    if(this.cfg.packagePrefix&&url.indexOf(this.cfg.packagePrefix)!==0){this.busy=false;this.status('O pacote não pertence ao repositório oficial.');return;}
     if (!/^[a-z0-9_.-]+$/i.test(this.cfg.pluginId) || validateManifest(m)) { this.busy = false; return; }
     var tmp = fs.mkdtempSync(pathM.join(os.tmpdir(), 'ascencio-update-'));
     var pkg = pathM.join(tmp, 'package.zxp');
@@ -579,7 +582,11 @@
         : 'Baixando… ' + (got / 1048576).toFixed(1) + ' MB');
     }, function (err) {
       if (err) return fail(err);
-
+      try {
+        if (!/^[a-f0-9]{64}$/i.test(m.sha256 || '')) throw new Error('Manifesto sem SHA-256 verificável.');
+        var digest = req('crypto').createHash('sha256').update(fs.readFileSync(pkg)).digest('hex');
+        if (digest.toLowerCase() !== m.sha256.toLowerCase()) throw new Error('SHA-256 do pacote não confere.');
+      } catch (integrityError) { return fail(integrityError); }
       self.bar(66);
       self.status('Extraindo…');
       extract(pkg, extracted, function (err2) {
@@ -600,7 +607,12 @@
         self.bar(82);
         self.status('Instalando…');
         try {
-          copyDir(src, dest);
+          if(self.cfg.isBusy&&self.cfg.isBusy()){rmrf(tmp);self.busy=false;setTimeout(function(){self.run(background);},5000);return;}
+          var stage=dest+'.update-stage',backup=dest+'.previous-'+Date.now();
+          if(fs.existsSync(stage))rmrf(stage);
+          copyDir(src,stage);
+          fs.renameSync(dest,backup);
+          try{fs.renameSync(stage,dest);}catch(installError){fs.renameSync(backup,dest);throw installError;}
         } catch (e3) {
           return fail(new Error('não deu para gravar em ' + dest + ' (' + e3.message + ')'), true);
         }
