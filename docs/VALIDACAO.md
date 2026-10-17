@@ -119,3 +119,7 @@ Desktop 1.4.3 e Editores 1.1.4 instalados por NSIS, ambos com saída 0; painel A
 Instalação Windows concluída com saída 0 nos dois instaladores. Motor instalado 1.4.4 baixou jNQXAC9IVRw em H.264/AAC; FFprobe e decodificação completa passaram. Clipboard via IPC possui testes de confiança, Unicode e repetição de bloqueio temporário; leitura nativa do Windows passou. Clique real no botão dentro do editor permanece no canal Beta. Android 1.3.6: execução 39056700647 concluída com sucesso, incluindo emulador.
 
 Auditoria: dependências de produção do app sem vulnerabilidades conhecidas; ferramenta de empacotamento atualizada para 26.15.3. Restam oito avisos moderados na cadeia de desenvolvimento. A disponibilização integral do código correspondente de todos os componentes FFmpeg continua pendente conforme THIRD-PARTY-NOTICES.md.
+
+## Correção de indexação 1.4.5
+
+Instaladores Desktop 1.4.5 e Editores 1.1.6 executados com saída 0. Painel Adobe 1.4.5 atualizado com backup. Motor extraído do ASAR instalado consultou o vídeo público jNQXAC9IVRw e retornou exatamente um item selecionado com título real. Testes cobrem link de vídeo com playlist, URLs dos itens e rejeição de coleção vazia. Suíte completa e validação de 58 arquivos passaram.
