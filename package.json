@@ -1,6 +1,6 @@
 {
   "name": "media-downloader",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "private": true,
   "description": "Site, documentação e ferramentas do Media Downloader",
   "license": "MIT",
@@ -17,7 +17,7 @@
     "package:integrations": "python scripts/package-integrations.py"
   },
   "devDependencies": {
-    "electron-builder": "25.1.8",
+    "electron-builder": "26.15.3",
     "jsdom": "26.1.0",
     "rcedit": "4.0.1"
   }

@@ -1,10 +1,11 @@
-const {app,BrowserWindow,ipcMain,dialog,shell,nativeImage,session}=require('electron');
+const {app,BrowserWindow,ipcMain,dialog,shell,nativeImage,session,clipboard}=require('electron');
 const fs=require('node:fs'),path=require('node:path'),{execFile}=require('node:child_process'),{pathToFileURL}=require('node:url');
 const {createEngine}=require('../shared/engine.cjs'),resolveAdapter=require('../shared/resolve.cjs'),{documentForMedia}=require('../shared/fcpxml.cjs');
 const PLUGIN_ID='com.alexascencio.mediadownloader.resolve';
 let win,engine,job=null,lastFile=null,resolve=null,integration=null;
 let outputDir;
 function trusted(event){if(!win||event.sender!==win.webContents||event.senderFrame!==win.webContents.mainFrame)throw Error('Origem de chamada não permitida.');}
+require('./clipboard.cjs').registerClipboard({ipcMain,clipboard,trust:trusted,prefix:'editors:clipboard'});
 function handle(name,fn){ipcMain.handle('editors:'+name,async(event,...args)=>{trusted(event);return fn(...args);});}
 function knownFile(){if(!lastFile||!fs.existsSync(lastFile)||!fs.statSync(lastFile).isFile())throw Error('Baixe ou selecione uma mídia primeiro.');return lastFile;}
 function rememberFile(file){fs.writeFileSync(path.join(statePath,'last-file.txt'),file,'utf8');}

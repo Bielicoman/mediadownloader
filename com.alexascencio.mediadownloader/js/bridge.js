@@ -154,11 +154,10 @@
                 try {
                     var child_process = require("child_process");
                     // pbpaste no macOS; PowerShell no Windows.
-                    var cmdClipboard = process.platform === "darwin"
-                        ? "pbpaste"
-                        : 'powershell.exe -NoProfile -Command "Get-Clipboard"';
+                    var executable=process.platform==='darwin'?'pbpaste':'powershell.exe';
+                    var argumentsList=process.platform==='darwin'?[]:['-NoProfile','-NonInteractive','-Command','[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); Get-Clipboard -Raw'];
                     return new Promise(function (resolve) {
-                        child_process.exec(cmdClipboard, { timeout: 1000 }, function (err, stdout) {
+                        child_process.execFile(executable,argumentsList,{timeout:8000,windowsHide:true,encoding:'utf8',maxBuffer:2*1024*1024},function(err,stdout){
                             if (!err && stdout && stdout.trim()) {
                                 return resolve(stdout.trim());
                             }

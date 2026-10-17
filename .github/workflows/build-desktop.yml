@@ -312,7 +312,7 @@ jobs:
       - name: Gerar instalador EXE com escolha de usuário e pasta
         run: |
           set -euo pipefail
-          npx --yes electron-builder@25.1.8 --win nsis --x64 --publish never \
+          npx --yes electron-builder@26.15.3 --win nsis --x64 --publish never \
             --projectDir app --config ../installers/windows/electron-builder.nsis.json \
             --prepackaged "../out/Media Downloader-win32-x64" \
             --config.directories.output=../dist --config.electronVersion="$ELECTRON_VERSION"

@@ -1,4 +1,4 @@
-const { ipcRenderer, clipboard, shell } = require("electron");
+const { ipcRenderer } = require("electron");
 
 window.desktopAPI = {
   setDownloadBusy: value=>ipcRenderer.invoke("updates:busy",value),
@@ -23,6 +23,6 @@ window.desktopAPI = {
   platform: process.platform,
 
   // Clipboard
-  readClipboard: () => clipboard.readText(),
-  writeClipboard: (text) => clipboard.writeText(text || "")
+  readClipboard: () => ipcRenderer.invoke("clipboard:read"),
+  writeClipboard: (text) => ipcRenderer.invoke("clipboard:write", text || "")
 };

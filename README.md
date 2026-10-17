@@ -9,11 +9,11 @@ Aplicativo gratuito de Alex Ascencio para mídia autorizada, playlists e arquivo
 
 | Produto | Versão | Canal | Pacote |
 |---|---|---|---|
-| Desktop Windows 10/11 x64 | 1.4.3 | Estável | [EXE](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.3/MediaDownloader-Windows-x64-Setup.exe) |
-| Painel Premiere e After Effects | 1.4.3 | Beta | [ZIP Adobe](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.3/MediaDownloader-Adobe-1.4.3.zip) |
-| Editores Windows: Resolve, CapCut e Avid | 1.1.4 | Beta | [Instalador](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.3/MediaDownloader-Editores-Windows-Setup.exe) |
-| Editores macOS: Final Cut, Resolve e Avid | 1.1.4 | Beta | [ZIP Mac](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.3/MediaDownloader-Editores-macOS-1.1.4.zip) |
-| Android | 1.3.5 | Beta | [ARM64](https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.5/MediaDownloader-Android-arm64.apk) · [Universal](https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.5/MediaDownloader-Android-universal.apk) |
+| Desktop Windows 10/11 x64 | 1.4.4 | Estável | [EXE](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Windows-x64-Setup.exe) |
+| Painel Premiere e After Effects | 1.4.4 | Beta | [ZIP Adobe](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Adobe-1.4.4.zip) |
+| Editores Windows: Resolve, CapCut e Avid | 1.1.5 | Beta | [Instalador](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Editores-Windows-Setup.exe) |
+| Editores macOS: Final Cut, Resolve e Avid | 1.1.5 | Beta | [ZIP Mac](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Editores-macOS-1.1.5.zip) |
+| Android | 1.3.6 | Beta | [ARM64](https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.6/MediaDownloader-Android-arm64.apk) · [Universal](https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.6/MediaDownloader-Android-universal.apk) |
 | Desktop macOS / Linux | 1.0.0 | Beta, pacote anterior | [Escolher arquitetura](https://mediadownloader-blush.vercel.app/#baixar) |
 
 Beta identifica uma entrega em avaliação, com compatibilidade variável conforme sistema e editor. Componentes têm versões independentes. O site distribui aplicativos e apresenta uma demonstração interativa; o processamento público de mídia no navegador está desativado.

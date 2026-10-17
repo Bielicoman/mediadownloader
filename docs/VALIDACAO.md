@@ -113,3 +113,9 @@ Pendente: abertura e download/importação através do painel CEP instalado, al�
 ## Cartão de mídia e nova instalação
 
 Desktop 1.4.3 e Editores 1.1.4 instalados por NSIS, ambos com saída 0; painel Adobe 1.4.3 copiado com backup. Motor do ASAR instalado baixou novamente jNQXAC9IVRw em H.264/AAC, conferido e decodificado. Teste do renderizador verificou seis campos com valores reais e seis ícones, preservando a ficha completa. Site publicado conferido em 390 px, sem transbordamento horizontal. Android 1.3.6 está em validação no emulador na execução 39056700647.
+
+## Entrega 1.4.4 / Editores 1.1.5
+
+Instalação Windows concluída com saída 0 nos dois instaladores. Motor instalado 1.4.4 baixou jNQXAC9IVRw em H.264/AAC; FFprobe e decodificação completa passaram. Clipboard via IPC possui testes de confiança, Unicode e repetição de bloqueio temporário; leitura nativa do Windows passou. Clique real no botão dentro do editor permanece no canal Beta. Android 1.3.6: execução 39056700647 concluída com sucesso, incluindo emulador.
+
+Auditoria: dependências de produção do app sem vulnerabilidades conhecidas; ferramenta de empacotamento atualizada para 26.15.3. Restam oito avisos moderados na cadeia de desenvolvimento. A disponibilização integral do código correspondente de todos os componentes FFmpeg continua pendente conforme THIRD-PARTY-NOTICES.md.

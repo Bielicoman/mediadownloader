@@ -21,6 +21,7 @@ try {
 
 let mainWindow = null;
 let downloadBusy=false;
+require("./clipboard.cjs").registerClipboard({ipcMain,clipboard,trust:event=>{if(!mainWindow||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw Error("Origem de chamada não permitida.");}});
 ipcMain.handle("updates:busy",(event,value)=>{if(mainWindow&&event.sender===mainWindow.webContents)downloadBusy=value===true;});
 
 function createWindow() {

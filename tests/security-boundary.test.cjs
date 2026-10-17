@@ -21,7 +21,7 @@ test('Electron denies remote navigation, popups, permissions and executable URL 
   const app={getPath:()=>process.cwd(),setPath(){},whenReady:()=>({then:fn=>fn()}),on(){}};
   const electron={app,BrowserWindow,ipcMain:{handle:(name,fn)=>handlers[name]=fn},shell:{openExternal:async url=>opened.push(url)}};
   const source=fs.readFileSync(path.join(__dirname,'../app/src/main.js'),'utf8');
-  vm.runInNewContext(source,{require(name){return name==='electron'?electron:require(name)},__dirname:path.join(__dirname,'../app/src'),process,console,URL});
+  vm.runInNewContext(source,{require(name){return name==='electron'?electron:name==='./clipboard.cjs'?require('../app/src/clipboard.cjs'):require(name)},__dirname:path.join(__dirname,'../app/src'),process,console,URL});
   let blocked=false;
   events['will-navigate']({preventDefault(){blocked=true}},'https://example.com');
   assert.equal(blocked,true);

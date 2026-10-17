@@ -72,3 +72,10 @@ Entrega Windows/CEP em preparação para publicação. A disponibilidade dos art
 ## 1.0.0
 
 Release anterior com instaladores distribuídos para Windows, macOS, Linux e Android. Consulte os [artefatos e notas originais](https://github.com/Bielicoman/mediadownloader/releases/tag/v1.0.0) para o conteúdo dessa versão.
+
+## 1.4.4 — 2026-10-17
+
+- Colar por IPC nativo com validação do remetente e repetição para bloqueios temporários.
+- Cartão único com miniatura compacta e metadados ao lado.
+- Editores 1.1.5 com botão Colar; ferramentas de empacotamento atualizadas.
+- Android 1.3.6: preparação dos motores visível, ícone e interface revisados.

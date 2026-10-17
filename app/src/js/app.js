@@ -359,7 +359,9 @@
   }
 
   async function handlePaste() {
-    var text = await window.Bridge.readClipboard();
+    var text;
+    try { text = await window.Bridge.readClipboard(); }
+    catch (error) { showToast("Não foi possível acessar a área de transferência. Tente novamente.","error"); if(elUrlInput)elUrlInput.focus(); return; }
     if (text && (text.startsWith("http://") || text.startsWith("https://"))) {
       if (elUrlInput) {
         elUrlInput.value = text.trim();

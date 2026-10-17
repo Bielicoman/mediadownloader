@@ -1,7 +1,7 @@
 {
   "name": "media-downloader-editors",
   "productName": "Media Downloader Editores",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "main": "main.cjs",
   "license": "MIT"
 }

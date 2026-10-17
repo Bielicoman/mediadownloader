@@ -25,3 +25,5 @@ $('deliver').onclick=()=>action(async()=>{if(target==='resolve'&&!info.resolve){
 $('reveal').onclick=()=>action(()=>api.reveal());$('drag').addEventListener('dragstart',event=>{event.preventDefault();if(file&&!busy)api.drag();});
 api.progress(p=>{if(p.percent!==undefined)$('bar').value=Math.min(100,Math.max(0,p.percent));if(p.status)$('status').textContent=p.status;});
 api.info().then(value=>{info=value;refresh();}).catch(e=>feedback(e.message,true));
+
+$('paste').addEventListener('click',()=>action(async()=>{const text=await api.readClipboard();if(!text.trim())throw Error('A área de transferência está vazia.');$('url').value=text.trim();$('url').dispatchEvent(new Event('input',{bubbles:true}));$('url').focus();}));
