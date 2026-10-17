@@ -1,6 +1,8 @@
 const {contextBridge,ipcRenderer}=require('electron');
 contextBridge.exposeInMainWorld('mediaEditors',{
  info:()=>ipcRenderer.invoke('editors:info'),
+ metadata:url=>ipcRenderer.invoke('editors:metadata',url),
+ probe:()=>ipcRenderer.invoke('editors:probe'),
  folder:()=>ipcRenderer.invoke('editors:folder'),
  download:options=>ipcRenderer.invoke('editors:download',options),
  cancel:()=>ipcRenderer.invoke('editors:cancel'),

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Downloader Desktop</title>
     <link rel="stylesheet" href="css/style.css">
-</head>
+<link rel="stylesheet" href="css/media-info.css"><link rel="stylesheet" href="css/collections.css"></head>
 <body>
     <!-- Frameless Desktop Titlebar -->
     <div class="titlebar">
@@ -105,7 +105,7 @@
                     </div>
                 </div>
 
-                <!-- Controls Row: Preset Selector + Action Button -->
+                <section id="mediaDetails" hidden aria-label="Dados da mídia"></section><!-- Controls Row: Preset Selector + Action Button -->
                 <p class="format-caption">Qualidade e formato</p><div class="controls-row">
                     <div class="custom-select-wrapper" id="customSelectWrapper">
 <input type="hidden" id="selectPreset" value="best" />
@@ -200,7 +200,7 @@
         <div id="tab-batch" class="tab-content">
             <div class="main-card">
                 <label style="font-weight:600; color:var(--text-secondary); font-size:11px;">Cole uma lista de URLs (uma por linha):</label>
-                <textarea id="batchTextarea" class="batch-textarea" placeholder="https://www.youtube.com/watch?v=...&#10;https://www.instagram.com/reel/...&#10;https://www.tiktok.com/@..."></textarea>
+                <div id="batchItemsList" aria-label="Mídias da lista"></div><textarea id="batchTextarea" class="batch-textarea" placeholder="Cole um link por vez ou vários de uma vez. Cada mídia aparece na lista acima."></textarea>
                 <div class="custom-select-wrapper" id="customSelectWrapperBatch">
 <input type="hidden" id="selectPresetBatch" value="best" />
 <button type="button" class="custom-select-trigger" id="customSelectTriggerBatch" title="Qualidade e formato" aria-label="Qualidade e formato" aria-expanded="false" aria-controls="customSelectDropdownBatch">
@@ -227,7 +227,7 @@
                     <span id="batchCountLabel" style="color:var(--text-muted); font-size:10.5px;">0 links detectados</span>
                     <button id="btnStartBatch" class="btn-download-primary">
                         <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                        Baixar Todos em Lote
+                        Baixar selecionados
                     </button>
                 </div>
             </div>
@@ -336,7 +336,7 @@
     <script src="js/bridge.js"></script>
     <script src="js/binManager.js"></script>
     <script src="js/downloader.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/media-info.js"></script><script src="js/collections.js"></script><script src="js/app.js"></script>
     <script src="js/ui-polish.js"></script>
 </body>
 </html>

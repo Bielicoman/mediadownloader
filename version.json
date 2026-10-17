@@ -48,18 +48,18 @@
       },
       "android-arm64": {
         "format": "apk",
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-arm64.apk",
-        "version": "1.0.0"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.2/MediaDownloader-Android-arm64.apk",
+        "version": "1.3.2"
       },
       "android-arm32": {
         "format": "apk",
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-arm32.apk",
-        "version": "1.0.0"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.2/MediaDownloader-Android-arm32.apk",
+        "version": "1.3.2"
       },
       "android-universal": {
         "format": "apk",
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.0.0/MediaDownloader-Android-universal.apk",
-        "version": "1.0.0"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.2/MediaDownloader-Android-universal.apk",
+        "version": "1.3.2"
       }
     }
   },

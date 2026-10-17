@@ -7,13 +7,30 @@ const {spawn, execFile} = require('node:child_process');
 const {promisify} = require('node:util');
 const {StringDecoder} = require('node:string_decoder');
 const run = promisify(execFile);
+const mediaInfo=require('../app/src/js/media-info.js');
 const platforms = ['youtube.com','youtu.be','vimeo.com','instagram.com','tiktok.com','facebook.com','fb.watch','twitter.com','x.com'];
 function validateInput(input) {
   let url; try { url = new URL(input.url); } catch { throw new Error('Cole um link completo de vídeo.'); }
   if (url.protocol !== 'https:' || url.username || url.password || url.port || !platforms.some(h=>url.hostname===h || url.hostname.endsWith('.'+h))) throw new Error('Use um link HTTPS do YouTube, Vimeo, Instagram, TikTok, Facebook ou X.');
-  if (!['original','premiere','mp3','wav'].includes(input.format)) throw new Error('Formato inválido.');
+  if (!['original','premiere','prores','mp3','wav','flac','m4a','audio_original','thumbnail'].includes(input.format)) throw new Error('Formato inválido.');
   if (!['best','4320','2160','1440','1080','720','480','360','240','144'].includes(input.quality)) throw new Error('Qualidade inválida.');
   if (url.pathname === '/playlist' || /\/(channel|user|c)\//.test(url.pathname) || /^\/@/.test(url.pathname)) throw new Error('Use o link de um vídeo. Coleções ainda não estão disponíveis na versão web.');
+  const host=url.hostname.toLowerCase().replace(/^www\./,'');
+  if(['youtube.com','m.youtube.com','music.youtube.com','youtu.be'].includes(host)){
+    const id=host==='youtu.be'?url.pathname.split('/')[1]:url.searchParams.get('v')||(/^\/(shorts|live|embed)\/([\w-]+)/.exec(url.pathname)||[])[2];
+    if(!/^[\w-]{11}$/.test(id||''))throw new Error('Use o link de um vídeo, não uma página de redirecionamento.');
+    url=new URL('https://www.youtube.com/watch?v='+id);
+  }else{
+    const safe=(['vimeo.com','player.vimeo.com'].includes(host)&&/^\/(?:video\/)?\d+(?:\/[\w-]+)?\/?$/.test(url.pathname))||
+      (host==='instagram.com'&&/^\/(p|reel|tv)\/[\w-]+\/?$/.test(url.pathname))||
+      (host==='tiktok.com'&&/^\/@[\w.-]+\/video\/\d+\/?$/.test(url.pathname))||
+      (['vm.tiktok.com','vt.tiktok.com'].includes(host)&&/^\/[\w-]+\/?$/.test(url.pathname))||
+      (host==='fb.watch'&&/^\/[\w-]+\/?$/.test(url.pathname))||
+      (host==='facebook.com'&&(/^\/watch\/?$/.test(url.pathname)&&/^\d+$/.test(url.searchParams.get('v')||'')||/^\/[^/]+\/videos\/\d+\/?$/.test(url.pathname)))||
+      (['twitter.com','x.com'].includes(host)&&/^\/[^/]+\/status\/\d+\/?$/.test(url.pathname));
+    if(!safe)throw new Error('Use o endereço direto de um vídeo público de uma plataforma suportada.');
+    const videoId=url.searchParams.get('v');url.search='';if(host==='facebook.com'&&videoId)url.searchParams.set('v',videoId);
+  }
   return {url:url.href,format:input.format,quality:input.quality};
 }
 function stopTree(child) {
@@ -27,19 +44,19 @@ class Jobs {
     this.ffmpeg=options.ffmpeg || process.env.FFMPEG_PATH || 'ffmpeg';
     this.ffprobe=options.ffprobe || process.env.FFPROBE_PATH || 'ffprobe';
     this.root=fs.mkdtempSync(path.join(os.tmpdir(),'media-web-'));
-    this.jobs=new Map(); this.maxJobs=options.maxJobs || 2;
+    this.jobs=new Map(); this.maxJobs=options.maxJobs || Math.min(2,Math.max(1,Number(process.env.MAX_JOBS)||2));
     this.maxBytes=options.maxBytes || 2*1024**3;
     this.timeoutMs=options.timeoutMs || 30*60*1000;
     this.ttlMs=options.ttlMs || 60*60*1000;
     this.timer=setInterval(()=>this.cleanup(),60000); this.timer.unref();
   }
   async ready() { await Promise.all([run(this.ytdlp,['--version'],{timeout:15000,windowsHide:true}),run(this.ffmpeg,['-version'],{timeout:15000,windowsHide:true}),run(this.ffprobe,['-version'],{timeout:15000,windowsHide:true})]); }
-  view(j) { return {id:j.id,state:j.state,stage:j.stage,percent:j.percent,error:j.error,filename:j.filename,bytes:j.bytes,expiresAt:j.expiresAt,downloadUrl:j.state==='ready'?'/api/jobs/'+j.id+'/file':null}; }
-  create(input) {
+  view(j) { return {id:j.id,state:j.state,stage:j.stage,percent:j.percent,error:j.error,filename:j.filename,bytes:j.bytes,expiresAt:j.expiresAt,metadata:j.metadata,downloadUrl:j.state==='ready'&&j.file?'/api/jobs/'+j.id+'/file':null}; }
+  create(input,inspect=false) {
     input=validateInput(input);
     if ([...this.jobs.values()].filter(j=>!['ready','error','cancelled'].includes(j.state)).length>=this.maxJobs || this.jobs.size>=40) { const e=new Error('O serviço está ocupado. Tente novamente em alguns minutos.'); e.status=429; throw e; }
     const id=randomBytes(24).toString('hex'),dir=path.join(this.root,id);
-    fs.mkdirSync(dir); const j={id,dir,input,state:'processing',stage:'Buscando o vídeo',percent:null,created:Date.now(),expiresAt:Date.now()+this.timeoutMs+this.ttlMs,child:null,transfers:0};
+    fs.mkdirSync(dir); const j={id,dir,input,inspect,timeoutMs:inspect?90000:null,state:'processing',stage:'Buscando o vídeo',percent:null,created:Date.now(),expiresAt:Date.now()+this.timeoutMs+this.ttlMs,child:null,transfers:0};
     this.jobs.set(id,j); this.process(j).catch(e=>{if(j.state!=='cancelled'){j.state='error';j.stage='Não foi possível preparar o arquivo';j.error=this.friendlyError(e.message);} this.removeFiles(j);});
     return this.view(j);
   }
@@ -55,9 +72,9 @@ class Jobs {
       let tail=''; const pending=[];
       for(const stream of [child.stdout,child.stderr]) {
         const state={decoder:new StringDecoder('utf8'),buffer:''};pending.push(state);
-        stream.on('data',data=>{const text=state.decoder.write(data);tail=(tail+text).slice(-6000);state.buffer+=text;const lines=state.buffer.split(/[\r\n]+/);state.buffer=lines.pop();for(const line of lines)onLine(line);});
+        stream.on('data',data=>{const text=state.decoder.write(data);tail=(tail+text).slice(-6000);state.buffer+=text;if(state.buffer.length>16*1024*1024){j.failure='Metadados acima do limite de tamanho.';stopTree(child);return;}const lines=state.buffer.split(/[\r\n]+/);state.buffer=lines.pop();for(const line of lines)onLine(line);});
       }
-      const timer=setTimeout(()=>{j.failure='O vídeo excedeu o tempo disponível. Tente um vídeo menor.';stopTree(child);},this.timeoutMs);
+      const timer=setTimeout(()=>{j.failure='O vídeo excedeu o tempo disponível. Tente um vídeo menor.';stopTree(child);},j.timeoutMs||this.timeoutMs);
       const budget=setInterval(()=>{try {const size=fs.readdirSync(j.dir).reduce((n,f)=>n+fs.statSync(path.join(j.dir,f)).size,0);if(size>this.maxBytes){j.failure='O arquivo excedeu o limite de 2 GB da versão web.';stopTree(child);}}catch{}},1000);
       const done=()=>{clearTimeout(timer);clearInterval(budget);if(j.child===child)j.child=null;};
       child.on('error',e=>{done();reject(e);}); child.on('close',code=>{done();for(const state of pending){state.buffer+=state.decoder.end();if(state.buffer)onLine(state.buffer);}if(code===0 && !j.failure && j.state!=='cancelled')resolve(tail);else reject(new Error(j.failure || tail || 'Cancelado.'));});
@@ -65,7 +82,15 @@ class Jobs {
   }
   async process(j) {
     const {url,format,quality}=j.input;
-    const audio=['wav','mp3'].includes(format),filter=quality==='best'?'':`[height<=${quality}]`;
+    if(j.inspect){
+      await this.command(j,this.ytdlp,['--ignore-config','--no-playlist','--skip-download','--dump-single-json','--no-warnings','--js-runtimes','node:'+process.execPath,'--socket-timeout','15','--retries','1','--',url],line=>{if(line.startsWith('{'))try{j.metadata=mediaInfo.source(JSON.parse(line));}catch{j.failure='Metadados acima do limite ou inválidos.';stopTree(j.child);}});
+      if(!j.metadata)throw Error('Metadados indisponíveis.');j.state='ready';j.stage='Dados da fonte';j.expiresAt=Date.now()+5*60000;return;
+    }
+    if(format==='thumbnail'){
+      await this.command(j,this.ytdlp,['--ignore-config','--no-playlist',...(path.isAbsolute(this.ffmpeg)?['--ffmpeg-location',path.dirname(this.ffmpeg)]:[]),'--skip-download','--write-thumbnail','--convert-thumbnails','png','--socket-timeout','20','--retries','2','-o',path.join(j.dir,'cover.%(ext)s'),'--',url]);
+      const name=fs.readdirSync(j.dir).find(n=>n.endsWith('.png'));if(!name)throw Error('Capa não disponível.');j.file=path.join(j.dir,name);j.filename='Capa.png';j.bytes=fs.statSync(j.file).size;j.state='ready';j.stage='Capa pronta';j.expiresAt=Date.now()+this.ttlMs;return;
+    }
+    const audio=['wav','mp3','flac','m4a','audio_original'].includes(format),filter=quality==='best'?'':`[height<=${quality}]`;
     const args=['--ignore-config','--no-playlist','--no-warnings','--no-colors','--newline','--no-simulate','--no-write-info-json','--no-write-thumbnail','--js-runtimes','node:'+process.execPath,'--socket-timeout','20','--retries','2','--fragment-retries','2','--concurrent-fragments','8','--max-filesize',String(this.maxBytes),'--match-filter','!is_live & duration <= 3600','--ffmpeg-location',path.dirname(path.resolve(this.ffmpeg)),'-f',audio?'bestaudio/best':`bestvideo${filter}+bestaudio/best${filter}`,'--merge-output-format','mkv','--print','before_dl:TITLE:%(title)s','--print','after_move:FILE:%(filepath)s','--progress-template','download:PROGRESS:%(progress._percent_str)s','-o',path.join(j.dir,'source.%(ext)s'),'--',url];
     // Let yt-dlp resolve FFmpeg from PATH when a bare executable name is used.
     if(!path.isAbsolute(this.ffmpeg)){const i=args.indexOf('--ffmpeg-location');args.splice(i,2);}
@@ -81,19 +106,21 @@ class Jobs {
       j.stage='Preparando '+(format==='premiere'?'Vídeo MP4':format.toUpperCase());j.percent=null;
       const probe=JSON.parse((await run(this.ffprobe,['-v','error','-show_streams','-show_format','-of','json',source],{windowsHide:true,timeout:30000,maxBuffer:1024*1024})).stdout);
       const video=probe.streams.find(s=>s.codec_type==='video'),sound=probe.streams.find(s=>s.codec_type==='audio'),duration=Number(probe.format.duration);
-      const ext=format==='premiere'?'mp4':format;j.file=path.join(j.dir,'final.'+ext);
+      const ext=format==='premiere'?'mp4':format==='prores'?'mov':format==='audio_original'?path.extname(source).slice(1):format;j.file=path.join(j.dir,'final.'+ext);
       let codecs;
       if(format==='premiere') {
         if(!video)throw new Error('Vídeo sem imagem.');
         const copy=video.codec_name==='h264' && video.pix_fmt==='yuv420p';
         codecs=['-map','0:v:0','-map','0:a:0?',...(copy?['-c:v','copy']:['-c:v','libx264','-preset','veryfast','-crf','16','-pix_fmt','yuv420p']),...(sound && sound.codec_name==='aac' && Number(sound.sample_rate)===48000?['-c:a','copy']:['-c:a','aac','-b:a','320k','-ar','48000']),'-movflags','+faststart'];
-      } else {if(!sound)throw new Error('Vídeo sem áudio.');codecs=['-vn',...(format==='mp3'?['-c:a','libmp3lame','-b:a','320k']:['-c:a','pcm_s24le','-ar','48000'])];}
+      } else if(format==='prores'){if(!video)throw Error('Vídeo sem imagem.');codecs=['-map','0:v:0','-map','0:a:0?','-c:v','prores_ks','-profile:v','3','-pix_fmt','yuv422p10le','-c:a','pcm_s24le','-ar','48000'];}
+      else {if(!sound)throw new Error('Vídeo sem áudio.');codecs=['-vn',...(format==='mp3'?['-c:a','libmp3lame','-b:a','320k']:format==='flac'?['-c:a','flac']:format==='m4a'?['-c:a','aac','-b:a','320k']:format==='audio_original'?['-c:a','copy']:['-c:a','pcm_s24le','-ar','48000'])];}
       await this.command(j,this.ffmpeg,['-nostdin','-hide_banner','-loglevel','error','-y','-i',source,...codecs,'-progress','pipe:1',j.file],line=>{const m=line.match(/^out_time_us=(\d+)/);if(m && duration>0)j.percent=Math.min(99,Number(m[1])/1e6/duration*100);});
       fs.unlinkSync(source);
     }
     const stat=fs.statSync(j.file);if(stat.size===0 || stat.size>this.maxBytes)throw new Error('Arquivo vazio ou acima do limite de tamanho.');
+    try{const probe=JSON.parse((await run(this.ffprobe,['-v','error','-show_streams','-show_format','-of','json',j.file],{windowsHide:true,timeout:15000,maxBuffer:4*1024*1024})).stdout);j.metadata=mediaInfo.probe(probe,path.basename(j.file));}catch{}
     const title=(j.title || 'Media Downloader').replace(/[\x00-\x1f<>:"/\\|?*]/g,'_').slice(0,120);
-    j.filename=title+path.extname(j.file);j.bytes=stat.size;j.state='ready';j.stage='Arquivo pronto';j.percent=100;j.expiresAt=Date.now()+this.ttlMs;
+    j.filename=title+path.extname(j.file);if(j.metadata){j.metadata.filename=j.filename;j.metadata.title=title;}j.bytes=stat.size;j.state='ready';j.stage='Arquivo pronto';j.percent=100;j.expiresAt=Date.now()+this.ttlMs;
   }
   cancel(id) { const j=this.jobs.get(id);if(!j)return false;if(j.state==='ready' && j.transfers)return false;j.state='cancelled';j.stage='Cancelado';stopTree(j.child);if(!j.child)this.removeFiles(j);return true; }
   removeFiles(j) {if(!j.transfers)fs.rmSync(j.dir,{recursive:true,force:true});}

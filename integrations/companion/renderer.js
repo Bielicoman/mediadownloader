@@ -1,5 +1,8 @@
 const api=window.mediaEditors,$=id=>document.getElementById(id);
 let target='resolve',info={},file=null,busy=false;
+let metadataTimer=null,metadataSequence=0;
+function showMedia(value){if(value)window.MediaInfo.render($('media-details'),value,'brands/');}
+$('url').addEventListener('input',()=>{const sequence=++metadataSequence;clearTimeout(metadataTimer);$('media-details').hidden=true;metadataTimer=setTimeout(async()=>{try{const value=await api.metadata($('url').value.trim());if(sequence===metadataSequence)showMedia(value);}catch(e){if(sequence===metadataSequence)feedback('Dados da fonte indisponíveis: '+e.message);}},650);});
 function feedback(text,error=false){$('feedback').textContent=text;$('feedback').classList.toggle('error',error);}
 function refresh(){
  document.querySelectorAll('[data-target]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.target===target)));
@@ -15,8 +18,8 @@ function refresh(){
 async function action(fn){try{await fn();}catch(e){feedback(e.message,true);}finally{refresh();}}
 document.querySelectorAll('[data-target]').forEach(b=>b.addEventListener('click',()=>{target=b.dataset.target;feedback('');refresh();}));
 $('folder').onclick=()=>action(async()=>{info.outputDir=await api.folder();});
-$('select').onclick=()=>action(async()=>{const selected=await api.selectFile();if(selected)file=selected;feedback('Arquivo pronto para entregar ao editor.');});
-$('download').onclick=()=>action(async()=>{busy=true;refresh();$('progress').hidden=false;$('bar').removeAttribute('value');$('status').textContent='Preparando download…';feedback('');try{const result=await api.download({url:$('url').value.trim(),preset:$('preset').value});file=result.filePath;$('status').textContent='Download concluído.';$('bar').value=100;feedback('Mídia pronta. Escolha como levar ao editor.');}catch(e){$('status').textContent=e.message;throw e;}finally{busy=false;}});
+$('select').onclick=()=>action(async()=>{const selected=await api.selectFile();if(selected){file=selected;showMedia(await api.probe());}feedback('Arquivo pronto para entregar ao editor.');});
+$('download').onclick=()=>action(async()=>{busy=true;refresh();$('progress').hidden=false;$('bar').removeAttribute('value');$('status').textContent='Preparando download…';feedback('');try{const result=await api.download({url:$('url').value.trim(),preset:$('preset').value});file=result.filePath;try{showMedia(await api.probe());}catch{}$('status').textContent='Download concluído.';$('bar').value=100;feedback('Mídia pronta. Escolha como levar ao editor.');}catch(e){$('status').textContent=e.message;throw e;}finally{busy=false;}});
 $('cancel').onclick=()=>action(async()=>{await api.cancel();});
 $('deliver').onclick=()=>action(async()=>{if(target==='resolve'){const result=await api.importResolve();if(!result||!result.imported)throw Error('Importação não confirmada.');feedback(result.reused?'Arquivo já estava no Media Pool.':'Arquivo confirmado no Media Pool.');}else if(target==='final-cut'){const result=await api.exportFinalCut();if(result)feedback('FCPXML salvo. Importe-o no Final Cut Pro no Mac.');}else{await api.reveal();feedback(target==='avid'?'Pasta aberta. No Avid, selecione a mídia pelo Source Browser.':'Pasta aberta. Importe ou arraste a mídia para o CapCut.');}});
 $('reveal').onclick=()=>action(()=>api.reveal());$('drag').addEventListener('dragstart',event=>{event.preventDefault();if(file&&!busy)api.drag();});

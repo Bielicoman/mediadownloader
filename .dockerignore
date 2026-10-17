@@ -14,3 +14,14 @@ MediaDownloaderPro
 *.zip
 *.zxp
 *.exe
+
+!app/
+app/*
+!app/src/
+app/src/*
+!app/src/js/
+app/src/js/*
+!app/src/js/media-info.js
+!app/src/css/
+app/src/css/*
+!app/src/css/media-info.css

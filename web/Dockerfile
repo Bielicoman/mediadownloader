@@ -8,6 +8,8 @@ COPY *.html *.css *.js *.json logo.png favicon.svg favicon.ico LICENSE LICENSE.t
 COPY assets assets
 COPY licenses licenses
 COPY web web
+COPY app/src/js/media-info.js app/src/js/media-info.js
+COPY app/src/css/media-info.css app/src/css/media-info.css
 RUN node scripts/build-site.cjs && chown -R node:node /srv/media
 USER node
 EXPOSE 3080

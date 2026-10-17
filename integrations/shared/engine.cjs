@@ -8,7 +8,7 @@ function createEngine({engineDir,binDirs,stateDir,outputDir}) {
  const window={Bridge:{getSystemPaths:async()=>({appPath:path.dirname(engineDir),localBin:path.join(stateDir,'bin'),bundledBins:binDirs,defaultDownloadDir:outputDir})}};
  const context={window,localStorage:storage,require:createRequire(path.join(engineDir,'binManager.js')),process,console,setTimeout,clearTimeout,Buffer,URL};
  vm.createContext(context);
- for(const name of ['binManager.js','downloader.js'])vm.runInContext(fs.readFileSync(path.join(engineDir,name),'utf8'),context,{filename:name});
+ for(const name of ['media-info.js','binManager.js','downloader.js'])vm.runInContext(fs.readFileSync(path.join(engineDir,name),'utf8'),context,{filename:name});
  return {downloader:window.Downloader,binaries:window.BinManager,storage};
 }
 module.exports={createEngine};

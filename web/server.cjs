@@ -13,9 +13,9 @@ function createServer(options={}) {
     try {
       const pathname=new URL(req.url,'http://localhost').pathname;
       if(pathname.startsWith('/api/')){
-        if(req.method==='GET' && pathname==='/api/health')return json(res,ready?200:503,{ready,formats:['original','premiere','mp3','wav'],maxBytes:jobs.maxBytes,retentionMinutes:60});
+        if(req.method==='GET' && pathname==='/api/health')return json(res,ready?200:503,{ready,formats:['original','premiere','prores','mp3','wav','flac','m4a','audio_original','thumbnail'],maxBytes:jobs.maxBytes,retentionMinutes:60});
         const match=pathname.match(/^\/api\/jobs\/([a-f0-9]{48})(\/file)?$/);
-        if(req.method==='POST' && pathname==='/api/jobs'){
+        if(req.method==='POST' && ['/api/jobs','/api/metadata'].includes(pathname)){
           const origin=req.headers.origin;
           if(!origin || origin!==(publicOrigin || 'http://'+req.headers.host))return json(res,403,{error:'Origem não autorizada.'});
           if(!/^application\/json(?:;|$)/i.test(req.headers['content-type']||''))return json(res,415,{error:'Envie JSON.'});
@@ -28,7 +28,7 @@ function createServer(options={}) {
           let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>4096)return json(res,413,{error:'Link muito longo.'});}
           let input;try{input=JSON.parse(body);}catch{return json(res,400,{error:'Pedido inválido.'});}
           if(!input || typeof input!=='object')return json(res,400,{error:'Pedido inválido.'});
-          try {return json(res,202,jobs.create(input));}catch(e){return json(res,e.status||400,{error:e.message});}
+          try {return json(res,202,jobs.create(input,pathname==='/api/metadata'));}catch(e){return json(res,e.status||400,{error:e.message});}
         }
         if(match){
           const j=jobs.jobs.get(match[1]);if(!j || Date.now()>j.expiresAt)return json(res,404,{error:'Download expirado. Prepare o arquivo novamente.'});
@@ -38,7 +38,7 @@ function createServer(options={}) {
             return json(res,jobs.cancel(j.id)?200:409,jobs.view(j));
           }
           if(['GET','HEAD'].includes(req.method) && match[2]){
-            if(j.state!=='ready')return json(res,409,{error:'O arquivo ainda não está pronto.'});
+            if(j.state!=='ready'||!j.file)return json(res,409,{error:'O arquivo ainda não está pronto.'});
             const stat=fs.statSync(j.file);let start=0,end=stat.size-1,status=200;
             if(req.headers.range){const range=req.headers.range.match(/^bytes=(\d+)-(\d*)$/);if(!range || Number(range[1])>=stat.size){res.writeHead(416,{'Content-Range':'bytes */'+stat.size});return res.end();}start=Number(range[1]);end=range[2]?Math.min(Number(range[2]),end):end;if(end<start){res.writeHead(416);return res.end();}status=206;res.setHeader('Content-Range',`bytes ${start}-${end}/${stat.size}`);}
             res.writeHead(status,{'Content-Type':'application/octet-stream','Content-Disposition':`attachment; filename="MediaDownloader${path.extname(j.file)}"; filename*=UTF-8''${encodeURIComponent(j.filename).replace(/['()*]/g,c=>'%'+c.charCodeAt(0).toString(16))}`,'Content-Length':end-start+1,'Accept-Ranges':'bytes','Cache-Control':'private, no-store'});

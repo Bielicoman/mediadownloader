@@ -1,14 +1,14 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {Jobs,validateInput}=require('../web/jobs.cjs'),{createServer}=require('../web/server.cjs');
-const input={url:'https://www.youtube.com/watch?v=test',format:'original',quality:'best'};
+const input={url:'https://www.youtube.com/watch?v=jNQXAC9IVRw',format:'original',quality:'best'};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 test('URL e opções: recusa rede local, credenciais, portas, protocolos e plataformas falsas',()=>{
-  for(const url of ['http://youtube.com/watch?v=x','https://127.0.0.1/','https://localhost/','file:///etc/passwd','https://youtube.com.evil.example/','https://user:pass@youtube.com/','https://youtube.com:8443/','https://www.youtube.com/playlist?list=x'])assert.throws(()=>validateInput({...input,url}));
+  for(const url of ['http://youtube.com/watch?v=x','https://127.0.0.1/','https://localhost/','file:///etc/passwd','https://youtube.com.evil.example/','https://user:pass@youtube.com/','https://youtube.com:8443/','https://www.youtube.com/playlist?list=x','https://www.youtube.com/redirect?q=http://127.0.0.1/','https://evil.youtube.com/watch?v=jNQXAC9IVRw'])assert.throws(()=>validateInput({...input,url}));
   for(const quality of ['best','4320','2160','1440','1080','720','480','360','240','144'])assert.equal(validateInput({...input,quality}).quality,quality);assert.throws(()=>validateInput({...input,format:'../../secret'}));assert.throws(()=>validateInput({...input,quality:'-x'}));
 });
 test('progresso em chunks, entrega original e limite de capacidade',async()=>{
   class FixtureJobs extends Jobs {async command(j,exe,args,onLine){assert(args.includes('--ignore-config'));assert(args.includes('--no-playlist'));assert(!args.includes('--no-check-certificates'));assert.equal(args.at(-1),input.url);onLine('TITLE:Vídeo de teste');onLine('PROGRESS: 50.0%');await wait(40);const file=path.join(j.dir,'source.mkv');fs.writeFileSync(file,'real-fixture-bytes');onLine('FILE:'+file);}}
-  const jobs=new FixtureJobs({maxJobs:1});try{const j=jobs.create(input);assert.throws(()=>jobs.create(input),/ocupado/);assert.equal(jobs.jobs.get(j.id).percent,50);await wait(80);const v=jobs.view(jobs.jobs.get(j.id));assert.equal(v.state,'ready');assert.equal(v.bytes,18);assert.equal(v.filename,'Vídeo de teste.mkv');assert(!JSON.stringify(v).includes(jobs.root));}finally{await jobs.close();}
+  const jobs=new FixtureJobs({maxJobs:1});try{const j=jobs.create(input);assert.throws(()=>jobs.create(input),/ocupado/);assert.equal(jobs.jobs.get(j.id).percent,50);for(let i=0;i<100 && jobs.jobs.get(j.id).state==='processing';i++)await wait(30);const v=jobs.view(jobs.jobs.get(j.id));assert.equal(v.state,'ready');assert.equal(v.bytes,18);assert.equal(v.filename,'Vídeo de teste.mkv');assert(!JSON.stringify(v).includes(jobs.root));}finally{await jobs.close();}
 });
 test('cancelamento encerra processo real e não gera resultado pronto',async()=>{
   const jobs=new Jobs();const j={id:'cancel',state:'processing',dir:fs.mkdtempSync(path.join(jobs.root,'cancel-')),expiresAt:Date.now()+1000};jobs.jobs.set(j.id,j);

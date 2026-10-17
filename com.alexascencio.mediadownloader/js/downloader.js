@@ -291,11 +291,16 @@
                     thumbnail: info.thumbnail || (instant ? instant.thumbnail : ""),
                     platform: platform,
                     maxHeight: (info.formats || []).reduce(function (mx, f) { return Math.max(mx, f.height || 0); }, 0),
+                    technical: window.MediaInfo ? window.MediaInfo.source(info) : null,
                     webpageUrl: info.webpage_url || url
                 };
             });
         },
 
+        inspectFile: function(file) {
+            var self=this;
+            return window.BinManager.findFfmpeg().then(function(ff){var probe=window.BinManager.findFfprobe(ff.path);if(!probe)throw new Error("FFprobe não encontrado.");return self._probe(probe,file);});
+        },
         fetchPlaylistOrChannel: function (url, onProgressStatus) {
             if (!isNode) return Promise.reject(new Error("Disponível apenas no app Desktop."));
             var self = this;
@@ -317,6 +322,7 @@
                         try {
                             var info = JSON.parse(Buffer.concat(out).toString("utf8"));
                             var items = (info.entries || []).map(function (it, idx) {
+                                it=it||{};var unavailable=(!it.id&&!it.url)||/\[(?:Private|Deleted) video\]/i.test(it.title||"");
                                 var thumb = it.thumbnail || (it.thumbnails && it.thumbnails.length ? it.thumbnails[it.thumbnails.length - 1].url : "");
                                 if (!thumb && it.id) thumb = "https://i.ytimg.com/vi/" + it.id + "/hqdefault.jpg";
                                 return {
@@ -327,7 +333,8 @@
                                     uploader: it.uploader || it.channel || info.title || "YouTube",
                                     durationFormatted: it.duration ? formatDuration(it.duration) : "--:--",
                                     thumbnail: thumb,
-                                    selected: true
+                                    unavailable: unavailable,
+                                    selected: !unavailable
                                 };
                             });
                             resolve({

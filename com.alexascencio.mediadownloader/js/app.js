@@ -379,6 +379,7 @@
     }
 
     function displayPreview(meta) {
+        if(window.MediaInfo)window.MediaInfo.render(document.getElementById("mediaDetails"),meta.technical||window.MediaInfo.source({title:meta.title,uploader:meta.uploader}),"icons/editors/");
         elPreviewBox.className = "preview-box active";
         if (meta.thumbnail) {
             elPreviewThumb.src = meta.thumbnail;
@@ -438,7 +439,7 @@
         var meta = currentMetadata;
 
         // Projeto salvo: grava em <pasta do projeto>/<bin>. Sem projeto: pasta das Configurações.
-        window.Bridge.getProjectInfo().then(function (info) {
+        return window.Bridge.getProjectInfo().then(function (info) {
             return info && info.projectFolder ? info.projectFolder : null;
         }, function () {
             return null;
@@ -469,6 +470,7 @@
             if (generation !== downloadGeneration) return;
             finishDownloadState();
             handlePostDownload(result, meta);
+            return result;
         }).catch(function (err) {
             if (generation !== downloadGeneration) return;
             var cancelled = /cancelado/i.test(err.message);
@@ -494,6 +496,7 @@
 
     function handlePostDownload(result, meta) {
         var filePath = result.filePath;
+        if(window.Downloader.inspectFile)window.Downloader.inspectFile(filePath).then(function(info){if(window.MediaInfo)window.MediaInfo.render(document.getElementById("mediaDetails"),window.MediaInfo.probe(info,filePath.split(/[\\/]/).pop()),"icons/editors/");}).catch(function(){});
         if (!filePath) return;
 
         var binName = localStorage.getItem("mediadownloader_bin_name") || "_Downloads";
@@ -850,5 +853,6 @@
         });
     }
 
+    window.CepCollectionHost={busy:function(){return isDownloading;},cancel:cancelDownload,download:function(item){elUrlInput.value=item.url;currentMetadata=item;return startDownload();}};
     document.addEventListener("DOMContentLoaded", init);
 })(window, document);

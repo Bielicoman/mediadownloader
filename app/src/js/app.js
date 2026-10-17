@@ -92,6 +92,7 @@
   var queueCancelled = false;
   var isDownloading = false;
   var playlistData = null;
+  var playlistView=null,batchView=null,batchItems=[],playlistTimer=null,playlistGeneration=0;
   var historyItems = [];
 
   // 1. Toast Notification
@@ -336,6 +337,7 @@
 
   function renderPreview(meta) {
     if (!elPreviewBox) return;
+    if(window.MediaInfo)window.MediaInfo.render(document.getElementById("mediaDetails"),meta.technical||window.MediaInfo.source({title:meta.title,uploader:meta.uploader}),"icons/editors/");
     elPreviewBox.classList.add("active");
     if (elPreviewThumb) elPreviewThumb.src = meta.thumbnail || "";
     if (elPreviewDuration) elPreviewDuration.textContent = meta.durationFormatted || "--:--";
@@ -406,6 +408,7 @@
         thumbnail: meta ? meta.thumbnail : ""
       });
 
+      try{var finalProbe=await window.Downloader.inspectFile(result.filePath);window.MediaInfo.render(document.getElementById("mediaDetails"),window.MediaInfo.probe(finalProbe,result.filePath.split(/[\\/]/).pop()),"icons/editors/");}catch(probeError){console.warn("Dados finais indisponíveis:",probeError.message);}
       // Clear input
       elUrlInput.value = "";
       if (elPreviewBox) elPreviewBox.classList.remove("active");
@@ -449,6 +452,7 @@
       return;
     }
 
+    var requestedUrl=url,requestGeneration=++playlistGeneration;
     elBtnIndexPlaylist.textContent = "Indexando...";
     elBtnIndexPlaylist.disabled = true;
 
@@ -457,6 +461,7 @@
         showToast(status, "info");
       });
 
+      if(requestGeneration!==playlistGeneration||elPlaylistUrlInput.value.trim()!==requestedUrl)return;
       playlistData = pl;
       renderPlaylistUI(pl);
       showToast(pl.itemsCount + " vídeos indexados na playlist!", "success");
@@ -474,6 +479,10 @@
     if (elPlaylistTitle) elPlaylistTitle.textContent = pl.title;
     if (elPlaylistStats) elPlaylistStats.textContent = pl.itemsCount + " vídeos · " + pl.uploader;
 
+    if(window.MediaCollections){
+      if(!playlistView)playlistView=window.MediaCollections.create({container:elPlaylistItemsList,key:"playlist",paused:function(){return isDownloading;},onSelection:updateSelectedCountBadge});
+      playlistView.load(pl.items);updateSelectedCountBadge();return;
+    }
     elPlaylistItemsList.innerHTML = "";
     pl.items.forEach(function (item, idx) {
       var row = document.createElement("div");
@@ -589,22 +598,20 @@
 
   // 6. Batch Downloads
   function handleBatchInput() {
-    var text = elBatchTextarea.value.trim();
-    if (!text) {
-      if (elBatchCountLabel) elBatchCountLabel.textContent = "0 links detectados";
-      return;
+    if(!elBatchTextarea)return;
+    var urls=window.MediaCollections?window.MediaCollections.urls(elBatchTextarea.value):elBatchTextarea.value.split(/\r?\n/).filter(function(u){return /^https?:\/\//.test(u);});
+    var existing={};batchItems.forEach(function(i){existing[i.url]=i;});
+    batchItems=urls.map(function(url){return existing[url]||{url:url,title:url,selected:true};});
+    if(elBatchCountLabel)elBatchCountLabel.textContent=batchItems.filter(function(i){return i.selected;}).length+" de "+batchItems.length+" links selecionados";
+    if(window.MediaCollections){
+      if(!batchView)batchView=window.MediaCollections.create({container:document.getElementById("batchItemsList"),key:"batch",paused:function(){return isDownloading;},onSelection:function(){if(elBatchCountLabel)elBatchCountLabel.textContent=batchItems.filter(function(i){return i.selected;}).length+" de "+batchItems.length+" links selecionados";},onRemove:function(item){elBatchTextarea.value=batchItems.filter(function(i){return i.url!==item.url;}).map(function(i){return i.url;}).join("\n");handleBatchInput();}});
+      batchView.load(batchItems);
     }
-    var lines = text.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(function (l) {
-      return l.startsWith("http://") || l.startsWith("https://");
-    });
-    if (elBatchCountLabel) elBatchCountLabel.textContent = lines.length + " links válidos detectados";
   }
 
   async function startBatchDownload() {
-    var text = elBatchTextarea.value.trim();
-    var urls = text.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(function (l) {
-      return l.startsWith("http://") || l.startsWith("https://");
-    });
+    handleBatchInput();
+    var urls=batchItems.filter(function(i){return i.selected;}).map(function(i){return i.url;});
 
     if (urls.length === 0) {
       showToast("Cole ao menos um link válido na caixa de texto.", "error");
@@ -656,7 +663,8 @@
 
     isDownloading = false;
     showProgressCard(false);
-    elBatchTextarea.value = urls.filter(function (url, index) { return !completed[index]; }).join("\n");
+    var finished={};urls.forEach(function(url,index){if(completed[index])finished[url]=true;});
+    elBatchTextarea.value = batchItems.filter(function(item){return !finished[item.url];}).map(function(item){return item.url;}).join("\n");
     handleBatchInput();
     currentDownloadId = null;
     showQueueResult("Lote", successes, failures, urls.length, queueCancelled);
@@ -784,6 +792,8 @@
     if (elBtnDownload) elBtnDownload.addEventListener("click", startSingleDownload);
 
     // Playlist
+    if(elPlaylistUrlInput){elPlaylistUrlInput.addEventListener("input",function(){clearTimeout(playlistTimer);++playlistGeneration;playlistTimer=setTimeout(function(){if(elPlaylistUrlInput.value.trim())handleIndexPlaylist();},650);});}
+    if(elBatchTextarea){elBatchTextarea.addEventListener("paste",function(event){if(!window.MediaCollections||!event.clipboardData)return;var pasted=window.MediaCollections.urls(event.clipboardData.getData("text"));if(!pasted.length)return;event.preventDefault();var all=window.MediaCollections.urls(elBatchTextarea.value+"\n"+pasted.join("\n"));elBatchTextarea.value=all.join("\n");handleBatchInput();});}
     if (elBtnIndexPlaylist) elBtnIndexPlaylist.addEventListener("click", handleIndexPlaylist);
     if (elBtnToggleSelectAll) elBtnToggleSelectAll.addEventListener("click", toggleSelectAllPlaylist);
     if (elBtnDownloadPlaylist) elBtnDownloadPlaylist.addEventListener("click", startPlaylistDownload);
