@@ -123,3 +123,7 @@ Auditoria: dependências de produção do app sem vulnerabilidades conhecidas; f
 ## Correção de indexação 1.4.5
 
 Instaladores Desktop 1.4.5 e Editores 1.1.6 executados com saída 0. Painel Adobe 1.4.5 atualizado com backup. Motor extraído do ASAR instalado consultou o vídeo público jNQXAC9IVRw e retornou exatamente um item selecionado com título real. Testes cobrem link de vídeo com playlist, URLs dos itens e rejeição de coleção vazia. Suíte completa e validação de 58 arquivos passaram.
+
+## Android 1.3.7 — ícone sem borda
+
+Execução 39060293943: compilação, testes unitários e conversões no emulador concluídos com sucesso. Quatro APKs publicados com SHA-256 conferido contra os digests do GitHub. Site aponta para 1.3.7. Ícone vetorial com fundo escuro, amarelo e verde, sem moldura; arte central preservada na área segura adaptativa. A aparência no launcher Xiaomi físico permanece dependente da máscara do aparelho.
