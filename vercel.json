@@ -48,6 +48,16 @@
       "source": "/MediaDownloader.zxp",
       "destination": "/#premiere",
       "permanent": false
+    },
+    {
+      "source": "/online",
+      "destination": "/#baixar",
+      "permanent": false
+    },
+    {
+      "source": "/online.html",
+      "destination": "/#baixar",
+      "permanent": false
     }
   ]
 }
