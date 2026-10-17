@@ -78,7 +78,7 @@ jobs:
             esac
             cp "$f" "dist/android-apk/MediaDownloader-Android-$name.apk"
           done
-          cd dist/android-apk && sha256sum *.apk > SHA256SUMS.txt
+          if compgen -G 'dist/android-apk/*.apk' >/dev/null; then cd dist/android-apk && sha256sum *.apk > SHA256SUMS.txt; fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -105,7 +105,7 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
                     addOption("--no-mtime");addOption("--newline");addOption("--no-simulate");addOption("--match-filter","!is_live")
                     addOption("-f",seletorFormato(perfil,qualidade));addOption("--merge-output-format","mkv")
                     addOption("-o",File(dir,"%(title).80s.%(ext)s").absolutePath)
-                    addOption("--print-to-file","after_move:%(filepath)s",resultFile.absolutePath)
+                    addCommands(listOf("--print-to-file","after_move:%(filepath)s",resultFile.absolutePath))
                 }
                 val id="download-${UUID.randomUUID()}";activeId=id
                 YoutubeDL.execute(pedido,id){progresso,_,linha->if(!cancelled){anotar(linha);_estado.value=Estado.Baixando(if(progresso>=0)(progresso/100).coerceIn(0f,1f)else null,if(linha.contains("[Merger]"))"Unindo vídeo e áudio…" else "Baixando da plataforma…")}}
