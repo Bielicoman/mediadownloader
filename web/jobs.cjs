@@ -12,7 +12,7 @@ function validateInput(input) {
   let url; try { url = new URL(input.url); } catch { throw new Error('Cole um link completo de vídeo.'); }
   if (url.protocol !== 'https:' || url.username || url.password || url.port || !platforms.some(h=>url.hostname===h || url.hostname.endsWith('.'+h))) throw new Error('Use um link HTTPS do YouTube, Vimeo, Instagram, TikTok, Facebook ou X.');
   if (!['original','premiere','mp3','wav'].includes(input.format)) throw new Error('Formato inválido.');
-  if (!['best','2160','1080','720'].includes(input.quality)) throw new Error('Qualidade inválida.');
+  if (!['best','4320','2160','1440','1080','720','480','360','240','144'].includes(input.quality)) throw new Error('Qualidade inválida.');
   if (url.pathname === '/playlist' || /\/(channel|user|c)\//.test(url.pathname) || /^\/@/.test(url.pathname)) throw new Error('Use o link de um vídeo. Coleções ainda não estão disponíveis na versão web.');
   return {url:url.href,format:input.format,quality:input.quality};
 }
@@ -66,7 +66,7 @@ class Jobs {
   async process(j) {
     const {url,format,quality}=j.input;
     const audio=['wav','mp3'].includes(format),filter=quality==='best'?'':`[height<=${quality}]`;
-    const args=['--ignore-config','--no-playlist','--no-warnings','--no-colors','--newline','--no-simulate','--no-write-info-json','--no-write-thumbnail','--js-runtimes','node:'+process.execPath,'--socket-timeout','20','--retries','2','--fragment-retries','2','--concurrent-fragments','4','--max-filesize',String(this.maxBytes),'--match-filter','!is_live & duration <= 3600','--ffmpeg-location',path.dirname(path.resolve(this.ffmpeg)),'-f',audio?'bestaudio/best':`bestvideo${filter}+bestaudio/best${filter}`,'--merge-output-format','mkv','--print','before_dl:TITLE:%(title)s','--print','after_move:FILE:%(filepath)s','--progress-template','download:PROGRESS:%(progress._percent_str)s','-o',path.join(j.dir,'source.%(ext)s'),'--',url];
+    const args=['--ignore-config','--no-playlist','--no-warnings','--no-colors','--newline','--no-simulate','--no-write-info-json','--no-write-thumbnail','--js-runtimes','node:'+process.execPath,'--socket-timeout','20','--retries','2','--fragment-retries','2','--concurrent-fragments','8','--max-filesize',String(this.maxBytes),'--match-filter','!is_live & duration <= 3600','--ffmpeg-location',path.dirname(path.resolve(this.ffmpeg)),'-f',audio?'bestaudio/best':`bestvideo${filter}+bestaudio/best${filter}`,'--merge-output-format','mkv','--print','before_dl:TITLE:%(title)s','--print','after_move:FILE:%(filepath)s','--progress-template','download:PROGRESS:%(progress._percent_str)s','-o',path.join(j.dir,'source.%(ext)s'),'--',url];
     // Let yt-dlp resolve FFmpeg from PATH when a bare executable name is used.
     if(!path.isAbsolute(this.ffmpeg)){const i=args.indexOf('--ffmpeg-location');args.splice(i,2);}
     let source;

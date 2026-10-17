@@ -6,7 +6,7 @@ O motor de downloads é compartilhado. Cada editor usa um mecanismo diferente; p
 |---|---|---|
 | Premiere Pro | Painel CEP Adobe 1.4.0 | Regressões de código aprovadas; teste nativo de importação pendente |
 | After Effects 2026 | Mesmo painel CEP, adaptador AE separado | Importação e camada testadas no AE 26.3x87; usuário confirmou funcionamento do painel |
-| DaVinci Resolve Studio | Workflow Integration 1.1.0 | APIs conferidas no SDK instalado; contratos testados; execução nativa pendente |
+| DaVinci Resolve Studio | Workflow Integration 1.1.1 | APIs conferidas no SDK instalado; contratos testados; execução nativa pendente |
 | Avid Media Composer | Companion externo: baixar mídia e abrir pasta para Source Browser | Fluxo de arquivo disponível; importação no Avid não testada; não é plugin AVX |
 | Final Cut Pro | Companion externo com exportação FCPXML 1.9 | Geração de XML testada; importação no Final Cut/Mac pendente; não é extensão interna |
 | CapCut | Companion externo com download, pasta e arrastar mídia | Operação do companion verificável no Windows; importação dentro do CapCut pendente; não é painel interno |
@@ -20,7 +20,7 @@ O painel oferece os quinze formatos e a qualidade padrão salva. No After Effect
 ## DaVinci Resolve Studio
 
 1. Instale o Desktop Media Downloader para disponibilizar yt-dlp, FFmpeg e FFprobe.
-2. Extraia `MediaDownloader-Resolve-1.1.0.zip` inteiro.
+2. Extraia `MediaDownloader-Resolve-1.1.1.zip` inteiro.
 3. Execute `Instalar-Resolve.ps1` no Windows ou `Instalar-Resolve.command` no Mac.
 4. Reinicie o Resolve e abra **Workspace > Workflow Integrations > Media Downloader**.
 5. Baixe um link e clique em **Importar no Media Pool**. Um footage existente é reutilizado pelo caminho completo. A timeline permanece intacta.

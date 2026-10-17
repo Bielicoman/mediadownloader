@@ -70,21 +70,21 @@
     "1.1.0": "Atualização da logo oficial"
   },
   "integrations": {
-    "version": "1.1.0",
+    "version": "1.1.1",
     "channel": "preview",
     "resolve": {
-      "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.0/MediaDownloader-Resolve-1.1.0.zip",
-      "sha256": "85efdd90fbaa9343fcec4bc871312a7afcd2e5684df188c938340acf05e2c8f9",
+      "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.1/MediaDownloader-Resolve-1.1.1.zip",
+      "sha256": "2ebb53b4e433cdf20644ce5cc94bbc88bed84cccb51755356e5ecd4ca4702bd3",
       "nativeValidation": "pending"
     },
     "editors": {
       "windows": {
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.0/MediaDownloader-Editores-Windows-1.1.0.zip",
-        "sha256": "621295763034f80dbe509eb89bf5cffe00ae96840619163cd8f8c18dba0f0484"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.1/MediaDownloader-Editores-Windows-1.1.1.zip",
+        "sha256": "a2f8e4a53d7277b6736cde67d3422815e0bf7cc56af384be77c00500a4f9d3f6"
       },
       "macOS": {
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.0/MediaDownloader-Editores-macOS-1.1.0.zip",
-        "sha256": "ed2a3de7a61ea0bc1208b08a2472abdc4e002ea5ef066faa732b7ddf8d619066"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/integrations-v1.1.1/MediaDownloader-Editores-macOS-1.1.1.zip",
+        "sha256": "c096a8acca70177b3c28b339ab0ceaa2560622ac78cf07fdd3a5413db96c3c13"
       },
       "targets": [
         "avid",

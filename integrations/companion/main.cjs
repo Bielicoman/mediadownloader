@@ -28,7 +28,7 @@ app.whenReady().then(async()=>{
  win.webContents.on('will-navigate',(event,url)=>{if(url!==localPage)event.preventDefault();});
  win.webContents.on('will-redirect',event=>event.preventDefault());win.webContents.on('will-attach-webview',event=>event.preventDefault());win.webContents.setWindowOpenHandler(()=>({action:'deny'}));
  session.defaultSession.setPermissionRequestHandler((_,__,callback)=>callback(false));session.defaultSession.setPermissionCheckHandler(()=>false);
- handle('info',()=>({resolve:!!resolve,platform:process.platform,outputDir,version:'1.1.0'}));
+ handle('info',()=>({resolve:!!resolve,platform:process.platform,outputDir,version:'1.1.1'}));
  handle('folder',async()=>{if(job)throw Error('Aguarde o download antes de trocar a pasta.');const result=await dialog.showOpenDialog(win,{properties:['openDirectory','createDirectory']});if(!result.canceled)outputDir=result.filePaths[0];return outputDir;});
  handle('select',async()=>{if(job)throw Error('Aguarde o download.');const result=await dialog.showOpenDialog(win,{properties:['openFile'],filters:[{name:'Mídia',extensions:['mp4','mov','mkv','webm','wav','mp3','m4a','flac','opus','png','jpg']}]});if(!result.canceled)lastFile=result.filePaths[0];return lastFile;});
  handle('download',async(options)=>{

@@ -4,7 +4,7 @@ const input={url:'https://www.youtube.com/watch?v=test',format:'original',qualit
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 test('URL e opções: recusa rede local, credenciais, portas, protocolos e plataformas falsas',()=>{
   for(const url of ['http://youtube.com/watch?v=x','https://127.0.0.1/','https://localhost/','file:///etc/passwd','https://youtube.com.evil.example/','https://user:pass@youtube.com/','https://youtube.com:8443/','https://www.youtube.com/playlist?list=x'])assert.throws(()=>validateInput({...input,url}));
-  assert.equal(validateInput(input).quality,'best');assert.throws(()=>validateInput({...input,format:'../../secret'}));assert.throws(()=>validateInput({...input,quality:'-x'}));
+  for(const quality of ['best','4320','2160','1440','1080','720','480','360','240','144'])assert.equal(validateInput({...input,quality}).quality,quality);assert.throws(()=>validateInput({...input,format:'../../secret'}));assert.throws(()=>validateInput({...input,quality:'-x'}));
 });
 test('progresso em chunks, entrega original e limite de capacidade',async()=>{
   class FixtureJobs extends Jobs {async command(j,exe,args,onLine){assert(args.includes('--ignore-config'));assert(args.includes('--no-playlist'));assert(!args.includes('--no-check-certificates'));assert.equal(args.at(-1),input.url);onLine('TITLE:Vídeo de teste');onLine('PROGRESS: 50.0%');await wait(40);const file=path.join(j.dir,'source.mkv');fs.writeFileSync(file,'real-fixture-bytes');onLine('FILE:'+file);}}
