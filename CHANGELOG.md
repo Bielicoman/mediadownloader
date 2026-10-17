@@ -92,3 +92,9 @@ Release anterior com instaladores distribuídos para Windows, macOS, Linux e And
 - Ícone adaptativo redesenhado com seta preenchida, amarelo e verde originais, fundo preto sem moldura e profundidade discreta.
 - Arte essencial dentro da área segura das máscaras Android, sem borda branca externa nem seta cortada.
 - Desenho vetorial para telas de alta densidade e ícone de compatibilidade anterior ao Android 8.
+
+## 1.4.6 — 2026-10-17
+
+- Auditoria de estados de prévia, seleção e cancelamento; quatro novas regressões.
+- Editores 1.1.7 com versão real e proteção de dados durante download.
+- Site com controles móveis de 44 px e acesso ao menu Plugins.

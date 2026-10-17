@@ -6,3 +6,26 @@
 .editor-title img.avid-logo{width:72px;height:30px;border-radius:0;object-fit:contain}
 .platform-tabs{padding:10px;gap:8px;background:#0d1118}.platform-tabs button{position:relative;min-height:48px;gap:10px;padding:12px 22px;border:1px solid transparent;border-radius:9px;color:#a7b0bf;box-shadow:none}.platform-tabs button[aria-selected=true]{color:#f0f1f3;background:#1b222d;border-color:#3a4555;box-shadow:none}.platform-tabs button:focus-visible{outline:2px solid #ffb020;outline-offset:2px}.platform-tabs img{display:block;width:20px;height:20px;flex-shrink:0;object-fit:contain}.platform-mark{display:grid;place-items:center;width:72px;height:72px;border:1px solid #ffffff12;border-radius:16px;background:#ffffff04;margin-bottom:22px}.platform-mark img{width:36px;height:36px;object-fit:contain}#panel-android .platform-mark img{width:52px;height:34px}@media(max-width:600px){.platform-tabs{gap:4px;padding:8px}.platform-tabs button{flex:1;flex-direction:column;gap:7px;padding:10px 6px;min-height:64px;font-size:11px}.platform-tabs img{width:22px;height:22px}.platform-mark{width:64px;height:64px}.platform-mark img{width:32px;height:32px}}
 .editor-card>.button{width:100%;min-height:44px;padding:11px 14px;border-radius:10px;font-size:12px;line-height:1.4;gap:8px;flex-shrink:0;text-align:center}.editor-card>.button+.button{margin-top:12px}.editor-card>.button:hover{transform:none}@media(max-width:650px){.editor-card>.button{min-height:46px;font-size:13px}}
+
+/* Final audit: readable focus and touch targets, including the plugin menu on phones. */
+input:focus-visible,select:focus-visible{outline:2px solid #ffb020;outline-offset:3px}
+@media(max-width:760px){
+ .site-header{flex-wrap:wrap;gap:10px;padding-bottom:10px}
+ .site-header .brand{min-height:44px}
+ .site-header nav{width:100%;justify-content:flex-start;gap:4px 10px}
+ .site-header nav>a,.site-header nav>a:not(.nav-download){display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 5px}
+ .site-header nav .nav-download{padding-inline:12px}
+ .site-header .language-switch select{min-height:44px;max-width:145px;font-size:11px}
+ .legal-links{gap:0 14px}.legal-links a{display:inline-flex;align-items:center;min-height:44px;font-size:12px}
+ .install-summary details a,.integration-help details a{display:inline-flex;align-items:center;min-height:44px}
+}
+
+@media(max-width:760px){
+ .site-header{position:relative;gap:6px}
+ .site-header .brand{font-size:11px;gap:8px;max-width:calc(100% - 125px)}
+ .site-header .brand img{width:28px;height:28px}
+ .site-header nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;width:100%}
+ .site-header nav>a,.site-header nav>a:not(.nav-download){font-size:11px;padding-inline:3px;white-space:nowrap}
+ .site-header .language-switch{position:absolute;top:14px;right:16px}
+ .site-header .language-switch select{max-width:120px}
+}

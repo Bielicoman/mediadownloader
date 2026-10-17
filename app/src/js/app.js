@@ -302,8 +302,10 @@
 
   // 3. Single Video Event Handlers
   var debounceTimer = null;
-  var singlePlaylistPending='';
+  var singlePlaylistPending='',singlePreviewGeneration=0;
+  function clearSinglePreview(){if(elPreviewBox)elPreviewBox.classList.remove('active');var details=document.getElementById('mediaDetails');if(details){details.hidden=true;var layout=details.closest('.single-media-layout');if(layout)layout.style.display='none';}currentMetadata=null;}
   function handleUrlChange(url) {
+    var previewGeneration=++singlePreviewGeneration;clearTimeout(debounceTimer);clearSinglePreview();
     if(window.MediaCollections&&window.MediaCollections.playlistUrl(url)){clearTimeout(debounceTimer);if(singlePlaylistPending===url)return;singlePlaylistPending=url;window.MediaCollections.askPlaylist(elUrlInput.closest('.input-capsule')||elUrlInput,url).then(async function(choice){if(elUrlInput.value.trim()!==url)return;if(choice==='playlist'){document.querySelector('[data-tab="tab-playlist"]').click();elPlaylistUrlInput.value=url;handleIndexPlaylist();}else if(choice==='video'){var links=await window.MediaCollections.expandLinks(url,{choose:async function(){return 'video';}});if(links[0]){elUrlInput.value=links[0];handleUrlChange(links[0]);}}}).catch(function(e){showToast(e.message,'error');}).finally(function(){singlePlaylistPending='';});return;}
 
     var thumbnailLink = String(url || "").match(/^https?:\/\/(?:i|img)\.ytimg\.com\/(?:vi|vi_webp)\/([A-Za-z0-9_-]{11})(?:\/|$)/i);
@@ -328,9 +330,9 @@
     debounceTimer = setTimeout(async function () {
       try {
         var meta = await window.Downloader.fetchMetadata(url, function (quick) {
-          if (elUrlInput.value.trim() === url && (!currentMetadata || currentMetadata.isInstant)) renderPreview(quick);
+          if (previewGeneration===singlePreviewGeneration && elUrlInput.value.trim() === url && (!currentMetadata || currentMetadata.isInstant)) renderPreview(quick);
         });
-        if (elUrlInput.value.trim() !== url) return;
+        if (previewGeneration!==singlePreviewGeneration || elUrlInput.value.trim() !== url) return;
         currentMetadata = meta;
         renderPreview(meta);
       } catch (err) {
@@ -348,6 +350,7 @@
     if (!elPreviewBox) return;
     if(window.MediaInfo)window.MediaInfo.render(document.getElementById("mediaDetails"),meta.technical||window.MediaInfo.source({title:meta.title,uploader:meta.uploader}),"icons/editors/");
     elPreviewBox.classList.add("active");
+    var layout=elPreviewBox.closest(".single-media-layout");if(layout)layout.style.display="";
     if (elPreviewThumb) if(window.MediaThumbnails)window.MediaThumbnails.set(elPreviewThumb,meta);else elPreviewThumb.src = meta.thumbnail || "";
     if (elPreviewDuration) elPreviewDuration.textContent = meta.durationFormatted || "--:--";
     if (elPreviewTitle) elPreviewTitle.textContent = meta.title || "Vídeo Online";
@@ -535,17 +538,18 @@
 
   function updateSelectedCountBadge() {
     if (!playlistData) return;
-    var count = playlistData.items.filter(function (i) { return i.selected; }).length;
+    var count = playlistData.items.filter(function (i) { return i.selected && !i.unavailable; }).length;
     if (elSelectedCountBadge) elSelectedCountBadge.textContent = count;
     if(elBtnDownloadPlaylist)elBtnDownloadPlaylist.disabled=count===0;
   }
 
   function toggleSelectAllPlaylist() {
     if (!playlistData) return;
-    var allSelected = playlistData.items.every(function (i) { return i.selected; });
+    var available=playlistData.items.filter(function(i){return !i.unavailable;});
+    var allSelected = available.length>0 && available.every(function (i) { return i.selected; });
     var newState = !allSelected;
 
-    playlistData.items.forEach(function (i) { i.selected = newState; });
+    playlistData.items.forEach(function (i) { i.selected = !i.unavailable && newState; });
     renderPlaylistUI(playlistData);
     if (elBtnToggleSelectAll) {
       elBtnToggleSelectAll.textContent = newState ? "Desmarcar Todos" : "Selecionar Todos";
@@ -554,7 +558,7 @@
 
   async function startPlaylistDownload() {
     if (!playlistData) return;
-    var selected = playlistData.items.filter(function (i) { return i.selected; });
+    var selected = playlistData.items.filter(function (i) { return i.selected && !i.unavailable; });
     if (selected.length === 0) {
       showToast("Nenhum vídeo selecionado.", "error");
       return;

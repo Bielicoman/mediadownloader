@@ -31,7 +31,7 @@ app.whenReady().then(async()=>{
  win.webContents.on('will-navigate',(event,url)=>{if(url!==localPage)event.preventDefault();});
  win.webContents.on('will-redirect',event=>event.preventDefault());win.webContents.on('will-attach-webview',event=>event.preventDefault());win.webContents.setWindowOpenHandler(()=>({action:'deny'}));
  session.defaultSession.setPermissionRequestHandler((_,__,callback)=>callback(false));session.defaultSession.setPermissionCheckHandler(()=>false);
- handle('info',()=>({resolve:!!resolve,platform:process.platform,outputDir,version:'1.1.2'}));
+ handle('info',()=>({resolve:!!resolve,platform:process.platform,outputDir,version:app.getVersion()}));
  const mediaInfo=require('./media-info.js');
  let metadataBusy=false;
  handle('metadata',async(text)=>{if(job||metadataBusy)throw Error('Aguarde a leitura atual.');if(typeof text!=='string'||text.length>2048)throw Error('Link inválido.');const url=new URL(text);if(url.protocol!=='https:'||url.username||url.password)throw Error('Use um link HTTPS sem credenciais.');metadataBusy=true;try{const result=await engine.downloader.fetchMetadata(url.href);return result.technical;}finally{metadataBusy=false;}});

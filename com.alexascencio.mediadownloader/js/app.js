@@ -293,6 +293,7 @@
 
     var debounceTimer = null;
     function handleUrlInput() {
+        ++singlePreviewGeneration;hidePreview();
         var url = elUrlInput.value.trim();
         clearTimeout(debounceTimer);
         if (!url || (!url.startsWith("http://") && !url.startsWith("https://"))) {
@@ -305,8 +306,9 @@
         }, 400);
     }
 
-    var singlePlaylistPending='';
+    var singlePlaylistPending='',singlePreviewGeneration=0;
     function handleUrlChange(url) {
+      var previewGeneration=++singlePreviewGeneration;hidePreview();
       if(window.MediaCollections&&window.MediaCollections.playlistUrl(url)){clearTimeout(debounceTimer);if(singlePlaylistPending===url)return;singlePlaylistPending=url;window.MediaCollections.askPlaylist(elUrlInput.closest('.input-capsule')||elUrlInput,url).then(async function(choice){if(elUrlInput.value.trim()!==url)return;if(choice==='playlist'){if(window.CepCollectionUI)window.CepCollectionUI.openPlaylist(url);}else if(choice==='video'){var links=await window.MediaCollections.expandLinks(url,{choose:async function(){return 'video';}});if(links[0]){elUrlInput.value=links[0];handleUrlChange(links[0]);}}}).catch(function(e){showToast(e.message,'error');}).finally(function(){singlePlaylistPending='';});return;}
 
     var thumbnailLink = String(url || "").match(/^https?:\/\/(?:i|img)\.ytimg\.com\/(?:vi|vi_webp)\/([A-Za-z0-9_-]{11})(?:\/|$)/i);
@@ -344,17 +346,19 @@
         // ETAPA 2: Busca metadados refinados em segundo plano sem travar a interface
         isFetchingMeta = true;
         window.Downloader.fetchMetadata(url, function (quick) {
-            if (elUrlInput.value.trim() !== url) return;
+            if(previewGeneration!==singlePreviewGeneration || elUrlInput.value.trim() !== url)return;
             if (!currentMetadata || currentMetadata.isInstant) {
                 currentMetadata = quick;
                 displayPreview(quick);
             }
         }).then(function (meta) {
+            if(previewGeneration!==singlePreviewGeneration)return;
             isFetchingMeta = false;
-            if (elUrlInput.value.trim() !== url) return;
+            if(previewGeneration!==singlePreviewGeneration || elUrlInput.value.trim() !== url)return;
             currentMetadata = meta;
             displayPreview(meta);
         }).catch(function (err) {
+            if(previewGeneration!==singlePreviewGeneration || elUrlInput.value.trim()!==url)return;
             isFetchingMeta = false;
             if (!currentMetadata || !currentMetadata.thumbnail) {
                 currentMetadata = instant || {
@@ -372,6 +376,7 @@
 
     function showPreviewLoading(platform, url) {
         elPreviewBox.className = "preview-box active";
+        var layout=elPreviewBox.closest(".single-media-layout");if(layout)layout.style.display="";
         elPreviewThumb.src = "";
         elPreviewDuration.textContent = "--:--";
         elPreviewTitle.textContent = "Obtendo dados do vídeo...";
@@ -384,6 +389,7 @@
     function displayPreview(meta) {
         if(window.MediaInfo)window.MediaInfo.render(document.getElementById("mediaDetails"),meta.technical||window.MediaInfo.source({title:meta.title,uploader:meta.uploader}),"icons/editors/");
         elPreviewBox.className = "preview-box active";
+        var layout=elPreviewBox.closest(".single-media-layout");if(layout)layout.style.display="";
         if (meta.thumbnail) {
             if (window.MediaThumbnails) window.MediaThumbnails.set(elPreviewThumb, { url: meta.url || elUrlInput.value, thumbnail: meta.thumbnail });
             else elPreviewThumb.src = meta.thumbnail;
@@ -400,6 +406,7 @@
     }
 
     function hidePreview() {
+        var details=document.getElementById("mediaDetails");if(details){details.hidden=true;var layout=details.closest(".single-media-layout");if(layout)layout.style.display="none";}
         elPreviewBox.className = "preview-box";
         currentMetadata = null;
         if (elInputPlatformIcon) {
