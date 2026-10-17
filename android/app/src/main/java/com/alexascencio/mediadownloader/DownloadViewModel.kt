@@ -24,6 +24,7 @@ sealed interface Estado {
     data class Concluido(val nomeArquivo:String,val uri:String,val mime:String):Estado
     data class Falhou(val mensagem:String):Estado
 }
+data class Preparacao(val etapa:Int=1,val titulo:String="Preparando os componentes",val detalhe:String="Na primeira abertura, os motores precisam ser preparados no celular.",val pronta:Boolean=false,val erro:Boolean=false)
 data class Previa(val url:String="",val titulo:String="",val autor:String="",val thumbnail:String?=null,val duracao:Int=0,val lendo:Boolean=false,val aviso:String?=null,val detalhes:List<Pair<String,String>> = emptyList(),val arquivoFinal:Boolean=false)
 
 class DownloadViewModel(app:Application):AndroidViewModel(app) {
@@ -31,6 +32,9 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
     val estado=_estado.asStateFlow()
     private val _previa=MutableStateFlow(Previa())
     val previa=_previa.asStateFlow()
+    private val _preparacao=MutableStateFlow(Preparacao())
+    val preparacao=_preparacao.asStateFlow()
+    private var initJob:Job?=null
     private val _motor=MutableStateFlow("Preparando motores…")
     val motor=_motor.asStateFlow()
     private val _registro=MutableStateFlow(emptyList<String>())
@@ -46,26 +50,32 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
     private val _appUpdate=MutableStateFlow<AppUpdate?>(null)
     val appUpdate=_appUpdate.asStateFlow()
     init {iniciarMotores();viewModelScope.launch(Dispatchers.IO){while(isActive){if(downloadJob?.isActive!=true)try{_appUpdate.value=AppUpdates.checkAndDownload(getApplication())}catch(e:Exception){anotar("Atualização do aplicativo indisponível: ${e.message}")};delay(21600000L)}}}
-    private fun iniciarMotores() {
-        viewModelScope.launch(Dispatchers.IO) {
+    private fun iniciarMotores(forceUpdate:Boolean=false) {
+        if(initJob?.isActive==true)return
+        initialized=false;_estado.value=Estado.Preparando
+        _preparacao.value=Preparacao(1,"Preparando yt-dlp e Python","Extraindo os componentes incluídos no aplicativo. Aguarde para baixar.")
+        initJob=viewModelScope.launch(Dispatchers.IO) {
             try {
-                YoutubeDL.init(getApplication());FFmpeg.init(getApplication());initialized=true
-                if(System.currentTimeMillis()-prefs.getLong("engine-update",0)>86400000L)atualizarInterno()
+                YoutubeDL.init(getApplication())
+                _preparacao.value=Preparacao(2,"Preparando o conversor","Configurando FFmpeg para unir vídeo e áudio e converter os arquivos.")
+                FFmpeg.init(getApplication())
+                _preparacao.value=Preparacao(3,"Conferindo o motor de download","Buscando correções quando necessário. A primeira abertura pode demorar um pouco.")
+                val updated=if(forceUpdate || System.currentTimeMillis()-prefs.getLong("engine-update",0)>86400000L)atualizarInterno()else true
+                initialized=true
                 _motor.value="yt-dlp ${YoutubeDL.versionName(getApplication()) ?: "incluído"} · pronto"
+                _preparacao.value=Preparacao(3,"Tudo pronto",if(updated)"Você já pode baixar sua mídia."else "Sem atualização de rede. Usando o motor incluído no aplicativo.",pronta=true)
                 _estado.value=Estado.Pronto
-            }catch(e:Exception){anotar(e.message.orEmpty());_estado.value=Estado.Falhou("Não foi possível preparar os motores. Toque em Atualizar motor para tentar novamente.")}
+            }catch(e:Exception){initialized=false;anotar(e.message.orEmpty());_preparacao.value=Preparacao(1,"Preparação interrompida","Confira espaço livre e conexão. Toque em Tentar novamente para preparar os componentes.",erro=true);_estado.value=Estado.Falhou("Não foi possível preparar os componentes do aplicativo.")}
         }
     }
-    private fun atualizarInterno() {
+    private fun atualizarInterno():Boolean {
         _motor.value="Atualizando o motor de download…"
-        try {YoutubeDL.updateYoutubeDL(getApplication(),YoutubeDL.UpdateChannel.STABLE);prefs.edit().putLong("engine-update",System.currentTimeMillis()).apply()}
-        catch(e:Exception){anotar("Atualização indisponível: ${e.message}")}
+        return try {YoutubeDL.updateYoutubeDL(getApplication(),YoutubeDL.UpdateChannel.STABLE);prefs.edit().putLong("engine-update",System.currentTimeMillis()).apply();true}
+        catch(e:Exception){anotar("Atualização indisponível: ${e.message}");false}
     }
     fun atualizarMotor() {
-        if(downloadJob?.isActive==true || _estado.value is Estado.Preparando)return
-        if(!initialized){_estado.value=Estado.Preparando;iniciarMotores();return}
-        cancelarPrevia();_estado.value=Estado.Preparando
-        viewModelScope.launch(Dispatchers.IO){atualizarInterno();_motor.value="yt-dlp ${YoutubeDL.versionName(getApplication()) ?: "incluído"}";_estado.value=Estado.Pronto}
+        if(downloadJob?.isActive==true || initJob?.isActive==true || _estado.value is Estado.Preparando)return
+        cancelarPrevia();iniciarMotores(true)
     }
     fun limpar(){if(!initialized){atualizarMotor();return};if(downloadJob?.isActive!=true)_estado.value=Estado.Pronto}
     @Synchronized private fun anotar(linha:String){if(linha.isNotBlank())_registro.value=(_registro.value+linha.take(4000)).takeLast(60)}
@@ -82,8 +92,8 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
         if(link==null){_previa.value=Previa();return}
         _previa.value=Previa(url=link,thumbnail=youtubeId(link)?.let{"https://i.ytimg.com/vi/$it/hqdefault.jpg"},lendo=true)
         previewJob=viewModelScope.launch(Dispatchers.IO) {
-            delay(650);while(!initialized && _estado.value is Estado.Preparando)delay(200)
-            if(!initialized || downloadJob?.isActive==true)return@launch
+            delay(650);while(_estado.value is Estado.Preparando)delay(200)
+            if(!initialized || downloadJob?.isActive==true){_previa.value=_previa.value.copy(lendo=false,aviso=if(!initialized)"Aguarde a preparação dos componentes para carregar os dados."else null);return@launch}
             val id="preview-${UUID.randomUUID()}";previewId=id
             try {
                 val response=YoutubeDL.execute(pedidoBase(link).apply{addOption("--dump-single-json");addOption("--skip-download")},id)
@@ -95,7 +105,8 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
     }
     fun cancelar(){cancelled=true;activeId?.let{YoutubeDL.destroyProcessById(it)};conversion?.destroy();_motor.value="Cancelando…"}
     fun baixar(texto:String,perfil:Perfil,qualidade:Qualidade) {
-        if(!initialized || downloadJob?.isActive==true)return
+        if(!initialized || _estado.value is Estado.Preparando){_motor.value="Preparando componentes. Aguarde a conclusão para baixar.";return}
+        if(downloadJob?.isActive==true)return
         val link=try{normalizarLink(texto)}catch(e:Exception){_estado.value=Estado.Falhou(erroAmigavel(e.message.orEmpty()));return}
         cancelarPrevia();cancelled=false;_registro.value=emptyList();_estado.value=Estado.Sondando
         downloadJob=viewModelScope.launch(Dispatchers.IO) {

@@ -82,7 +82,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: android-1.3.5-validation
+          name: android-1.3.6-validation
           path: |
             dist/android-apk
             dist/android-device
@@ -92,6 +92,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view android-v1.3.5 >/dev/null 2>&1 || gh release create android-v1.3.5 --target "$GITHUB_SHA" --title 'Android 1.3.5 · Beta' --notes 'Android Beta com idiomas e preferência local, atualizações verificadas e formatos de mídia. Consulte README e documentação para instalação, licenças e avisos do sistema. Preserve seus dados antes de substituir uma instalação com assinatura diferente.'
-          gh release upload android-v1.3.5 dist/android-apk/* --clobber
+          gh release view android-v1.3.6 >/dev/null 2>&1 || gh release create android-v1.3.6 --target "$GITHUB_SHA" --title 'Android 1.3.6 · Beta' --notes 'Android Beta com idiomas e preferência local, atualizações verificadas e formatos de mídia. Consulte README e documentação para instalação, licenças e avisos do sistema. Preserve seus dados antes de substituir uma instalação com assinatura diferente.'
+          gh release upload android-v1.3.6 dist/android-apk/* --clobber
 

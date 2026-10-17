@@ -16,6 +16,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import coil.ImageLoader
 import coil.decode.SvgDecoder
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -69,6 +71,7 @@ class MainActivity:ComponentActivity() {
 
 @Composable private fun Tela(vm:DownloadViewModel,linkInicial:String) {
     val estado by vm.estado.collectAsStateWithLifecycle()
+    val preparacao by vm.preparacao.collectAsStateWithLifecycle()
     val previa by vm.previa.collectAsStateWithLifecycle()
     val motor by vm.motor.collectAsStateWithLifecycle()
     val appUpdate by vm.appUpdate.collectAsStateWithLifecycle()
@@ -79,33 +82,43 @@ class MainActivity:ComponentActivity() {
     var qualidade by rememberSaveable{mutableStateOf(Qualidade.MAXIMA)}
     var detalhes by rememberSaveable{mutableStateOf(false)}
     var aviso by remember{mutableStateOf("")}
-    val ocupado=estado is Estado.Preparando || estado is Estado.Sondando || estado is Estado.Baixando
+    var idiomaAberto by rememberSaveable{mutableStateOf(false)}
+    val baixando=estado is Estado.Sondando || estado is Estado.Baixando
+    val ocupado=estado is Estado.Preparando || baixando
     LaunchedEffect(linkInicial){if(linkInicial.isNotBlank()){url=linkInicial;vm.carregarPrevia(url)}}
     DisposableEffect(ocupado){val window=(context as? Activity)?.window;if(ocupado)window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)else window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);onDispose{window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)}}
     val permissao=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()){ok->if(ok)vm.baixar(url,perfil,qualidade)else aviso="Autorize o armazenamento para salvar a mídia neste Android."}
     Scaffold(containerColor=Fundo){pad->
-        Column(Modifier.fillMaxSize().padding(pad).verticalScroll(rememberScrollState()).padding(horizontal=20.dp,vertical=24.dp),verticalArrangement=Arrangement.spacedBy(18.dp)) {
-            Seletor("Idioma / Language",L10n.languages[L10n.language].orEmpty(),!ocupado,L10n.languages.values.toList()){index->L10n.select(context,L10n.languages.keys.toList()[index])}
+        Column(Modifier.fillMaxSize().padding(pad).verticalScroll(rememberScrollState()).padding(horizontal=16.dp,vertical=14.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(12.dp)){
-                Surface(shape=RoundedCornerShape(8.dp),color=Superficie,border=androidx.compose.foundation.BorderStroke(1.dp,Borda)){Icon(Icons.Outlined.Download,null,tint=Ambar,modifier=Modifier.padding(9.dp).size(25.dp))}
-                Column{Text(L10n.t("Media Downloader"),fontSize=21.sp,fontWeight=FontWeight.ExtraBold,fontFamily=Fonte);Text(L10n.t("Sua mídia, pronta para editar."),fontSize=12.sp,color=Apagado)}
+                Image(painterResource(R.drawable.logo_oficial),contentDescription="Media Downloader",modifier=Modifier.size(42.dp))
+                Column(Modifier.weight(1f)){Text(L10n.t("Media Downloader"),fontSize=21.sp,fontWeight=FontWeight.ExtraBold,fontFamily=Fonte);Text(L10n.t("Sua mídia, pronta para editar."),fontSize=12.sp,color=Apagado)}
+                TextButton(onClick={idiomaAberto=!idiomaAberto},enabled=!baixando){Text("Idioma",fontSize=11.sp)}
             }
-            Surface(shape=RoundedCornerShape(14.dp),color=Superficie){Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(14.dp)){
-                Text(L10n.t("Seu próximo download"),fontWeight=FontWeight.Bold,fontSize=19.sp)
+            if(idiomaAberto)Seletor("Idioma / Language",L10n.languages[L10n.language].orEmpty(),!ocupado,L10n.languages.values.toList()){index->L10n.select(context,L10n.languages.keys.toList()[index]);idiomaAberto=false}
+            if(!preparacao.pronta)Surface(shape=RoundedCornerShape(10.dp),color=Superficie,border=androidx.compose.foundation.BorderStroke(1.dp,Borda)){Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
+                Text(L10n.t(preparacao.titulo),fontWeight=FontWeight.Bold,fontSize=14.sp)
+                Text(L10n.t(preparacao.detalhe),fontSize=12.sp,color=Apagado)
+                if(!preparacao.erro){LinearProgressIndicator(modifier=Modifier.fillMaxWidth());Text("Etapa ${preparacao.etapa} de 3 · preparação do aplicativo",fontSize=11.sp,color=Ambar)}else TextButton(onClick=vm::atualizarMotor){Text(L10n.t("Tentar novamente"))}
+            }}
+            Surface(shape=RoundedCornerShape(14.dp),color=Superficie){Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
+                Text(L10n.t("Seu próximo download"),fontWeight=FontWeight.Bold,fontSize=17.sp)
                 Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)){
-                    OutlinedTextField(value=url,onValueChange={url=it;vm.carregarPrevia(it)},enabled=!ocupado,singleLine=true,label={Text(L10n.t("Link do vídeo"))},placeholder={Text(L10n.t("https://…"))},modifier=Modifier.weight(1f),shape=RoundedCornerShape(8.dp),colors=OutlinedTextFieldDefaults.colors(unfocusedBorderColor=Borda,focusedBorderColor=Ambar))
-                    TextButton(onClick={clipboard.getText()?.text?.let{url=it;vm.carregarPrevia(it)}},enabled=!ocupado){Text(L10n.t("Colar"))}
+                    OutlinedTextField(value=url,onValueChange={url=it;vm.carregarPrevia(it)},enabled=!baixando,singleLine=true,label={Text(L10n.t("Link do vídeo"))},placeholder={Text(L10n.t("https://…"))},modifier=Modifier.weight(1f),shape=RoundedCornerShape(8.dp),colors=OutlinedTextFieldDefaults.colors(unfocusedBorderColor=Borda,focusedBorderColor=Ambar))
+                    TextButton(onClick={clipboard.getText()?.text?.let{url=it;vm.carregarPrevia(it)}},enabled=!baixando){Text(L10n.t("Colar"))}
                 }
                 if(previa.url.isNotBlank())CartaoPrevia(previa)
-                Seletor("Como quer salvar?",perfil.rotulo,!ocupado,Perfil.entries.map{it.rotulo}){i->perfil=Perfil.entries[i]}
-                Seletor("Qualidade do vídeo",qualidade.rotulo,!ocupado && !perfil.ehAudio && perfil!=Perfil.CAPA,Qualidade.entries.map{it.rotulo}){i->qualidade=Qualidade.entries[i]}
+                Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
+                    Seletor("Como quer salvar?",perfil.rotulo,!ocupado,Perfil.entries.map{it.rotulo},Modifier.weight(1f)){i->perfil=Perfil.entries[i]}
+                    Seletor("Qualidade do vídeo",qualidade.rotulo,!ocupado && !perfil.ehAudio && perfil!=Perfil.CAPA,Qualidade.entries.map{it.rotulo},Modifier.weight(1f)){i->qualidade=Qualidade.entries[i]}
+                }
                 Text(L10n.t(perfil.detalhe),color=Apagado,fontSize=12.sp)
-                Button(onClick={aviso="";if(Build.VERSION.SDK_INT<29 && ContextCompat.checkSelfPermission(context,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED)permissao.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)else vm.baixar(url,perfil,qualidade)},enabled=!ocupado && url.isNotBlank(),shape=RoundedCornerShape(8.dp),modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)) {Text(if(ocupado)"Preparando…" else "Baixar mídia",fontWeight=FontWeight.Bold)}
+                Button(onClick={aviso="";if(Build.VERSION.SDK_INT<29 && ContextCompat.checkSelfPermission(context,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED)permissao.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)else vm.baixar(url,perfil,qualidade)},enabled=preparacao.pronta && !ocupado && url.isNotBlank(),shape=RoundedCornerShape(8.dp),modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)) {Text(L10n.t(if(!preparacao.pronta)"Preparando componentes…" else if(ocupado)"Preparando…" else "Baixar mídia"),fontWeight=FontWeight.Bold)}
                 if(estado is Estado.Sondando || estado is Estado.Baixando)OutlinedButton(onClick=vm::cancelar,modifier=Modifier.fillMaxWidth()){Text(L10n.t("Cancelar"))}
                 Text(L10n.t("Mantenha o aplicativo aberto durante o download. Máxima qualidade usa os formatos disponíveis na fonte."),fontSize=11.sp,color=Apagado)
             }}
             when(val e=estado){
-                Estado.Preparando->{Text(motor,color=Apagado,fontSize=13.sp);LinearProgressIndicator(modifier=Modifier.fillMaxWidth())}
+                Estado.Preparando->Unit
                 Estado.Sondando->{Text(L10n.t("Acessando o vídeo…"),color=Ambar);LinearProgressIndicator(modifier=Modifier.fillMaxWidth())}
                 is Estado.Baixando->{Text(e.linha,color=Ambar);if(e.progresso!=null){LinearProgressIndicator(progress={e.progresso},modifier=Modifier.fillMaxWidth());Text("${(e.progresso*100).toInt()}% desta etapa",color=Apagado,fontSize=12.sp)}else LinearProgressIndicator(modifier=Modifier.fillMaxWidth())}
                 is Estado.Concluido->{Text(L10n.t("Arquivo salvo"),color=Verde,fontWeight=FontWeight.Bold);Text(e.nomeArquivo,maxLines=3,overflow=TextOverflow.Ellipsis);Text("${if(perfil==Perfil.CAPA)"Imagens" else if(perfil.ehAudio)"Música" else "Filmes"}/MediaDownloader",color=Apagado,fontSize=12.sp)
@@ -125,11 +138,11 @@ class MainActivity:ComponentActivity() {
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable private fun Seletor(rotulo:String,selecionado:String,enabled:Boolean,itens:List<String>,escolher:(Int)->Unit){
+@Composable private fun Seletor(rotulo:String,selecionado:String,enabled:Boolean,itens:List<String>,modifier:Modifier=Modifier,escolher:(Int)->Unit){
     var expanded by remember{mutableStateOf(false)}
-    Column(verticalArrangement=Arrangement.spacedBy(6.dp)){
+    Column(modifier,verticalArrangement=Arrangement.spacedBy(6.dp)){
         Text(L10n.t(rotulo),fontSize=12.sp,color=Apagado)
-        OutlinedButton(onClick={expanded=true},enabled=enabled,shape=RoundedCornerShape(9.dp),modifier=Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=14.dp,vertical=12.dp)){Text(L10n.t(selecionado),modifier=Modifier.weight(1f),color=if(enabled)Texto else Apagado);Text(L10n.t("⌄"),color=Ambar)}
+        OutlinedButton(onClick={expanded=true},enabled=enabled,shape=RoundedCornerShape(9.dp),modifier=Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=14.dp,vertical=12.dp)){Text(L10n.t(selecionado),maxLines=1,overflow=TextOverflow.Ellipsis,modifier=Modifier.weight(1f),color=if(enabled)Texto else Apagado);Text(L10n.t("⌄"),color=Ambar)}
     }
     if(expanded)ModalBottomSheet(onDismissRequest={expanded=false},containerColor=Fundo){
         Column(Modifier.fillMaxWidth().heightIn(max=650.dp).verticalScroll(rememberScrollState()).padding(horizontal=20.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
@@ -147,9 +160,9 @@ class MainActivity:ComponentActivity() {
     var detailsOpen by remember{mutableStateOf(false)}
     val context=LocalContext.current
     val imageLoader=remember(context){ImageLoader.Builder(context).components{add(SvgDecoder.Factory())}.build()}
-    Row(horizontalArrangement=Arrangement.spacedBy(12.dp),verticalAlignment=Alignment.CenterVertically){
-        if(previa.thumbnail!=null)AsyncImage(model=previa.thumbnail,contentDescription="Miniatura do vídeo",contentScale=ContentScale.Crop,modifier=Modifier.width(112.dp).aspectRatio(16f/9).clip(RoundedCornerShape(8.dp)))
-        Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)){
+    Column(verticalArrangement=Arrangement.spacedBy(10.dp)){
+        if(previa.thumbnail!=null)AsyncImage(model=previa.thumbnail,contentDescription="Miniatura do vídeo",contentScale=ContentScale.Crop,modifier=Modifier.fillMaxWidth().aspectRatio(16f/9).clip(RoundedCornerShape(9.dp)))
+        Column(verticalArrangement=Arrangement.spacedBy(4.dp)){
             Text(previa.titulo.ifBlank{if(previa.lendo)"Lendo informações…" else "Prévia do vídeo"},fontWeight=FontWeight.SemiBold,fontSize=13.sp,maxLines=3,overflow=TextOverflow.Ellipsis)
             if(previa.autor.isNotBlank())Text(previa.autor,fontSize=11.sp,color=Apagado,maxLines=1,overflow=TextOverflow.Ellipsis)
             if(previa.duracao>0)Text("${previa.duracao/60}:${(previa.duracao%60).toString().padStart(2,'0')}",fontSize=11.sp,color=Apagado)

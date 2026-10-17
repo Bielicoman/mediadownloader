@@ -16,6 +16,8 @@ class EngineDeviceTest {
         val deadline=System.currentTimeMillis()+90000
         while(vm.estado.value is Estado.Preparando && System.currentTimeMillis()<deadline)Thread.sleep(200)
         assertEquals(Estado.Pronto,vm.estado.value)
+        assertTrue("Motores só podem ser liberados após a preparação",vm.preparacao.value.pronta)
+        assertEquals(3,vm.preparacao.value.etapa)
         assertTrue(File(app.applicationInfo.nativeLibraryDir,"libqjs.so").length()>100000)
         val results=File(app.filesDir,"device-test").apply{mkdirs()}
         for(perfil in listOf(Perfil.VIDEO_MAX,Perfil.AUDIO_MP3,Perfil.AUDIO_WAV,Perfil.AUDIO_FLAC,Perfil.AUDIO_M4A,Perfil.VIDEO_PRORES,Perfil.CAPA)) {
