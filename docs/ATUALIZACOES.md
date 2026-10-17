@@ -4,9 +4,9 @@
 
 | Componente | Comportamento |
 |---|---|
-| Desktop Windows 1.4.4+ | Consulta o site oficial; baixa atualização com SHA-512 quando não há download de mídia ativo; instala ao fechar o app. |
-| Editores Windows 1.1.5+ — Beta | Mesmo mecanismo; o instalador também atualiza os atalhos Lua do Resolve. |
-| Painel Adobe 1.4.4+ — Beta | Consulta o manifesto oficial, verifica SHA-256 do ZIP, guarda backup e troca os arquivos; reabra o painel para carregar a versão nova. |
+| Desktop Windows 1.4.5+ | Consulta o site oficial; baixa atualização com SHA-512 quando não há download de mídia ativo; instala ao fechar o app. |
+| Editores Windows 1.1.6+ — Beta | Mesmo mecanismo; o instalador também atualiza os atalhos Lua do Resolve. |
+| Painel Adobe 1.4.5+ — Beta | Consulta o manifesto oficial, verifica SHA-256 do ZIP, guarda backup e troca os arquivos; reabra o painel para carregar a versão nova. |
 | Android 1.3.6+ — Beta | Consulta releases Android, verifica hash e assinatura do APK; a instalação precisa de confirmação do sistema. |
 | macOS, Linux e ZIP portátil — Beta | Atualização manual pelo site nesta entrega. |
 

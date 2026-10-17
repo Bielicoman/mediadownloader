@@ -17,16 +17,16 @@ shutil.copy2(root/'app/src/css/media-info.css',companion/'media-info.css')
 (companion/'engine').mkdir(exist_ok=True)
 for name in ['media-info.js','downloader.js','binManager.js']:shutil.copy2(root/'app/src/js'/name,companion/'engine'/name)
 shutil.copy2(root/'integrations/resolve/manifest.xml',bundle/'manifest.xml')
-(bundle/'package.json').write_text(json.dumps({'name':'media-downloader-resolve','version':'1.1.5','main':'companion/main.cjs','license':'MIT'}),encoding='utf-8')
+(bundle/'package.json').write_text(json.dumps({'name':'media-downloader-resolve','version':'1.1.6','main':'companion/main.cjs','license':'MIT'}),encoding='utf-8')
 shutil.copy2(root/'LICENSE',bundle/'LICENSE')
 shutil.copy2(root/'THIRD-PARTY-NOTICES.md',bundle/'THIRD-PARTY-NOTICES.md')
 shutil.copytree(root/'licenses',bundle/'licenses',dirs_exist_ok=True)
 def add(z,file,name):
  info=zipfile.ZipInfo(str(name).replace('\\','/'));info.create_system=3;info.external_attr=(0o100755 if file.suffix=='.command' else 0o100644)<<16;info.compress_type=zipfile.ZIP_DEFLATED;z.writestr(info,file.read_bytes())
-with zipfile.ZipFile(root/'dist/MediaDownloader-Resolve-1.1.5.zip','w') as z:
+with zipfile.ZipFile(root/'dist/MediaDownloader-Resolve-1.1.6.zip','w') as z:
  for f in bundle.rglob('*'):
   if f.is_file() and f.suffix not in ['.node','.exe']:add(z,f,f.relative_to(stage))
  for f in (root/'integrations/resolve').glob('Instalar-*'):add(z,f,f.name)
  for f in (root/'integrations/resolve/scripts').glob('*.lua'):add(z,f,Path('scripts')/f.name)
  add(z,root/'docs/INTEGRACOES.md','LEIA-PRIMEIRO.md')
-print(root/'dist/MediaDownloader-Resolve-1.1.5.zip')
+print(root/'dist/MediaDownloader-Resolve-1.1.6.zip')

@@ -1,6 +1,6 @@
 {
   "name": "media-downloader",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "private": true,
   "description": "Site, documentação e ferramentas do Media Downloader",
   "license": "MIT",
@@ -8,7 +8,7 @@
   "scripts": {
     "serve:web": "node web/server.cjs",
     "test:web": "node --test tests/web-service.test.cjs tests/web-preview.test.cjs",
-    "test": "node tests/preset-ui.test.cjs && node tests/ui-regressions.test.cjs && node tests/core-safety.test.cjs && node tests/downloader-streams.test.cjs && node tests/binary-validation.test.cjs && node tests/site-integrity.test.cjs && node --test tests/security-boundary.test.cjs && node --test tests/adobe-bridge.test.cjs tests/aftereffects-host.test.cjs && node --test tests/editor-integrations.test.cjs && node --test tests/auto-update.test.cjs && node --test tests/collections.test.cjs",
+    "test": "node tests/preset-ui.test.cjs && node tests/ui-regressions.test.cjs && node tests/core-safety.test.cjs && node tests/downloader-streams.test.cjs && node tests/binary-validation.test.cjs && node tests/site-integrity.test.cjs && node --test tests/security-boundary.test.cjs && node --test tests/adobe-bridge.test.cjs tests/aftereffects-host.test.cjs && node --test tests/editor-integrations.test.cjs && node --test tests/auto-update.test.cjs && node --test tests/collections.test.cjs && node tests/playlist-indexing.test.cjs",
     "check": "node scripts/check-source.cjs",
     "serve": "node server.js",
     "build:site": "node scripts/build-site.cjs",

@@ -465,6 +465,7 @@
     }
 
     var requestedUrl=url,requestGeneration=++playlistGeneration;
+    playlistData=null; if(elPlaylistContainer)elPlaylistContainer.style.display="none";
     elBtnIndexPlaylist.textContent = "Indexando...";
     elBtnIndexPlaylist.disabled = true;
 
@@ -476,7 +477,7 @@
       if(requestGeneration!==playlistGeneration||elPlaylistUrlInput.value.trim()!==requestedUrl)return;
       playlistData = pl;
       renderPlaylistUI(pl);
-      showToast(pl.itemsCount + " vídeos indexados na playlist!", "success");
+      showToast(pl.singleVideo ? "Este link é de um vídeo. Ele foi adicionado à lista." : pl.itemsCount + " vídeos indexados na playlist!", "success");
     } catch (err) {
       showToast("Erro: " + err.message, "error");
     } finally {
@@ -536,6 +537,7 @@
     if (!playlistData) return;
     var count = playlistData.items.filter(function (i) { return i.selected; }).length;
     if (elSelectedCountBadge) elSelectedCountBadge.textContent = count;
+    if(elBtnDownloadPlaylist)elBtnDownloadPlaylist.disabled=count===0;
   }
 
   function toggleSelectAllPlaylist() {

@@ -79,3 +79,10 @@ Release anterior com instaladores distribuídos para Windows, macOS, Linux e And
 - Cartão único com miniatura compacta e metadados ao lado.
 - Editores 1.1.5 com botão Colar; ferramentas de empacotamento atualizadas.
 - Android 1.3.6: preparação dos motores visível, ícone e interface revisados.
+
+## 1.4.5 — 2026-10-17
+
+- Vídeo único no modo playlist vira um item selecionável, sem coleção falsa com zero vídeos.
+- Link de vídeo com list aponta para a coleção; coleções vazias falham com mensagem clara.
+- Limpa resultado anterior ao indexar; desabilita download sem seleção.
+- Menu do site renomeado para Plugins.

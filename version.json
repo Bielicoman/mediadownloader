@@ -1,7 +1,7 @@
 {
   "pluginId": "com.alexascencio.mediadownloader",
   "name": "Media Downloader",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "channel": "stable",
   "author": "Alex Ascencio",
   "type": "CEP",
@@ -13,18 +13,18 @@
     "macOS"
   ],
   "releaseDate": "2026-10-17",
-  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Adobe-1.4.4.zip",
-  "zipUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Adobe-1.4.4.zip",
+  "downloadUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.5/MediaDownloader-Adobe-1.4.5.zip",
+  "zipUrl": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.5/MediaDownloader-Adobe-1.4.5.zip",
   "mandatory": false,
   "desktop": {
-    "version": "1.4.4",
+    "version": "1.4.5",
     "releaseDate": "2026-10-17",
-    "releasePage": "https://github.com/Bielicoman/mediadownloader/releases/tag/v1.4.4",
+    "releasePage": "https://github.com/Bielicoman/mediadownloader/releases/tag/v1.4.5",
     "builds": {
       "win32-x64": {
         "format": "exe",
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Windows-x64-Setup.exe",
-        "version": "1.4.4"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.5/MediaDownloader-Windows-x64-Setup.exe",
+        "version": "1.4.5"
       },
       "darwin-arm64": {
         "format": "dmg",
@@ -74,24 +74,24 @@
     "1.4.1": "Playlists com escolha, lista e grade ajustáveis, miniaturas alternativas, ações de download acessíveis e atualização verificada no Windows e Adobe.",
     "1.4.2": "Atualizador corrigido, idiomas, demonstração interativa, documentação e avisos de instalação revisados.",
     "1.4.3": "Cartão de metadados com seis dados principais, capa ampla e ícones de compatibilidade, mantendo a ficha completa.",
-    "1.4.4": "Colar pelo processo principal, miniatura compacta ao lado dos metadados e atualização dos componentes de distribuição."
+    "1.4.5": "Corrige vídeo único indexado como playlist vazia, normaliza links de coleção e impede sucesso com lista vazia."
   },
   "integrations": {
-    "version": "1.1.5",
+    "version": "1.1.6",
     "channel": "beta",
     "resolve": {
-      "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Resolve-1.1.5.zip",
-      "sha256": "5e5561c6d139b46b2a8febd6fbf32a9759b9ad9401c86a0be4add58c52cc9328",
+      "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.5/MediaDownloader-Resolve-1.1.6.zip",
+      "sha256": "c52d69b1c08c944a144abb6664bacbcc58112676cabe50f95ad91b3b29409cdc",
       "nativeValidation": "pending"
     },
     "editors": {
       "windows": {
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Editores-Windows-Setup.exe",
-        "sha256": "b0516d8030bf98e3ddfa896e10054677b5a5107a555da5862829ef68b4bef8b3"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.5/MediaDownloader-Editores-Windows-Setup.exe",
+        "sha256": "24aedd9ecad60b2867836a0dd8519a3cd02c1e471c07e9f86dc8f552be70a43f"
       },
       "macOS": {
-        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Editores-macOS-1.1.5.zip",
-        "sha256": "78141224cb237d9b117b22db5bd4a0fcb0456433299d139a7d05b76547c52aaf"
+        "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.5/MediaDownloader-Editores-macOS-1.1.6.zip",
+        "sha256": "8adc6a548e342249813404aeb071feaa63562d62e77a179c0350207845bfba23"
       },
       "targets": [
         "avid",
@@ -103,9 +103,9 @@
     }
   },
   "adobePreview": {
-    "version": "1.4.4",
-    "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Adobe-1.4.4.zip",
+    "version": "1.4.5",
+    "url": "https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.5/MediaDownloader-Adobe-1.4.5.zip",
     "channel": "beta"
   },
-  "sha256": "5e384667188d596ac41506d943d93346c1d1df0fd16c44d6598c48e3c12cb794"
+  "sha256": "62f83d5d6aa9bfae108a8b6e0cb8e0cd4c4d7fcb4769cf5251a2ce9dce703b7e"
 }

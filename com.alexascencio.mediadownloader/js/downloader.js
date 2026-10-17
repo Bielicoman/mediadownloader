@@ -304,13 +304,17 @@
         fetchPlaylistOrChannel: function (url, onProgressStatus) {
             if (!isNode) return Promise.reject(new Error("Disponível apenas no app Desktop."));
             var self = this;
+            // Prefer the collection URL when a watch link also carries a playlist.
+            try { var parsed = new URL(url); var listId = parsed.searchParams.get("list");
+                if (/(^|\.)youtube\.com$/i.test(parsed.hostname) && listId) url = "https://www.youtube.com/playlist?list=" + encodeURIComponent(listId);
+            } catch (_) {}
             var platform = this.detectPlatform(url);
             if (onProgressStatus) onProgressStatus("Lendo a lista de vídeos...");
 
             return window.BinManager.findYtDlp().then(function (ytdlp) {
                 if (!ytdlp.found) throw new Error("yt-dlp não encontrado.");
                 return new Promise(function (resolve, reject) {
-                    var args = ["--encoding", "utf-8", "--flat-playlist", "-J", "--no-warnings",
+                    var args = ["--encoding", "utf-8", "--flat-playlist", "--yes-playlist", "-J", "--no-warnings",
                         "--socket-timeout", "20", "--cache-dir", cacheDir()].concat(self._cookiesArgs(), [url]);
                     var child = child_process.spawn(ytdlp.path, args, { windowsHide: true });
                     var out = [], err = "";
@@ -321,14 +325,17 @@
                         if (code !== 0) return reject(new Error(friendlyError(err, code)));
                         try {
                             var info = JSON.parse(Buffer.concat(out).toString("utf8"));
-                            var items = (info.entries || []).map(function (it, idx) {
+                            var isCollection = Array.isArray(info.entries) || info._type === "playlist" || info._type === "multi_video";
+                            var entries = Array.isArray(info.entries) ? info.entries : (!isCollection && info.id ? [info] : []);
+                            if (!entries.length) throw new Error("Nenhum vídeo disponível nesta playlist. Confira o link e o acesso à coleção.");
+                            var items = entries.map(function (it, idx) {
                                 it=it||{};var unavailable=(!it.id&&!it.url)||/\[(?:Private|Deleted) video\]/i.test(it.title||"");
                                 var thumb = it.thumbnail || (it.thumbnails && it.thumbnails.length ? it.thumbnails[it.thumbnails.length - 1].url : "");
                                 if (!thumb && it.id) thumb = "https://i.ytimg.com/vi/" + it.id + "/hqdefault.jpg";
                                 return {
                                     id: it.id || "item_" + idx,
                                     index: idx + 1,
-                                    url: it.url || (it.id ? "https://www.youtube.com/watch?v=" + it.id : url),
+                                    url: it.webpage_url || (it.id && /youtube/i.test(it.ie_key || info.extractor || platform.id || "") ? "https://www.youtube.com/watch?v=" + it.id : it.url || url),
                                     title: it.title || ("Vídeo " + (idx + 1)),
                                     uploader: it.uploader || it.channel || info.title || "YouTube",
                                     durationFormatted: it.duration ? formatDuration(it.duration) : "--:--",
@@ -342,6 +349,7 @@
                                 uploader: info.uploader || info.channel || "YouTube",
                                 platform: platform,
                                 itemsCount: items.length,
+                                singleVideo: !isCollection,
                                 items: items
                             });
                         } catch (pe) {

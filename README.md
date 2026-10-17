@@ -9,10 +9,10 @@ Aplicativo gratuito de Alex Ascencio para mídia autorizada, playlists e arquivo
 
 | Produto | Versão | Canal | Pacote |
 |---|---|---|---|
-| Desktop Windows 10/11 x64 | 1.4.4 | Estável | [EXE](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Windows-x64-Setup.exe) |
-| Painel Premiere e After Effects | 1.4.4 | Beta | [ZIP Adobe](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Adobe-1.4.4.zip) |
-| Editores Windows: Resolve, CapCut e Avid | 1.1.5 | Beta | [Instalador](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Editores-Windows-Setup.exe) |
-| Editores macOS: Final Cut, Resolve e Avid | 1.1.5 | Beta | [ZIP Mac](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.4/MediaDownloader-Editores-macOS-1.1.5.zip) |
+| Desktop Windows 10/11 x64 | 1.4.5 | Estável | [EXE](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.5/MediaDownloader-Windows-x64-Setup.exe) |
+| Painel Premiere e After Effects | 1.4.5 | Beta | [ZIP Adobe](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.5/MediaDownloader-Adobe-1.4.5.zip) |
+| Editores Windows: Resolve, CapCut e Avid | 1.1.6 | Beta | [Instalador](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.5/MediaDownloader-Editores-Windows-Setup.exe) |
+| Editores macOS: Final Cut, Resolve e Avid | 1.1.6 | Beta | [ZIP Mac](https://github.com/Bielicoman/mediadownloader/releases/download/v1.4.5/MediaDownloader-Editores-macOS-1.1.6.zip) |
 | Android | 1.3.6 | Beta | [ARM64](https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.6/MediaDownloader-Android-arm64.apk) · [Universal](https://github.com/Bielicoman/mediadownloader/releases/download/android-v1.3.6/MediaDownloader-Android-universal.apk) |
 | Desktop macOS / Linux | 1.0.0 | Beta, pacote anterior | [Escolher arquitetura](https://mediadownloader-blush.vercel.app/#baixar) |
 
