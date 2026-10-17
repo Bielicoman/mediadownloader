@@ -29,3 +29,18 @@ input:focus-visible,select:focus-visible{outline:2px solid #ffb020;outline-offse
  .site-header .language-switch{position:absolute;top:14px;right:16px}
  .site-header .language-switch select{max-width:120px}
 }
+
+.github-support{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:28px;padding:36px;border:1px solid #ffbd3e40;border-radius:20px;background:radial-gradient(ellipse at 0 0,#ffb02016,transparent 65%),#10141b;box-shadow:inset 0 1px #ffde8720,0 16px 45px #0003;overflow:hidden}
+.github-star-art{width:86px;height:86px;display:grid;place-items:center;color:#ffbf37;filter:drop-shadow(0 6px 14px #ffb02025)}
+.github-support-label{display:block;font-size:10px;letter-spacing:1.4px;color:#d2ad68;margin-bottom:10px}
+.github-support-copy h2{font-size:clamp(24px,2.5vw,32px);letter-spacing:-1px;line-height:1.25}
+.github-support-copy p{max-width:500px;margin-top:12px;font-size:13px;color:#a8b1bf;line-height:1.8}
+.github-support-action{display:flex;flex-direction:column;align-items:center;gap:11px;min-width:0}
+.github-star-button{gap:10px;min-height:52px;white-space:nowrap;box-shadow:0 7px 24px #ffb02025,inset 0 1px #ffe7b7}
+.github-star-button svg{flex:none}.github-support-action small{font-size:10px;color:#939fae;text-align:center}
+@media(max-width:1000px){.github-support{grid-template-columns:auto minmax(0,1fr);padding:28px;gap:20px}.github-support-action{grid-column:2;align-items:flex-start}.github-support-action small{text-align:left}}
+@media(max-width:600px){.github-support{grid-template-columns:minmax(0,1fr);gap:18px;padding:24px}.github-star-art{width:58px;height:58px}.github-star-art svg{width:54px;height:54px}.github-support-action{grid-column:1;align-items:stretch}.github-star-button{font-size:12px;padding-inline:12px;gap:8px;white-space:normal}.github-support-action small{text-align:center}}
+
+.donation-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:40px;align-items:center;padding:32px;border:1px solid #ffffff17;border-radius:18px;background:#10151c}
+.donation-card h2{font-size:clamp(24px,2.5vw,30px);letter-spacing:-.8px}.donation-card>div>p{font-size:13px;color:#a5b0bf;margin-top:12px;line-height:1.8}.donation-copy label{display:block;font-size:12px;color:#d6dce6;margin-bottom:9px}.pix-key-row{display:flex;gap:9px;min-width:0}.pix-key-row input{width:100%;min-width:0;background:#080c12;border:1px solid #ffffff1c;border-radius:8px;color:#dde3ec;font:12px Manrope,sans-serif;padding:13px 11px}.pix-key-row button{flex:none;font-size:11px;padding-inline:13px;min-height:46px;border-radius:8px}.pix-feedback{min-height:20px;margin:7px 0 4px;font-size:11px;color:#9ce6bf}.donation-copy small{font-size:10px;color:#99a5b5;line-height:1.6;display:block}
+@media(max-width:850px){.donation-card{grid-template-columns:minmax(0,1fr);gap:22px;padding:25px}}@media(max-width:420px){.pix-key-row{flex-direction:column}.pix-key-row input{min-height:46px}.pix-key-row button{width:100%}}

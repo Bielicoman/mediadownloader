@@ -1,6 +1,19 @@
 (function(root){'use strict';
 var languages={pt:'Português (Brasil)',en:'English',es:'Español',fr:'Français · Beta',de:'Deutsch · Beta',it:'Italiano · Beta'};
-var rows=`Idioma|Language|Idioma|Langue|Sprache|Lingua
+var rows=`APOIO VOLUNTÁRIO|VOLUNTARY SUPPORT|APOYO VOLUNTARIO|SOUTIEN VOLONTAIRE|FREIWILLIGE UNTERSTÜTZUNG|SUPPORTO VOLONTARIO
+Ajude o projeto a continuar.|Help keep the project going.|Ayuda a que el proyecto continúe.|Aidez le projet à continuer.|Hilf dem Projekt weiterzumachen.|Aiuta il progetto a continuare.
+Se quiser contribuir com o desenvolvimento, você pode fazer uma doação por Pix. O aplicativo continua gratuito para todos.|You can support development with a voluntary Pix donation. The app remains free for everyone.|Puedes apoyar el desarrollo con una donación voluntaria por Pix. La app sigue siendo gratuita para todos.|Vous pouvez soutenir le développement par un don volontaire via Pix. L’application reste gratuite pour tous.|Du kannst die Entwicklung freiwillig per Pix unterstützen. Die App bleibt für alle kostenlos.|Puoi sostenere lo sviluppo con una donazione volontaria tramite Pix. L’app resta gratuita per tutti.
+Chave Pix · e-mail|Pix key · email|Clave Pix · correo|Clé Pix · e-mail|Pix-Schlüssel · E-Mail|Chiave Pix · e-mail
+Copiar chave Pix|Copy Pix key|Copiar clave Pix|Copier la clé Pix|Pix-Schlüssel kopieren|Copia chiave Pix
+Confira o beneficiário no seu banco antes de confirmar a doação.|Verify the recipient in your banking app before confirming the donation.|Verifica al destinatario en tu banco antes de confirmar la donación.|Vérifiez le bénéficiaire dans votre banque avant de confirmer le don.|Prüfe den Empfänger in deiner Banking-App, bevor du die Spende bestätigst.|Verifica il beneficiario nella tua banca prima di confermare la donazione.
+Chave Pix copiada. Cole no aplicativo do seu banco.|Pix key copied. Paste it into your banking app.|Clave Pix copiada. Pégala en tu banco.|Clé Pix copiée. Collez-la dans votre application bancaire.|Pix-Schlüssel kopiert. Füge ihn in deiner Banking-App ein.|Chiave Pix copiata. Incollala nell’app della tua banca.
+Chave selecionada. Use Copiar ou Ctrl+C no seu dispositivo.|Key selected. Use Copy or Ctrl+C on your device.|Clave seleccionada. Usa Copiar o Ctrl+C.|Clé sélectionnée. Utilisez Copier ou Ctrl+C.|Schlüssel ausgewählt. Verwende Kopieren oder Strg+C.|Chiave selezionata. Usa Copia o Ctrl+C.
+FEITO COM CÓDIGO ABERTO|BUILT WITH OPEN SOURCE|HECHO CON CÓDIGO ABIERTO|CRÉÉ EN OPEN SOURCE|MIT OPEN SOURCE ENTWICKELT|REALIZZATO CON CODICE APERTO
+Gostou do app? Dê uma estrela.|Enjoying the app? Give it a star.|¿Te gusta la app? Dale una estrella.|L’application vous plaît ? Ajoutez une étoile.|Gefällt dir die App? Gib ihr einen Stern.|Ti piace l’app? Lascia una stella.
+Seu apoio ajuda outras pessoas a encontrar o Media Downloader e acompanhar as próximas versões.|Your support helps others discover Media Downloader and follow upcoming releases.|Tu apoyo ayuda a otras personas a descubrir Media Downloader y seguir las próximas versiones.|Votre soutien aide à faire découvrir Media Downloader et ses prochaines versions.|Deine Unterstützung hilft anderen, Media Downloader und kommende Versionen zu entdecken.|Il tuo supporto aiuta altri a scoprire Media Downloader e le prossime versioni.
+Dar uma estrela no GitHub|Star on GitHub|Dar una estrella en GitHub|Ajouter une étoile sur GitHub|Stern auf GitHub vergeben|Lascia una stella su GitHub
+Entre no GitHub e clique em Star para apoiar.|Sign in to GitHub and click Star to support.|Inicia sesión en GitHub y pulsa Star para apoyar.|Connectez-vous à GitHub et cliquez sur Star.|Melde dich bei GitHub an und klicke auf Star.|Accedi a GitHub e fai clic su Star.
+Idioma|Language|Idioma|Langue|Sprache|Lingua
 Configurações|Settings|Configuración|Paramètres|Einstellungen|Impostazioni
 Configurações & Diagnóstico|Settings & diagnostics|Configuración y diagnóstico|Paramètres et diagnostic|Einstellungen und Diagnose|Impostazioni e diagnostica
 Salvar Configurações|Save settings|Guardar configuración|Enregistrer les paramètres|Einstellungen speichern|Salva impostazioni

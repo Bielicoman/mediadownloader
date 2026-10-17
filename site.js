@@ -2,3 +2,6 @@
 
 // Navegação suave com hash e preferência de movimento respeitada.
 document.addEventListener('click',event=>{const link=event.target.closest('a[href^="#"]');if(!link||event.defaultPrevented||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;const hash=link.getAttribute('href');if(hash.length<2)return;const target=document.getElementById(decodeURIComponent(hash.slice(1)));if(!target)return;event.preventDefault();history.pushState(null,'',hash);target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});});
+
+// Copia somente a chave pública fornecida pelo criador; nenhum pagamento é iniciado.
+(()=>{const button=document.querySelector('[data-copy-pix]'),input=document.getElementById('pixKey'),feedback=document.getElementById('pixFeedback');if(!button||!input||!feedback)return;button.addEventListener('click',async()=>{try{if(!navigator.clipboard||!navigator.clipboard.writeText)throw Error('clipboard unavailable');await navigator.clipboard.writeText(input.value);feedback.textContent='Chave Pix copiada. Cole no aplicativo do seu banco.';}catch{input.focus();input.select();feedback.textContent='Chave selecionada. Use Copiar ou Ctrl+C no seu dispositivo.';}});})();

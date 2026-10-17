@@ -7,8 +7,9 @@ async function main(){
  for(const name of ['media-info.js','downloader.js','binManager.js'])fs.writeFileSync(path.join(engineDir,name),asar.extractFile(archive,path.join('src','js',name)));
  const version=JSON.parse(asar.extractFile(archive,'package.json')).version;
  const engine=createEngine({engineDir,stateDir:path.join(out,'state'),outputDir:out,binDirs:[path.join(resources,'bin')]});
- const metadata=await engine.downloader.fetchMetadata('https://www.youtube.com/watch?v=jNQXAC9IVRw');
- const job=engine.downloader.startDownload({url:'https://www.youtube.com/watch?v=jNQXAC9IVRw',preset:'best',outputDir:out},()=>{},()=>{}),result=await job;
+ const sourceUrl=process.argv[2]||'https://www.youtube.com/watch?v=jNQXAC9IVRw';
+ const metadata=await engine.downloader.fetchMetadata(sourceUrl);
+ const job=engine.downloader.startDownload({url:sourceUrl,preset:'best',outputDir:out},()=>{},()=>{}),result=await job;
  const ffmpeg=await engine.binaries.findFfmpeg(),ffprobe=engine.binaries.findFfprobe(ffmpeg.path);
  const probe=JSON.parse(execFileSync(ffprobe,['-v','error','-show_streams','-show_format','-of','json',result.filePath],{encoding:'utf8',windowsHide:true}));
  execFileSync(ffmpeg.path,['-v','error','-i',result.filePath,'-f','null','-'],{windowsHide:true,timeout:60000});
