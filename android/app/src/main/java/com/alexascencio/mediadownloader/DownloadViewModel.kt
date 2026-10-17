@@ -70,7 +70,7 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
     private fun pedidoBase(url:String)=YoutubeDLRequest(url).apply {
         addOption("--ignore-config");addOption("--no-playlist");addOption("--no-colors")
         addOption("--socket-timeout","20");addOption("--retries","2");addOption("--fragment-retries","2")
-        addOption("--concurrent-fragments","4");addOption("--remote-components","ejs:github")
+        addOption("--concurrent-fragments","8");addOption("--remote-components","ejs:github")
         addOption("--cache-dir",File(getApplication<Application>().cacheDir,"yt-cache").absolutePath)
     }
     private fun cancelarPrevia(){previewId?.let{YoutubeDL.destroyProcessById(it)};previewJob?.cancel();previewJob=null;previewId=null}
@@ -122,14 +122,28 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
     internal fun converter(source:File,perfil:Perfil,dir:File):File {
         val app=getApplication<Application>();val ext=when(perfil){Perfil.AUDIO_MP3->"mp3";Perfil.AUDIO_WAV->"wav";else->"mp4"}
         val output=File(dir,"${source.nameWithoutExtension}.edit.$ext")
+        val base=File(app.noBackupFilesDir,"youtubedl-android/packages")
+        val libraryPath=listOf("python","ffmpeg","aria2c").joinToString(":"){File(base,"$it/usr/lib").absolutePath}
+        val ffmpeg=File(app.applicationInfo.nativeLibraryDir,"libffmpeg.so").absolutePath
+        var description=""
+        if(!perfil.ehAudio){
+            val probe=ProcessBuilder(ffmpeg,"-nostdin","-hide_banner","-i",source.absolutePath).redirectErrorStream(true)
+            probe.environment()["LD_LIBRARY_PATH"]=libraryPath
+            val process=probe.start();conversion=process
+            description=process.inputStream.bufferedReader().readText();process.waitFor();conferirCancelamento()
+        }
+        val copyVideo=Regex("Video: h264[^\n]*yuv420p(?:\\(|[, ])").containsMatchIn(description)
+        val copyAudio=Regex("Audio: aac[^\n]*48000 Hz").containsMatchIn(description)
         val codec=when(perfil){
             Perfil.AUDIO_MP3->listOf("-vn","-c:a","libmp3lame","-b:a","320k")
             Perfil.AUDIO_WAV->listOf("-vn","-c:a","pcm_s24le","-ar","48000")
-            else->listOf("-map","0:v:0","-map","0:a:0?","-c:v","libx264","-crf","16","-preset","veryfast","-pix_fmt","yuv420p","-threads","2","-c:a","aac","-b:a","320k","-ar","48000","-movflags","+faststart")
+            else->listOf("-map","0:v:0","-map","0:a:0?")+
+                (if(copyVideo)listOf("-c:v","copy")else listOf("-c:v","libx264","-crf","16","-preset","veryfast","-pix_fmt","yuv420p","-threads","2"))+
+                (if(copyAudio)listOf("-c:a","copy")else listOf("-c:a","aac","-b:a","320k","-ar","48000"))+
+                listOf("-movflags","+faststart")
         }
-        val base=File(app.noBackupFilesDir,"youtubedl-android/packages")
         val builder=ProcessBuilder(listOf(File(app.applicationInfo.nativeLibraryDir,"libffmpeg.so").absolutePath,"-nostdin","-hide_banner","-loglevel","error","-y","-i",source.absolutePath)+codec+listOf("-progress","pipe:1",output.absolutePath)).redirectErrorStream(true)
-        builder.environment()["LD_LIBRARY_PATH"]=listOf("python","ffmpeg","aria2c").joinToString(":"){File(base,"$it/usr/lib").absolutePath}
+        builder.environment()["LD_LIBRARY_PATH"]=libraryPath
         fun status(p:Float?)=Estado.Baixando(p,if(perfil.ehAudio)"Convertendo o áudio…" else "Preparando MP4 para edição…")
         _estado.value=status(null);val proc=builder.start();conversion=proc;val errors=StringBuilder()
         try {
