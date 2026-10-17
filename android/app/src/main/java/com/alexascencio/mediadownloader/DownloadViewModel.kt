@@ -43,7 +43,9 @@ class DownloadViewModel(app:Application):AndroidViewModel(app) {
     @Volatile private var cancelled=false
     private var downloadJob:Job?=null
     private var previewJob:Job?=null
-    init {iniciarMotores()}
+    private val _appUpdate=MutableStateFlow<AppUpdate?>(null)
+    val appUpdate=_appUpdate.asStateFlow()
+    init {iniciarMotores();viewModelScope.launch(Dispatchers.IO){while(isActive){if(downloadJob?.isActive!=true)try{_appUpdate.value=AppUpdates.checkAndDownload(getApplication())}catch(e:Exception){anotar("Atualização do aplicativo indisponível: ${e.message}")};delay(21600000L)}}}
     private fun iniciarMotores() {
         viewModelScope.launch(Dispatchers.IO) {
             try {

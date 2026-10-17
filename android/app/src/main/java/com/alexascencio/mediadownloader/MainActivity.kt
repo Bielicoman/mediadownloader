@@ -71,6 +71,7 @@ class MainActivity:ComponentActivity() {
     val estado by vm.estado.collectAsStateWithLifecycle()
     val previa by vm.previa.collectAsStateWithLifecycle()
     val motor by vm.motor.collectAsStateWithLifecycle()
+    val appUpdate by vm.appUpdate.collectAsStateWithLifecycle()
     val registro by vm.registro.collectAsStateWithLifecycle()
     val context=LocalContext.current;val clipboard=LocalClipboardManager.current
     var url by rememberSaveable{mutableStateOf("")}
@@ -106,7 +107,7 @@ class MainActivity:ComponentActivity() {
                 Estado.Preparando->{Text(motor,color=Apagado,fontSize=13.sp);LinearProgressIndicator(modifier=Modifier.fillMaxWidth())}
                 Estado.Sondando->{Text("Acessando o vídeo…",color=Ambar);LinearProgressIndicator(modifier=Modifier.fillMaxWidth())}
                 is Estado.Baixando->{Text(e.linha,color=Ambar);if(e.progresso!=null){LinearProgressIndicator(progress={e.progresso},modifier=Modifier.fillMaxWidth());Text("${(e.progresso*100).toInt()}% desta etapa",color=Apagado,fontSize=12.sp)}else LinearProgressIndicator(modifier=Modifier.fillMaxWidth())}
-                is Estado.Concluido->{Text("Arquivo salvo",color=Verde,fontWeight=FontWeight.Bold);Text(e.nomeArquivo,maxLines=3,overflow=TextOverflow.Ellipsis);Text("${if(perfil.ehAudio)"Música" else "Filmes"}/MediaDownloader",color=Apagado,fontSize=12.sp)
+                is Estado.Concluido->{Text("Arquivo salvo",color=Verde,fontWeight=FontWeight.Bold);Text(e.nomeArquivo,maxLines=3,overflow=TextOverflow.Ellipsis);Text("${if(perfil==Perfil.CAPA)"Imagens" else if(perfil.ehAudio)"Música" else "Filmes"}/MediaDownloader",color=Apagado,fontSize=12.sp)
                     if(e.uri.isNotBlank())OutlinedButton(onClick={try{context.startActivity(Intent.createChooser(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(e.uri),e.mime).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),"Abrir mídia"))}catch(_:Exception){aviso="Abra a mídia pelo gerenciador de arquivos do celular."}}){Text("Abrir arquivo")}
                     TextButton(onClick=vm::limpar){Text("Baixar outro")}}
                 is Estado.Falhou->{Text("Não foi possível baixar",color=Ambar,fontWeight=FontWeight.Bold);Text(e.mensagem,fontSize=13.sp,color=Apagado);TextButton(onClick=vm::limpar){Text("Tentar novamente")}}
@@ -114,6 +115,7 @@ class MainActivity:ComponentActivity() {
             }
             if(aviso.isNotBlank())Text(aviso,color=Ambar,fontSize=13.sp)
             Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){Text(motor,modifier=Modifier.weight(1f),color=Apagado,fontSize=11.sp);TextButton(onClick=vm::atualizarMotor,enabled=!ocupado){Text("Atualizar motor",fontSize=12.sp)}}
+            appUpdate?.let { update->OutlinedButton(enabled=!ocupado,onClick={try{if(Build.VERSION.SDK_INT>=26&&!context.packageManager.canRequestPackageInstalls()){context.startActivity(Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:"+context.packageName)))}else{val uri=androidx.core.content.FileProvider.getUriForFile(context,context.packageName+".updates",update.file);context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(uri,"application/vnd.android.package-archive").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))}}catch(_:Exception){aviso="Não foi possível abrir o instalador do Android."}}){Text("Instalar atualização "+update.version)}}
             if(registro.isNotEmpty()){
                 TextButton(onClick={detalhes=!detalhes}){Text(if(detalhes)"Ocultar detalhes técnicos" else "Ver detalhes técnicos",fontSize=12.sp)}
                 if(detalhes)SelectionContainer{Text(registro.takeLast(18).joinToString("\n"),fontFamily=FontFamily.Monospace,fontSize=10.sp,color=Apagado,modifier=Modifier.fillMaxWidth().background(Superficie,RoundedCornerShape(8.dp)).padding(12.dp))}
