@@ -56,7 +56,7 @@ jobs:
             cd android && gradle --no-daemon connectedDebugAndroidTest && cd ..
             mkdir -p dist/android-device
             adb exec-out run-as com.alexascencio.mediadownloader tar -cf - files/device-test > dist/android-device/results.tar
-            adb uninstall com.alexascencio.mediadownloader
+            adb shell pm list packages | grep -qx "package:com.alexascencio.mediadownloader" && adb uninstall com.alexascencio.mediadownloader || test -z "$(adb shell pm list packages com.alexascencio.mediadownloader)"
             adb install android/app/build/outputs/apk/release/app-universal-release.apk
             adb shell am start -n com.alexascencio.mediadownloader/.MainActivity -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT https://youtu.be/Uw-_a0taISM
             sleep 35

@@ -9,7 +9,7 @@ enum class Perfil(val rotulo:String,val detalhe:String,val ehAudio:Boolean) {
     AUDIO_WAV("Áudio WAV","PCM 24-bit / 48 kHz, pronto para edição.",true)
 }
 enum class Qualidade(val rotulo:String,val limite:Int?) {
-    MAXIMA("Máxima disponível",null),UHD("Até 4K",2160),FULLHD("Até Full HD",1080),HD("Até HD",720)
+    MAXIMA("Máxima disponível",null),OITO_K("Até 8K · 4320p",4320),UHD("Até 4K · 2160p",2160),QHD("Até 2K · 1440p",1440),FULLHD("Até Full HD · 1080p",1080),HD("Até HD · 720p",720),SD("Até 480p",480),BAIXA("Até 360p",360),MINIMA("Até 240p",240),ECONOMICA("Até 144p",144)
 }
 fun youtubeId(link:String):String?=runCatching {
     val uri=URI(link);val host=uri.host?.lowercase()?.removePrefix("www.")?.removePrefix("m.")
