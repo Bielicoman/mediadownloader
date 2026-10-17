@@ -8,7 +8,7 @@ O link `https://www.youtube.com/watch?v=Uw-_a0taISM` fornecido na captura retorn
 
 O APK publicado anteriormente usava youtubedl-android 0.17.3. A fonte 1.3.1 foi atualizada para 0.18.1 com QuickJS, atualização diária/manual do yt-dlp e componentes EJS oficiais. A interface ganhou Manrope, miniatura real, título/autor/duração quando obtidos, seletores compactos independentes, cancelamento e detalhes técnicos recolhidos. O compartilhamento é tratado também quando a Activity já está aberta.
 
-Cada solicitação usa uma pasta temporária isolada e lê o caminho final informado pelo yt-dlp. A publicação no MediaStore limpa entradas incompletas se falhar. Android antigo solicita permissão de gravação na interface. MP4 é convertido para H.264/AAC; MP3 e WAV usam codecs explícitos. Vídeo original preserva os codecs da fonte.
+Cada solicitação usa uma pasta temporária isolada e lê o caminho final informado pelo yt-dlp. A publicação no MediaStore limpa entradas incompletas se falhar. Android antigo solicita permissão de gravação na interface. MP4 reutiliza H.264 yuv420p e AAC 48 kHz compatíveis, convertendo apenas os demais casos; MP3 e WAV usam codecs explícitos. Vídeo original preserva os codecs da fonte.
 
 Há uma assinatura de release permanente configurada no armazenamento de segredos do CI. APKs antigos assinados com uma chave de debug diferente podem exigir a remoção da instalação antiga antes de instalar a nova; não prometer atualização por cima. As mídias já salvas nas pastas públicas são independentes do aplicativo.
 
@@ -24,8 +24,14 @@ A API web foi testada localmente com download real e decodificação de vídeo o
 
 O SDK Resolve atual retorna Promises na inicialização e na obtenção do host. O companion agora aguarda ambas e valida o objeto recebido. Os testes cobrem essa sequência e os contratos de importação, mas a conexão MCP local ao Resolve não se estabeleceu; importação nativa ainda pendente.
 
-Um teste em uma janela Electron real do companion 1.1.0 baixou o vídeo público `jNQXAC9IVRw`, confirmou o MP4 no disco, alternou para o destino Avid e exportou FCPXML. Evidências locais ficam em `work/companion-e2e`. O diálogo de escolha do destino XML foi substituído apenas no executor de teste para salvar na pasta de teste; o código IPC e a geração do arquivo são os de produção.
+Um teste em uma janela Electron real do companion 1.1.1 baixou o vídeo público `jNQXAC9IVRw`, confirmou o MP4 no disco, alternou para o destino Avid e exportou FCPXML. Evidências locais ficam em `work/companion-e2e`. O diálogo de escolha do destino XML foi substituído apenas no executor de teste para salvar na pasta de teste; o código IPC e a geração do arquivo são os de produção.
 
 Avid é entrega externa de arquivos para o Source Browser, não plugin AVX. Final Cut é exportação FCPXML por companion externo, não extensão interna. Não foram executados Media Composer ou Final Cut Pro neste computador. O pacote Mac inclui um launcher que obtém o runtime Electron oficial e verifica o SHA-256; a execução no macOS permanece pendente.
 
 Os ZIPs publicados como prévia têm SHA-256 e passaram pela checagem CRC do empacotador. Os testes automatizados do repositório e da API web passaram. Isso não substitui testes dentro de cada editor.
+
+## Refinamento de prévia e velocidade
+
+A página oficial agora oferece limites de resolução de 144p a 8K, além de máxima disponível. A miniatura do YouTube começa a carregar a partir do ID do link no evento de entrada/colar, sem consulta ao worker. A rede ainda determina o tempo para a imagem aparecer. Imagens placeholder/indisponíveis são identificadas; outros serviços dependem de metadados e não recebem uma imagem inventada. A prévia foi verificada na produção, com imagem real de 480px, e o formulário em viewport de 390px não teve transbordamento horizontal.
+
+Web e Android passaram de quatro para oito fragmentos simultâneos. O backend web após essa alteração preparou o vídeo público curto jNQXAC9IVRw em aproximadamente 12,2 segundos localmente. O arquivo final real foi H.264 yuv420p 320x240 e AAC 48 kHz, decodificado integralmente com FFmpeg sem erro. O limite selecionado foi 1080p e a fonte permaneceu 240p, sem ampliação. Este teste isolado não mede ganho comparativo nem garante tempo para outros vídeos ou redes.
